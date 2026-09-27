@@ -1,6 +1,4 @@
-# ISO/IEC 27001:2022 — krav och Annex A-kontroller
-# Flyttad från method-grc-verktyg.html (fas 0). Redigera här, inte i koden.
-# ID:n är alltid strängar. "guidance" = vad revisorn förväntar sig se som bevis.
+# YAML Data för ISO27001-ramverket.
 
 schemaVersion: 1
 id: iso27001

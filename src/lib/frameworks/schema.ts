@@ -1,13 +1,15 @@
 import { z } from 'zod'
 
-// Gemensamt format för alla ramverk (ISO 27001, NIS2, DORA ...).
-// Nya fält (t.ex. automatiska molnkontroller, mappningar mellan ramverk)
-// läggs till som valfria fält så att befintliga YAML-filer fortsätter fungera.
+/* Schema för ramverk. Använder zod för att validera data. 
+  Huvudpunkter för design är:
+  - Alla ID:n ska vara strängar och inte integers p.g.a strängar är mer flexibla.
+  - Vissa fält är valfria då vissa kontroller inte kräver motiviering eller ramverk saknar vissa fält.
+*/
 
 export const ControlSchema = z.object({
-  id: z.string().min(1), // alltid sträng: "4.1", "A.8.10"
+  id: z.string().min(1), // alltid sträng, inte int
   title: z.string().min(1),
-  guidance: z.string().optional(), // vad revisorn förväntar sig se som bevis
+  guidance: z.string().optional(), // bevis för kontrollen
 })
 
 export const GroupSchema = z.object({
@@ -20,7 +22,7 @@ export const SectionSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
   soa: z.boolean(), // true = ingår i Statement of Applicability
-  unit: z.string(), // "krav" / "kontroller", används i UI-texter
+  unit: z.string(), // "krav" eller "kontroll"
   groups: z.array(GroupSchema).min(1),
 })
 
@@ -38,7 +40,7 @@ export const FrameworkSchema = z
     for (const s of fw.sections)
       for (const g of s.groups)
         for (const c of g.controls) {
-          if (seen.has(c.id)) ctx.addIssue({ code: 'custom', message: `Dubblett-ID: ${c.id}` })
+          if (seen.has(c.id)) ctx.addIssue({ code: 'custom', message: `Duplication of ID: ${c.id}` })
           seen.add(c.id)
         }
   })

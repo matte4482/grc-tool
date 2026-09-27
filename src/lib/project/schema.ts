@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-// Projektfilens format (.grc.json), se ARCHITECTURE B-10 och B-17.
+// Projektfil (.grc.json), se ARCHITECTURE B-10 och B-17.
 //
-// Regler:
-// - Beräknade värden sparas aldrig (riskvärde, nivå, faktisk restrisk, uppfyllnadsgrad).
+// Huvudpunkter för design:
+// - Beräknade värden sparas inte. Logiken finns för att de ska räknas fram. 
 // - Nya fält läggs till som valfria, så att äldre projektfiler fortsätter validera.
 // - Kontroller som saknas i `controls` tolkas som ej bedömda och tillämpliga.
 // - Kopplingar mot ramverket (okända kontroll-ID:n, SoA-lås) kontrolleras i
@@ -11,11 +11,9 @@ import { z } from 'zod'
 
 export const PROJECT_SCHEMA_VERSION = 1
 
-// ── Grundtyper ──────────────────────────────────────────────────────────────
-
-const isoDate = z.iso.date() // "2026-09-22"
-const isoDateTime = z.iso.datetime({ offset: true }) // "2026-09-22T14:42:00Z"
-const text = z.string() // fritext, får vara tom
+const isoDate = z.iso.date() // Datum i format yyyy-mm-dd
+const isoDateTime = z.iso.datetime({ offset: true }) 
+const text = z.string() // fritext för eventuell beskrivning
 const name = z.string().min(1)
 
 export const RISK_ID = /^R-\d{3,}$/
@@ -28,7 +26,7 @@ export const TreatmentSchema = z.enum(['undecided', 'reduce', 'share', 'accept',
 
 export const ActionStatusSchema = z.enum(['not_started', 'in_progress', 'done'])
 
-/** Nivå 1–5 i riskmetodens skalor. */
+// Risknivå 1-5
 export const LevelSchema = z.int().min(1).max(5)
 
 export const RiskScoreSchema = z.object({
@@ -41,11 +39,11 @@ export const ChangeSchema = z.object({
   by: text,
 })
 
-// ── Evidens ─────────────────────────────────────────────────────────────────
+// Evidens 
 
 export const EvidenceSchema = z.object({
   id: z.string().regex(EVIDENCE_ID, 'Evidens-ID ska ha formen EV-001'),
-  file: name, // sökväg relativt projektfilen, t.ex. "evidens/Natverkspolicy_v2.1.pdf"
+  file: name, // sökväg till bifogad fil
   size: z.int().min(0),
   sha256: z.string().regex(/^[0-9a-f]{64}$/), // upptäcker flyttad eller ändrad fil
   source: z.enum(['manual', 'automatic']), // automatic = importerad från t.ex. CloudSecComp
@@ -54,23 +52,18 @@ export const EvidenceSchema = z.object({
   note: text.optional(),
 })
 
-// ── Kontroller och grundkrav ────────────────────────────────────────────────
+// Bedömning av kontroller
 
 export const ControlAssessmentSchema = z.object({
   status: StatusSchema,
-  /**
-   * Valfri uppdelning i teknisk och organisatorisk del (B-18). Övergripande
-   * `status` sätts alltid av konsulten; delarna är underlag, inte en beräkning.
-   */
   parts: z
     .object({
       technical: StatusSchema.optional(),
-      organizational: StatusSchema.optional(),
+      organizational: StatusSchema.optional(), // valfri status: teknisk / organisatorisk kontroll
     })
     .optional(),
   comment: text.default(''),
   owner: text.default(''),
-  /** Fritextreferens till dokument eller system, när ingen fil bifogas. */
   evidenceNote: text.default(''),
   evidence: z.array(EvidenceSchema).default([]),
   /** Gäller bara kontroller i avsnitt med soa: true. */
@@ -79,7 +72,7 @@ export const ControlAssessmentSchema = z.object({
   updated: ChangeSchema.optional(),
 })
 
-// ── Riskmetod ───────────────────────────────────────────────────────────────
+// Riskmetod - risknivåer, sannolikhet, konsekvens, acceptans.
 
 export const RiskMethodSchema = z
   .object({
@@ -109,7 +102,7 @@ export const RiskMethodSchema = z
     }),
     acceptanceThreshold: z.int().min(1).max(25),
     reviewIntervalMonths: z.int().min(1),
-    approvedBy: text.default(''),
+    approvedBy: text.default(''),     // ansvarig person
     approvedAt: isoDate.optional(),
   })
   .superRefine((m, ctx) => {
@@ -123,7 +116,7 @@ export const RiskMethodSchema = z
     })
   })
 
-// ── Risker ──────────────────────────────────────────────────────────────────
+// Risker 
 
 /**
  * Koppling mellan risk och kontroll. Effekt och typ är valfria tills
@@ -170,7 +163,7 @@ export const RiskSchema = z.object({
   history: z.array(ChangeSchema.extend({ text: name })).default([]),
 })
 
-// ── Åtgärder ────────────────────────────────────────────────────────────────
+// ── Åtgärder 
 
 export const ActionSchema = z.object({
   id: z.string().regex(ACTION_ID, 'Åtgärds-ID ska ha formen ATG-001'),
