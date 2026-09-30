@@ -118,3 +118,129 @@ footer {
   padding-bottom: 28px;
   color: var(--ink-faint);
 }
+
+/* ── Fas 1: sidhuvud med sparstatus, formulär och meddelanden ─────────── */
+
+.head-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.client {
+  margin-top: 4px;
+  font-family: var(--font-head);
+  color: #d8d4ca;
+}
+
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.save-state {
+  font-size: 12px;
+  margin-right: 6px;
+}
+.save-state.tone-ok {
+  color: #a9c98a;
+}
+.save-state.tone-warn {
+  color: #f0c27a;
+}
+.save-state.tone-error {
+  color: #f09595;
+}
+.save-state.tone-muted {
+  color: var(--ink-faint);
+}
+
+button {
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+}
+button:hover:not(:disabled) {
+  border-color: var(--gold);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+button.primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #f2efe8;
+}
+header.app button {
+  background: transparent;
+  border-color: #3d3b35;
+  color: #f2efe8;
+}
+header.app button:hover:not(:disabled) {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+input {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.row input {
+  flex: 1 1 240px;
+}
+
+.field {
+  display: grid;
+  gap: 4px;
+  max-width: 420px;
+  margin-bottom: 12px;
+}
+.field span {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.files {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.notice {
+  background: var(--amber-bg);
+  color: var(--amber);
+  border: 1px solid #fac775;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+.notice.error {
+  background: var(--red-bg);
+  color: var(--red);
+  border-color: #f7c1c1;
+}
+.notice ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}

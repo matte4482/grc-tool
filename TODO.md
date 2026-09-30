@@ -6,26 +6,39 @@ Småfix och konkreta punkter som ska åtgärdas. Claude läser den här filen in
 - Ange fil och rad när det går, och i vilken fas punkten senast måste vara åtgärdad.
 - Större beslut hör hemma i ARCHITECTURE.md, inte här.
 
-*Senast uppdaterad: 27 september 2026*
+*Senast uppdaterad: 29 september 2026*
 
-## Före fas 1 (filsparande)
+## Fas 1 (filsparande), pågår
 
-- [ ] **Bestäm mappåtkomst eller filåtkomst.** Ska konsulten välja uppdragets *mapp* (`showDirectoryPicker`) eller bara *projektfilen* (`showSaveFilePicker`)? Mappen behövs för evidens i fas 4, så valet påverkar hur sparandet byggs. Skriv in beslutet i ARCHITECTURE.
-- [ ] **Verifiera File System Access API från `file://`.** Kontrollera att `showSaveFilePicker` och `showDirectoryPicker` fungerar när `dist/index.html` öppnas från disk i Chrome och Edge, på både Mac och Windows, innan sparandet byggs.
-- [ ] **`takeId` ändrar projektet direkt** (`src/lib/project/project.ts:76–81`). När store byggs måste alla ändringar gå via store, annars uppdateras inte sparstatus och autosparning. Låt store anropa `takeId` och markera projektet som osparat.
-- [ ] **`serializeProject` kastar fel vid ogiltigt projekt** (`src/lib/project/project.ts:63–65`). Store måste fånga felet och visa det tydligt, och aldrig skriva en halv fil.
+- [x] **Bestäm mappåtkomst eller filåtkomst.** Mapp, se ARCHITECTURE B-22. *(29 sep 2026)*
+- [x] **`takeId` ändrar projektet direkt.** Nu en ren funktion som tar löpnumren och returnerar nya; store sparar dem via `newId` (B-23). *(29 sep 2026)*
+- [x] **`serializeProject` kastar fel vid ogiltigt projekt.** Store kontrollerar med `validateProject` före sparning, fångar felet och skriver aldrig (B-23). *(29 sep 2026)*
+- [ ] **Prova i riktig webbläsare från `file://`.** Bygg med `npm run build` och öppna `dist/index.html` från disk:
+  - Chrome och Edge, på Mac och Windows: välj mapp, skapa, ändra kundnamnet, spara, stäng fliken (varning ska visas), öppna igen.
+  - En synkad SharePoint- eller OneDrive-mapp: att skrivningen fungerar och att ingen konfliktkopia uppstår.
+  - Safari eller Firefox: nedladdningsläget, att "Spara" ger en fil och att den går att öppna igen.
+  - Att nedladdningen fungerar med CSP aktiv. Den använder en `blob:`-adress; `img-src` tillåter `blob:`, men nedladdning är inte provad.
+- [ ] **Autosparningen är inte provad med riktig tid.** Logiken är testad (`autosaveTick`), men timern på tio minuter och varningen vid stängning är bara provade i kod. Prova dem i webbläsaren.
+- [ ] **Beslut: localStorage som reservkopia vid krasch.** Filen är det som gäller. Ska varje ändring också skrivas till localStorage och erbjudas vid nästa start om webbläsaren kraschat innan autosparningen? Kunddata skulle då ligga i webbläsaren tills filen sparats (B-02). Om ja: bygg i fas 1 och rensa kopian när filen sparats.
+- [ ] **Rätta kriteriet för fas 1 i Plan 2.0.** "Arbetet överlever att datorn startas om och cachen rensas" stämmer inte som skäl: localStorage överlever omstart. Det verkliga kriteriet är att arbetet finns i kundens mapp och går att öppna på en annan dator.
 
 ## Före fas 2 (startsida och vyer)
 
-- [ ] **Avsnittsnamn är hårdkodade för ISO 27001** (`src/App.svelte:26–27`: `'clauses'`, `'annex-a'`). Gå igenom `framework.sections` och använd `section.unit` och `section.title`, så att NIS2 och andra ramverk fungerar utan kodändring.
+- [ ] **`App.svelte` är ett tillfälligt skal från fas 1.** Ersätt med den riktiga startsidan. Mapphandtag för "Senaste arbeten" sparas i IndexedDB (B-22), och behörigheten måste frågas om vid nästa besök.
+- [ ] **Avsnittsnamn är hårdkodade för ISO 27001** (`src/App.svelte:215–216`: `'clauses'`, `'annex-a'`). Gå igenom `framework.sections` och använd `section.unit` och `section.title`, så att NIS2 och andra ramverk fungerar utan kodändring.
 
 ## Före fas 3 (risk)
 
-- [ ] **Ö-03 måste avgöras:** regeln för faktisk restrisk (alternativ A eller B). Se ARCHITECTURE.
+- [ ] **O-03 måste avgöras:** regeln för faktisk restrisk (alternativ A eller B). Se ARCHITECTURE.
 
 ## Före fas 4 (evidens)
 
 - [ ] **Dubblerade evidens-ID:n rapporteras med fel sökväg** (`src/lib/project/schema.ts`, `unique(evidenceIds, 'evidens', 'controls')` i `ProjectSchema.superRefine`). Felet pekar alltid på `controls`, även när dubbletten sitter på en risk. Rapportera den faktiska platsen, till exempel `risks.0.evidence.0.id`, och lägg till ett test.
+
+## Före fas 5 (åtgärdsplan)
+
+- [ ] **O-04 måste avgöras:** hur åtgärder skapas och hanteras (förslag eller automatiskt, vad som händer när underlaget ändras, en åtgärd för flera brister, prioritet). Se ARCHITECTURE.
+- [ ] **README säger två olika saker om åtgärder** (4.7 "skapas automatiskt", 4.9 "föreslås"). Rätta README när O-04 är avgjord.
 
 ## Småfix, när som helst
 

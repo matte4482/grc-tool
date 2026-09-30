@@ -58,7 +58,7 @@ grc-tool/
 │   └── finalize-build.mjs            ✅ kontroll av bygget + CSP (körs av npm run build)
 ├── tests/fixtures/                   ✅ påhittade projektfiler för tester
 └── src/
-    ├── main.ts / App.svelte          ✅ startpunkt (i fas 0 ett enkelt skal)
+    ├── main.ts / App.svelte          ✅ startpunkt (i fas 1 ett enkelt skal för att skapa, öppna och spara)
     ├── app.css                       ✅ grundstil, färger från det gamla verktyget
     ├── yaml.d.ts / globals.d.ts      ✅ typning av *.yaml-importer och byggkonstanter
     ├── lib/
@@ -72,10 +72,16 @@ grc-tool/
     │   │   ├── schema.ts             ✅ zod-schema för projektfilen
     │   │   ├── project.ts            ✅ skapa, läsa in, skriva ut, kontrollera mot ramverk
     │   │   ├── project.test.ts       ✅
-    │   │   └── store.svelte.ts       app-state med Svelte-runes
+    │   │   ├── session.ts            ✅ store-logiken: projekt, sparstatus, spara, autospara
+    │   │   ├── session.test.ts       ✅
+    │   │   └── store.svelte.ts       ✅ gör sessionen reaktiv för vyerna (Svelte-runes)
     │   ├── zod-setup.ts              ✅ zod utan kodgenerering (krävs av CSP)
     │   ├── risk/                     riskmetod, riskvärden, nivåer, restrisk
-    │   ├── storage/                  öppna, spara och autospara fil
+    │   ├── storage/                  ✅ var projektfilen sparas
+    │   │   ├── target.ts             ✅ gränssnittet SaveTarget och filnamn
+    │   │   ├── folder.ts             ✅ vald mapp via File System Access API (Chrome, Edge)
+    │   │   ├── download.ts           ✅ reservläge: nedladdning (Safari, Firefox)
+    │   │   └── target.test.ts        ✅
     │   └── report/                   rapport och SoA för utskrift
     ├── views/                        en komponent per flik (se avsnitt 4)
     └── components/                   återanvändbara delar: statusväljare, filter, matris …
@@ -128,8 +134,8 @@ Funktionerna nedan är det verktyget ska kunna. Skisserna finns hos Mateusz (sk�
     - *Med typrisker:* ungefär 28 vanliga risker förifyllda.
     - *Tomt register.*
     - *Kopiera från kund:* återanvänder riskmetod och struktur från ett tidigare uppdrag, men inte bedömningarna.
-  - **Sparplats:** efter valen väljer användaren var projektfilen ska sparas.
-- **Öppna befintligt arbete:** dra in en `.grc.json`, eller välj fil. Exportfiler från det gamla verktyget känns igen och avvisas med ett tydligt meddelande (ARCHITECTURE B-16).
+  - **Sparplats:** efter valen väljer användaren uppdragets mapp, och projektfilen sparas där med kundens namn (ARCHITECTURE B-22).
+- **Öppna befintligt arbete:** välj uppdragets mapp, så hittar verktyget projektfilen. I Safari och Firefox väljs filen i stället. Exportfiler från det gamla verktyget känns igen och avvisas med ett tydligt meddelande (ARCHITECTURE B-16).
 - **Senaste arbeten:** kund, ramverk, senast ändrad och uppfyllnadsgrad, med knappen "Fortsätt".
 - **Informationsrad:** "Bedömningen sparas som en fil i kundens mapp. Inget lagras hos Method IT."
 
@@ -214,7 +220,7 @@ Riskregistret är underlag för krav 6.1.1, 6.1.3 och 8.2.
   |---|---|
   | Före behandling | Anges för hand (K × S) |
   | Planerad restrisk | Anges för hand |
-  | Faktisk restrisk | Räknas fram från status på kopplade kontroller (regeln är en öppen fråga, se ARCHITECTURE Ö-03) |
+  | Faktisk restrisk | Räknas fram från status på kopplade kontroller (regeln är en öppen fråga, se ARCHITECTURE O-03) |
 
 - **Kopplade kontroller:** ref, namn, status och SoA-läge ("Låst tillämplig"). Knappen "+ Koppla kontroll".
 - **Historik** över ändringar, till exempel ändrad status på kopplad kontroll, ny koppling eller risk skapad från typrisk.
@@ -261,7 +267,7 @@ Grundkrav och Annex A använder samma vy, med en växlare mellan dem.
 
 ### 4.9 Åtgärdsplan
 
-- **Åtgärder** skapas automatiskt från kontroller som är Delvis eller Ej uppfyllda, och från risker över acceptansnivån. De kan också skapas för hand.
+- **Åtgärder** skapas automatiskt från kontroller som är Delvis eller Ej uppfyllda, och från risker över acceptansnivån. De kan också skapas för hand. Om de skapas direkt eller först föreslås är en öppen fråga (ARCHITECTURE O-04).
 - **Fält per åtgärd:**
   - beskrivning och ansvarig
   - deadline
@@ -283,9 +289,10 @@ Grundkrav och Annex A använder samma vy, med en växlare mellan dem.
 
 ### 4.11 Spara och öppna
 
-- **"Spara" och "Spara som"** skriver direkt till en fil i kundens SharePoint-mapp (Chrome och Edge). I Safari och Firefox laddas filen ned i stället (ARCHITECTURE Ö-01).
-- **Autosparning** var tionde minut, men bara när något har ändrats.
-- **Sparstatus** visas tydligt: sparat till fil, osparade ändringar, eller bara sparat i webbläsaren.
+- **"Spara" och "Spara som"** skriver direkt till projektfilen i uppdragets mapp, till exempel kundens synkade SharePoint-mapp (Chrome och Edge). I Safari och Firefox laddas filen ned i stället (ARCHITECTURE O-01, B-22).
+- **Autosparning** var tionde minut, men bara när något har ändrats och bara till en mapp, aldrig som nedladdning.
+- **Sparstatus** visas tydligt: sparat till fil, osparade ändringar, sparar, nedladdad eller fel (ARCHITECTURE B-23).
+- **Ogiltigt projekt i minnet** skrivs aldrig till fil. Felen visas med sökväg i stället.
 - **Osparade ändringar** ger en varning vid stängning.
 - **Ogiltig projektfil** ger ett tydligt fel om vad som är fel. Filen skrivs aldrig över.
 

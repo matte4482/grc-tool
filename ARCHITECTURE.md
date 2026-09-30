@@ -19,9 +19,9 @@ Nya beslut läggs till sist, med nästa lediga nummer. Ett beslut som ändras sk
 
 ## Nuläge
 
-*Senast uppdaterad: 26 september 2026*
+*Senast uppdaterad: 29 september 2026*
 
-- **Fas:** 0 är klar. Nästa fas är 1, säkert filsparande (faser enligt Plan 2.0, se B-19).
+- **Fas:** 1, säkert filsparande, pågår (faser enligt Plan 2.0, se B-19).
 - **Klart i fas 0:**
   - Projektet är uppsatt med Svelte, TypeScript och Vite.
   - ISO/IEC 27001:2022 är flyttat från det gamla verktyget (`legacy/method-grc-verktyg.html`) till YAML, med schema och test.
@@ -31,8 +31,14 @@ Nya beslut läggs till sist, med nästa lediga nummer. Ett beslut som ändras sk
   - Bygget ger en enda fristående HTML-fil med säkerhetspolicy (B-03, B-20).
   - Vites startmall är ersatt av ett enkelt skal, och det felaktiga beroendet `npm` är borttaget.
   - `npm test` och `npm run build` går igenom lokalt (26 september 2026).
-- **Nästa steg:** fas 1. Spara och Spara som med File System Access API, autosparning var tionde minut, sparstatus och varning vid stängning (Ö-01). Kontrollera först att `showSaveFilePicker` fungerar när verktyget öppnas från disk (`file://`) i Chrome och Edge.
-- **Väntar på beslut:** Ö-03 (regel för restrisk), senast före fas 3.
+- **Klart i fas 1 hittills:**
+  - Konsulten väljer uppdragets mapp, och projektfilen sparas där (B-22).
+  - Store med sparstatus, autosparning var tionde minut och varning vid stängning (B-23).
+  - `takeId` är en ren funktion; nya ID:n skapas bara via store (B-23).
+  - Ett ogiltigt projekt skrivs aldrig till fil; felet visas i sparstatusen (B-23).
+  - Mappsparandet och store är provade i Chromium mot webbläsarens privata filyta (OPFS), med CSP aktiv.
+- **Nästa steg:** prova hela flödet i Chrome och Edge med `dist/index.html` öppnad från disk, på Mac och Windows, och i Safari eller Firefox för nedladdningsläget (se TODO.md).
+- **Väntar på beslut:** O-03 (regel för restrisk), senast före fas 3. O-04 (hur åtgärder skapas och hanteras), senast före fas 5.
 
 ---
 
@@ -139,7 +145,7 @@ Varje kunduppdrag är en JSON-fil med ändelsen `.grc.json`. Den innehåller kun
 - **Ett ramverk per projektfil.** Om en kund behöver både ISO 27001 och NIS2 blir det två uppdrag.
 - **Ramverket anges med `id` och `version`**, men själva innehållet kopieras inte in i projektfilen.
 
-Hur verktyget sparar till filen avgjordes i Ö-01.
+Hur verktyget sparar till filen avgjordes i O-01.
 
 ## B-11 · Gamla sparfiler ska kunna läsas in
 
@@ -199,7 +205,7 @@ Testfiler heter `*.test.ts` och ligger bredvid det de testar. Varje ramverk har 
 
 ## B-15 · Kontroll-ID:n följer standardens numrering
 
-**Status:** Beslutat · avgör Ö-02
+**Status:** Beslutat · avgör O-02
 
 Alla ID:n ska vara de nummer som står i standarden, så att de kan kopplas mot andra ramverk och mot framtida automatiska kontroller. I det gamla verktyget var grundkraven i kapitel 6 numrerade i löpordning. De har nu bytts ut:
 
@@ -233,7 +239,7 @@ Konsekvenser:
 
 - Punkten om migrering i fas 0 och punkten om att uppgradera gamla filer i fas 7 stryks ur Plan 2.0.
 - Kriteriet för att fas 0 är klar blir: ett nytt projekt kan sparas, öppnas igen och valideras utan att något ändras.
-- Om någon försöker öppna en gammal exportfil visas "Filen är inte en projektfil från GRC-verktyget." Den skrivs aldrig över.
+- Om någon försöker öppna en gammal exportfil visas "Filen är inte en giltig projektfil." Den skrivs aldrig över.
 - Jämförelse i fas 7 fungerar bara mellan bedömningar som gjorts i det nya verktyget.
 
 ## B-17 · Projektfilens datamodell
@@ -246,7 +252,7 @@ Datamodellen i `src/lib/project/schema.ts` har plats för allt i Plan 2.0 från 
 - **ID för bedömningen.** Varje projektfil har ett `id` (UUID) och kan ha `previousId`, som pekar på bedömningen den utgår från.
 - **Fält som saknas fylls i vid inläsning.** Tomma texter, tomma listor och standardvärden behöver inte stå i filen. Det gör att nya valfria fält kan läggas till utan att äldre filer slutar validera.
 - **Beräknade värden sparas aldrig.** Riskvärde, nivå, faktisk restrisk och uppfyllnadsgrad räknas fram.
-- **Kopplingen mellan risk och kontroll är ett objekt**, `{ control, effect?, type? }`, inte bara ett ID. Effekt och typ är valfria, så modellen fungerar med både alternativ A och B i Ö-03.
+- **Kopplingen mellan risk och kontroll är ett objekt**, `{ control, effect?, type? }`, inte bara ett ID. Effekt och typ är valfria, så modellen fungerar med både alternativ A och B i O-03.
 - **Godkännande av restrisk över acceptansnivån** kräver en motivering. Det kontrolleras i schemat.
 - **Evidens kan finnas på både kontroller och risker** och har sökväg, storlek, `sha256`, källa, vem som lade till den och när. Kontrollsumman gör att verktyget kan varna om en fil har flyttats eller ändrats.
 - **Kontroller mot ramverket görs separat.** Schemat känner inte till ramverket. `checkAgainstFramework()` i `project.ts` kontrollerar okända kontroll-ID:n, att grundkrav inte väljs bort och att kontroller som är kopplade till en risk inte är bortvalda.
@@ -310,13 +316,62 @@ Verifierat 25 september 2026 i Chromium med filen öppnad direkt från disk: pro
 - **Register.** `src/lib/frameworks/index.ts` listar alla ramverk. Tillgängliga ramverk valideras med zod när modulen laddas, så ett fel i en YAML-fil stoppar både testerna och appen direkt. Kommande ramverk (NIS2, CIS Controls v8, DORA) står i samma lista utan innehåll och visas som "Kommer" på startsidan.
 - **Svenska felmeddelanden.** `parseProject()` använder zods svenska språkpaket. Egna meddelanden i schemat, till exempel om motivering för godkännande, går före. Testerna kontrollerar sökvägen till felet och inte zods ordalydelse, eftersom den kan ändras mellan versioner.
 
+## B-22 · Konsulten väljer uppdragets mapp
+
+**Status:** Beslutat
+
+Beslutat 29 september 2026. Verktyget får åtkomst till **uppdragets mapp** med `showDirectoryPicker`, inte bara till projektfilen med `showSaveFilePicker`.
+
+Skäl:
+
+- **Evidens i fas 4.** Bifogade filer ska sparas i en mapp `evidens/` bredvid projektfilen. Med åtkomst bara till projektfilen skulle konsulten behöva välja mappen en gång till i fas 4, och sparandet skulle behöva byggas om.
+- **Öppna utan att leta efter filen.** Konsulten väljer kundens mapp, och verktyget hittar projektfilen själv.
+
+Så fungerar det (`src/lib/storage/`):
+
+- **Nytt arbete:** konsulten anger kundnamn och väljer mapp. Projektfilen får namn efter kunden, till exempel `exempelbolaget-ab.grc.json` (`projectFileName`), och sparas direkt. Finns en fil med samma namn skapas ingen ny.
+- **Öppna:** konsulten väljer mappen. Finns en projektfil öppnas den; finns flera får konsulten välja.
+- **Skrivning:** `createWritable()` skriver till en tillfällig fil och byter ut originalet först när skrivningen är klar. En avbruten sparning lämnar den gamla filen orörd.
+- **Behörighet:** webbläsaren frågar om verktyget får läsa och skriva i mappen. Frågan måste komma från ett klick.
+- **Sparmål:** store känner bara till gränssnittet `SaveTarget` (`target.ts`), inte om det är en mapp eller en nedladdning. Då kan sparandet bytas ut, till exempel mot en skrivbordsversion, utan att store ändras.
+
+Reservläge i Safari och Firefox (O-01): "Spara" laddar ned en kopia (`download.ts`), och "Öppna" läser en vald fil. Nedladdningar autosparas aldrig, eftersom varje sparning annars ger en ny fil i Hämtade filer. Sparstatusen säger det tydligt.
+
+Senaste arbeten på startsidan (fas 2) kräver att mapphandtaget sparas mellan besöken, i webbläsarens IndexedDB. Det byggs i fas 2.
+
+## B-23 · Store och sparande
+
+**Status:** Beslutat
+
+Store är appens enda källa för det öppna projektet. Den består av två delar:
+
+| Fil | Innehåll |
+|---|---|
+| `src/lib/project/session.ts` | `ProjectSession`: projektet, sparstatusen och all logik. Ren TypeScript som testas utan webbläsare. |
+| `src/lib/project/store.svelte.ts` | Ett tunt skal som kopierar sessionens värden till `$state`, så att vyerna ritas om. Startar autosparning och varning vid stängning. |
+
+Regler:
+
+- **Projektet ändras aldrig på plats.** `update(change)` ger en kopia att ändra i, och kopian blir det nya projektet. Då märker store varje ändring och markerar filen som osparad. Vyerna ändrar bara via store.
+- **Nya ID:n skapas bara via `newId(kind)`.** `takeId` i `project.ts` är en ren funktion: den tar emot löpnumren och returnerar ID:t och nya löpnummer, utan att ändra något. Store sparar de nya löpnumren via `update`.
+- **Ett ogiltigt projekt skrivs aldrig.** Före sparning kontrolleras projektet med `validateProject`. Vid fel skrivs ingenting, och sparstatusen visar felen med sökväg. `serializeProject` anropas dessutom i `try/catch`, så att ett oväntat fel också syns i stället för att försvinna.
+- **Skrivfel syns.** Nekad behörighet, en borttagen mapp eller en full disk visas i sparstatusen, och ändringarna räknas fortfarande som osparade.
+- **Ändringar under pågående sparning går inte förlorade.** Store håller ett ändringsnummer. Om projektet ändrades medan filen skrevs räknas det fortfarande som osparat efteråt.
+- **Autosparning** sker var tionde minut, bara om något har ändrats och bara till en mapp, aldrig som nedladdning.
+- **Varning vid stängning** (`beforeunload`) visas när det finns osparade ändringar.
+- **Öppning** kontrollerar filen med `parseProject`. En ogiltig fil öppnas inte, och det öppna projektet lämnas orört. Avvikelser mot ramverket (`checkAgainstFramework`), till exempel en okänd kontroll, hindrar inte öppning men visas som varningar.
+
+Sparstatusen har fem lägen: inget projekt, sparat, osparade ändringar, sparar och fel. `describeStatus` gör om den till text för sidhuvudet, till exempel "Sparat till exempelbolaget-ab.grc.json 14:42".
+
+Öppen fråga: localStorage som reservkopia vid krasch (se TODO.md).
+
 ---
 
 ## Öppna frågor
 
-### Ö-01 · Hur verktyget sparar till fil
+### O-01 · Hur verktyget sparar till fil
 
-**Förslag:** Använd File System Access API (`showSaveFilePicker`). Då kan verktyget spara automatiskt till samma fil i kundens synkade SharePoint-mapp.
+**Förslag:** Använd File System Access API (`showSaveFilePicker`). Då kan verktyget spara automatiskt till samma fil i kundens synkade SharePoint-mapp. *(Senare ändrat till val av mapp i stället för fil, se B-22.)*
 
 **Problem:** API:t finns bara i Chrome och Edge, och det fungerar inte i Safari eller Firefox.
 
@@ -326,7 +381,7 @@ Verifierat 25 september 2026 i Chromium med filen öppnad direkt från disk: pro
 
 **Avgjord 25 september 2026 (Plan 2.0, fas 1):** Båda lägena. Chrome och Edge skriver direkt till filen i kundens SharePoint-mapp. I Safari och Firefox laddas filen ned i stället, och verktyget rekommenderar Chrome eller Edge. Autosparning sker var tionde minut, men bara när något har ändrats. Sparstatusen visas alltid, och stängning med osparade ändringar ger en varning.
 
-### Ö-02 · Numreringen i kapitel 6 följer inte standarden
+### O-02 · Numreringen i kapitel 6 följer inte standarden
 
 **Avgjord 25 september 2026:** ID:n följer standarden, se B-15.
 
@@ -334,7 +389,7 @@ Grundkraven 6.1–6.6 är numrerade i löpordning. I standarden heter de 6.1.1, 
 
 Ändringen påverkar översättningen av gamla sparfiler (B-11). Den görs som en egen commit, med en tabell som översätter gamla ID:n till nya.
 
-### Ö-03 · Regel för faktisk restrisk
+### O-03 · Regel för faktisk restrisk
 
 *Måste avgöras före fas 3. Datamodellen (B-17) fungerar med båda alternativen.*
 
@@ -388,3 +443,38 @@ Metoden (skala, faktorer och avrundning) ska stå i riskmetoden och skrivas ut s
 
 - Vi väljer alternativ A eller B.
 - Justeringarna 1–4 gäller, om vi väljer B.
+
+### O-04 · Hur åtgärder skapas och hanteras
+
+*Måste avgöras före fas 5 (åtgärdsplan). Datamodellen (B-17) klarar alla alternativen nedan, eventuellt med ett nytt valfritt fält.*
+
+Plan 2.0 och README beskriver vad åtgärdsplanen ska visa, men inte hur åtgärderna uppstår och vad som händer när underlaget ändras. README säger på ett ställe att en åtgärd *skapas* automatiskt när en kontroll sätts till Delvis eller Ej uppfylld (4.7), och på ett annat att den *föreslås* (4.9). Fyra frågor behöver besvaras.
+
+**1 · Skapas åtgärden automatiskt eller föreslås den?**
+
+- *Skapas direkt:* varje brist blir genast en åtgärd med eget ID. Enkelt, men listan fylls med halvfärdiga åtgärder utan ansvarig och deadline, och ID:n förbrukas på åtgärder som sedan tas bort.
+- *Föreslås:* en brist ger ett åtgärdsförslag som syns vid kontrollen och i åtgärdsplanen. Först när konsulten godkänner förslaget blir det en åtgärd med ID, ansvarig och deadline.
+
+**2 · Vad händer när underlaget ändras?**
+
+Till exempel när en kontroll först sätts till Ej uppfylld och sedan till Uppfylld, eller när en risk sänks under acceptansnivån. Ska åtgärden tas bort, stängas eller ligga kvar? Om statusen ändras fram och tillbaka får det inte uppstå dubbletter.
+
+**3 · En åtgärd för flera brister?**
+
+Datamodellen tillåter redan att en åtgärd kopplas till flera kontroller och risker (`controls` och `risks` i `ActionSchema`). Det som saknas är hur konsulten gör det i gränssnittet, till exempel slår ihop två förslag eller kopplar ett förslag till en befintlig åtgärd.
+
+**4 · Behövs prioritet?**
+
+Åtgärder har deadline men ingen prioritet. En ledning som ska välja vad som görs först kan behöva det.
+
+**Rekommendation**
+
+1. **Förslag, inte automatiska åtgärder.** Förslagen räknas fram ur kontrollernas status och riskernas värden och sparas aldrig i projektfilen, på samma sätt som andra beräknade värden (B-17). Bara godkända åtgärder sparas och får ett ID.
+2. **En godkänd åtgärd tas aldrig bort automatiskt.** Om underlaget blir uppfyllt, eller risken hamnar under acceptansnivån, markeras åtgärden med "Underlaget är åtgärdat, stäng?" och konsulten beslutar. Ett förslag visas inte för en brist som redan har en åtgärd, så dubbletter kan inte uppstå. Åtgärder som inte längre behövs får status *Avbruten* i stället för att tas bort, så att historiken finns kvar till jämförelsen i fas 7. Det kräver ett nytt värde, `cancelled`, i `ActionStatusSchema`.
+3. **Koppla till befintlig åtgärd.** När konsulten godkänner ett förslag kan det bli en ny åtgärd eller kopplas till en befintlig. Då kan en åtgärd, till exempel "Inför MFA", täcka flera kontroller och risker.
+4. **Valfri prioritet: Hög, Medel eller Låg.** Verktyget föreslår en prioritet: Hög för risker över acceptansnivån och för kontroller som är Ej uppfyllda, Medel för Delvis uppfyllda. Konsulten kan ändra den. Det kräver ett nytt valfritt fält, `priority`, i `ActionSchema`.
+
+**Beslut behövs om:**
+
+- Förslag eller automatiska åtgärder (fråga 1).
+- Rekommendationerna 2–4 gäller, eller ändras.
