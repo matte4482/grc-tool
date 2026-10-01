@@ -35,11 +35,23 @@ npm run dev          # startar utvecklingsservern på http://localhost:5173
 npm test             # kör alla tester en gång
 npm run test:watch   # kör om testerna vid varje ändring
 npm run check        # typkontroll (Svelte + TypeScript)
-npm run build        # bygger verktyget till en enda fil: dist/index.html
-npm run preview      # visar det byggda verktyget i webbläsaren
+npm run build        # bygger verktyget till en enda fil: dist/GRC-verktyget-<version>.html
+npm run preview      # visar det byggda verktyget, på http://localhost:4173/GRC-verktyget-<version>.html
 ```
 
-`npm run build` gör två saker: Vite bygger och bäddar in allt i `dist/index.html`, och sedan kontrollerar `scripts/finalize-build.mjs` att filen är fristående och lägger in en säkerhetspolicy (ARCHITECTURE B-03 och B-20). Det är `dist/index.html` som delas ut till konsulterna. Den går att öppna direkt från disk, utan server och utan nät.
+`npm run build` gör två saker: Vite bygger och bäddar in allt i `dist/index.html`, och sedan kontrollerar `scripts/finalize-build.mjs` att filen är fristående, lägger in en säkerhetspolicy och döper om filen efter versionen, till exempel `dist/GRC-verktyget-0.1.0.html` (ARCHITECTURE B-03, B-20 och B-24). Det är den filen som delas ut till konsulterna. Den går att öppna direkt från disk, utan server och utan nät.
+
+### Ny version
+
+Versionen står i `package.json` och följer formen MAJOR.MINOR.PATCH:
+
+| Kommando | Exempel | När |
+|---|---|---|
+| `npm version patch` | 0.1.0 → 0.1.1 | Rättelser |
+| `npm version minor` | 0.1.1 → 0.2.0 | Nya funktioner, till exempel en avslutad fas |
+| `npm version major` | 0.2.0 → 1.0.0 | Skarp version (M4) |
+
+`npm version` uppdaterar `package.json` och `package-lock.json` och skapar en commit och en git-tagg, till exempel `v0.2.0`. Lägg till `--no-git-tag-version` för att bara ändra numret. Kör sedan `npm run build`. Versionen syns i filnamnet och i verktygets sidfot.
 
 ## 2. Projektstruktur
 

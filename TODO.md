@@ -6,14 +6,14 @@ Småfix och konkreta punkter som ska åtgärdas. Claude läser den här filen in
 - Ange fil och rad när det går, och i vilken fas punkten senast måste vara åtgärdad.
 - Större beslut hör hemma i ARCHITECTURE.md, inte här.
 
-*Senast uppdaterad: 29 september 2026*
+*Senast uppdaterad: 30 september 2026*
 
 ## Fas 1 (filsparande), pågår
 
 - [x] **Bestäm mappåtkomst eller filåtkomst.** Mapp, se ARCHITECTURE B-22. *(29 sep 2026)*
 - [x] **`takeId` ändrar projektet direkt.** Nu en ren funktion som tar löpnumren och returnerar nya; store sparar dem via `newId` (B-23). *(29 sep 2026)*
 - [x] **`serializeProject` kastar fel vid ogiltigt projekt.** Store kontrollerar med `validateProject` före sparning, fångar felet och skriver aldrig (B-23). *(29 sep 2026)*
-- [ ] **Prova i riktig webbläsare från `file://`.** Bygg med `npm run build` och öppna `dist/index.html` från disk:
+- [ ] **Prova i riktig webbläsare från `file://`.** Bygg med `npm run build` och öppna `dist/GRC-verktyget-0.1.0.html` från disk:
   - Chrome och Edge, på Mac och Windows: välj mapp, skapa, ändra kundnamnet, spara, stäng fliken (varning ska visas), öppna igen.
   - En synkad SharePoint- eller OneDrive-mapp: att skrivningen fungerar och att ingen konfliktkopia uppstår.
   - Safari eller Firefox: nedladdningsläget, att "Spara" ger en fil och att den går att öppna igen.
@@ -39,6 +39,11 @@ Småfix och konkreta punkter som ska åtgärdas. Claude läser den här filen in
 
 - [ ] **O-04 måste avgöras:** hur åtgärder skapas och hanteras (förslag eller automatiskt, vad som händer när underlaget ändras, en åtgärd för flera brister, prioritet). Se ARCHITECTURE.
 - [ ] **README säger två olika saker om åtgärder** (4.7 "skapas automatiskt", 4.9 "föreslås"). Rätta README när O-04 är avgjord.
+
+## Före fas 8 (lansering), gärna tidigare
+
+- [x] **Versionsnummer och filnamn.** Versionen är 0.1.0, och bygget döper filen till `GRC-verktyget-<version>.html` (B-24). *(30 sep 2026)*
+- [ ] **Rutin för att dela ut en ny version.** Var läggs filen (intranät, en SharePoint-mapp)? Hur får konsulterna veta att det finns en ny version? Ska gamla versioner ligga kvar? Skriv rutinen i README när den är bestämd.
 
 ## Småfix, när som helst
 

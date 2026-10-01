@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { createHash } from 'node:crypto'
-import { addCsp, buildCsp, externalReferences, scriptHashes } from './finalize-build.mjs'
+import { addCsp, buildCsp, externalReferences, releaseFileName, scriptHashes } from './finalize-build.mjs'
 
 const page = (head, body = '') =>
   `<!doctype html><html lang="sv"><head><meta charset="UTF-8" />${head}</head><body>${body}</body></html>`
@@ -66,5 +66,18 @@ describe('CSP', () => {
 
   it('kräver <meta charset>', () => {
     expect(() => addCsp('<html><head></head></html>')).toThrow(/meta charset/)
+  })
+})
+
+describe('releaseFileName', () => {
+  it('döper filen efter versionen', () => {
+    expect(releaseFileName('0.1.0')).toBe('GRC-verktyget-0.1.0.html')
+    expect(releaseFileName('1.0.0-beta.1')).toBe('GRC-verktyget-1.0.0-beta.1.html')
+  })
+
+  it('stoppar ogiltiga versioner', () => {
+    expect(() => releaseFileName('dev')).toThrow(/Ogiltig version/)
+    expect(() => releaseFileName('1.0')).toThrow(/Ogiltig version/)
+    expect(() => releaseFileName('1.0.0/../x')).toThrow(/Ogiltig version/)
   })
 })

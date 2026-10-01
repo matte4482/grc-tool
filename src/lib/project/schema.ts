@@ -116,16 +116,15 @@ export const RiskMethodSchema = z
     })
   })
 
-// Risker 
+// Risker - lista med risker och detaljer om varje risk. Möjlighet att koppla till kontroll.
 
 /**
- * Koppling mellan risk och kontroll. Effekt och typ är valfria tills
- * regeln för restrisk är beslutad (ARCHITECTURE Ö-03).
+ * Objekt för att koppla en risk till en kontroll. Möjliggör funktionen att kontroll sänker risk. 
  */
 export const RiskControlLinkSchema = z.object({
   control: name, // kontroll-ID, t.ex. "A.8.20"
   effect: z.enum(['low', 'medium', 'high']).optional(),
-  type: z.enum(['preventive', 'limiting']).optional(), // sänker sannolikhet resp. konsekvens
+  type: z.enum(['preventive', 'limiting']).optional(), // förebyggande och begränsande sänker sannolikhet resp. konsekvens
 })
 
 export const RiskSchema = z.object({
@@ -142,15 +141,16 @@ export const RiskSchema = z.object({
   treatmentPlan: text.default(''),
   controls: z.array(RiskControlLinkSchema).default([]),
   evidence: z.array(EvidenceSchema).default([]),
-  /** ID på typrisken den skapades från, om någon. */
+  // ID på typrisken den skapades från, om någon.
   template: z.string().optional(),
   identifiedAt: isoDate,
   lastAssessedAt: isoDate.optional(),
+  // zod objekt för godkännande av risk.
   approval: z
     .object({
       by: name,
       at: isoDate,
-      /** Aktivt beslut att acceptera restrisk över acceptansnivån. Kräver motivering. */
+      // Aktivt beslut att acceptera restrisk över acceptansnivån. Kräver motivering.
       aboveThreshold: z.boolean().default(false),
       justification: text.default(''),
     })
@@ -163,7 +163,7 @@ export const RiskSchema = z.object({
   history: z.array(ChangeSchema.extend({ text: name })).default([]),
 })
 
-// ── Åtgärder 
+// Åtgärder 
 
 export const ActionSchema = z.object({
   id: z.string().regex(ACTION_ID, 'Åtgärds-ID ska ha formen ATG-001'),
@@ -172,7 +172,7 @@ export const ActionSchema = z.object({
   owner: text.default(''),
   due: isoDate.optional(),
   status: ActionStatusSchema.default('not_started'),
-  /** Varifrån åtgärden kom. `id` är kontroll- eller risk-ID. */
+  // Varifrån åtgärden kom. `id` är kontroll- eller risk-ID.
   source: z.discriminatedUnion('type', [
     z.object({ type: z.literal('control'), id: name }),
     z.object({ type: z.literal('risk'), id: z.string().regex(RISK_ID) }),
@@ -184,29 +184,26 @@ export const ActionSchema = z.object({
   completedAt: isoDate.optional(),
 })
 
-// ── Projektfilen ────────────────────────────────────────────────────────────
+// Projektfilen
 
 export const ProjectSchema = z
   .object({
     schemaVersion: z.literal(PROJECT_SCHEMA_VERSION),
     tool: z.literal('method-grc'),
-    /** Unikt ID för bedömningen. */
+    // Unikt ID för projektfilen. 
     id: z.uuid(),
-    /** ID på bedömningen den här utgår från (fas 7, jämförelse). */
+    // ID på tidigare projektfil vid eventuell jämförelse och spårning av arbete. Uppfyller ISO27001 10.1 Continual improvement.
     previousId: z.uuid().optional(),
     client: z.object({ name: name }),
     framework: z.object({ id: name, version: name }),
     createdAt: isoDateTime,
     updatedAt: isoDateTime,
-
     riskMethod: RiskMethodSchema.optional(),
     risks: z.array(RiskSchema).default([]),
     controls: z.record(z.string(), ControlAssessmentSchema).default({}),
     actions: z.array(ActionSchema).default([]),
-
     /**
-     * Nästa lediga löpnummer. ID:n återanvänds aldrig, inte ens när en risk
-     * eller åtgärd tas bort, så att två bedömningar kan jämföras (fas 7).
+     Nästa lediga nummer för risk, åtgärd eller evidens. Inga ID:n återanvänds för att kunna spåra arbetet. 
      */
     nextNumber: z
       .object({
@@ -217,6 +214,7 @@ export const ProjectSchema = z
       .default({ risk: 1, action: 1, evidence: 1 }),
   })
   .superRefine((p, ctx) => {
+    // hjälpfunktion för att kontrollera ID i projektet. Inga dubletter får förekomma.
     const unique = (ids: string[], kind: string, path: string) => {
       const seen = new Set<string>()
       for (const id of ids) {
@@ -224,11 +222,13 @@ export const ProjectSchema = z
         seen.add(id)
       }
     }
-    unique(p.risks.map((r) => r.id), 'risk', 'risks')
-    unique(p.actions.map((a) => a.id), 'åtgärd', 'actions')
+    unique(p.risks.map((r) => r.id), 'risk', 'risks') // kontrollerar risk ID:n
+    unique(p.actions.map((a) => a.id), 'åtgärd', 'actions') // kontrollerar åtgärds ID:n
+    //samlar evidens från kontroller och risker (de kan förekomma på två platser)
     const evidenceIds = [...Object.values(p.controls), ...p.risks].flatMap((x) => x.evidence.map((e) => e.id))
-    unique(evidenceIds, 'evidens', 'controls')
+    unique(evidenceIds, 'evidens', 'controls') // kontrollerar evidens ID:n
 
+    // kontrollerar att nästa löpnummer är större än högsta använda nummer.
     const numberOf = (id: string) => Number(id.slice(id.lastIndexOf('-') + 1))
     const maxOf = (ids: string[]) => ids.reduce((m, id) => Math.max(m, numberOf(id)), 0)
     const checks: [keyof typeof p.nextNumber, number][] = [
@@ -255,3 +255,4 @@ export type RiskControlLink = z.infer<typeof RiskControlLinkSchema>
 export type Risk = z.infer<typeof RiskSchema>
 export type Action = z.infer<typeof ActionSchema>
 export type Project = z.infer<typeof ProjectSchema>
+export type NextNumber = Project['nextNumber']

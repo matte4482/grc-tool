@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 /* Schema för ramverk. Använder zod för att validera data. 
   Huvudpunkter för design är:
-  - Alla ID:n ska vara strängar och inte integers p.g.a strängar är mer flexibla.
+  - Alla ID:n ska vara strängar och ints.
   - Vissa fält är valfria då vissa kontroller inte kräver motiviering eller ramverk saknar vissa fält.
 */
 

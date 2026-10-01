@@ -19,7 +19,7 @@ Nya beslut läggs till sist, med nästa lediga nummer. Ett beslut som ändras sk
 
 ## Nuläge
 
-*Senast uppdaterad: 29 september 2026*
+*Senast uppdaterad: 30 september 2026*
 
 - **Fas:** 1, säkert filsparande, pågår (faser enligt Plan 2.0, se B-19).
 - **Klart i fas 0:**
@@ -37,7 +37,8 @@ Nya beslut läggs till sist, med nästa lediga nummer. Ett beslut som ändras sk
   - `takeId` är en ren funktion; nya ID:n skapas bara via store (B-23).
   - Ett ogiltigt projekt skrivs aldrig till fil; felet visas i sparstatusen (B-23).
   - Mappsparandet och store är provade i Chromium mot webbläsarens privata filyta (OPFS), med CSP aktiv.
-- **Nästa steg:** prova hela flödet i Chrome och Edge med `dist/index.html` öppnad från disk, på Mac och Windows, och i Safari eller Firefox för nedladdningsläget (se TODO.md).
+  - Versionen är 0.1.0, och bygget döper filen efter versionen (B-24).
+- **Nästa steg:** prova hela flödet i Chrome och Edge med `dist/GRC-verktyget-0.1.0.html` öppnad från disk, på Mac och Windows, och i Safari eller Firefox för nedladdningsläget (se TODO.md).
 - **Väntar på beslut:** O-03 (regel för restrisk), senast före fas 3. O-04 (hur åtgärder skapas och hanteras), senast före fas 5.
 
 ---
@@ -67,9 +68,9 @@ Det gamla verktyget är en enda HTML-fil som går att öppna utan installation, 
 Så går bygget till (`npm run build`):
 
 1. **Vite** bygger appen från `index.html` och `src/main.ts`. Svelte-komponenterna kompileras till vanlig JavaScript, TypeScript-typerna tas bort och YAML-ramverken blir JavaScript-objekt (B-09).
-2. **`vite-plugin-singlefile`** bäddar in all JavaScript och CSS direkt i `dist/index.html`. Pluginet är bara aktivt vid bygget, inte i utvecklingsservern eller testerna.
+2. **`vite-plugin-singlefile`** bäddar in all JavaScript och CSS direkt i `dist/index.html`, som döps om i steg 4. Pluginet är bara aktivt vid bygget, inte i utvecklingsservern eller testerna.
 3. **`publicDir: false`** i `vite.config.ts` gör att inga filer kopieras bredvid index.html. Ikonen ligger som en data:-adress i `index.html`.
-4. **`scripts/finalize-build.mjs`** kontrollerar resultatet och lägger in CSP (B-20). Bygget misslyckas om `dist/` innehåller mer än `index.html`, eller om filen hänvisar till något utanför sig själv.
+4. **`scripts/finalize-build.mjs`** kontrollerar resultatet, lägger in CSP (B-20) och döper om filen efter versionen (B-24). Bygget misslyckas om `dist/` innehåller mer än `index.html`, om filen hänvisar till något utanför sig själv, eller om versionen i `package.json` är ogiltig.
 
 Konsekvens: alla ramverk, typsnitt och ikoner bäddas in i filen vid bygget. Verktyget får inte hämta något från nätet när det körs. Typsnitten är systemtypsnitt (Calibri, Cambria med reserver), så inga typsnittsfiler behövs.
 
@@ -364,6 +365,26 @@ Regler:
 Sparstatusen har fem lägen: inget projekt, sparat, osparade ändringar, sparar och fel. `describeStatus` gör om den till text för sidhuvudet, till exempel "Sparat till exempelbolaget-ab.grc.json 14:42".
 
 Öppen fråga: localStorage som reservkopia vid krasch (se TODO.md).
+
+## B-24 · Versionsnummer och filnamn
+
+**Status:** Beslutat
+
+Beslutat 30 september 2026. Verktyget har ett versionsnummer i `package.json` av formen MAJOR.MINOR.PATCH (semantisk versionering). Första numrerade versionen är 0.1.0.
+
+- **PATCH** (0.1.0 → 0.1.1): rättelser.
+- **MINOR** (0.1.1 → 0.2.0): nya funktioner, till exempel en avslutad fas.
+- **MAJOR** (0.x → 1.0.0): den skarpa versionen vid M4. Därefter höjs MAJOR om projektfilens format ändras på ett sätt som äldre verktyg inte kan läsa.
+
+Den byggda filen döps efter versionen, till exempel `dist/GRC-verktyget-0.1.0.html`. Det görs som sista steg i `scripts/finalize-build.mjs` (`releaseFileName`):
+
+- Versionen läses direkt ur `package.json` och kontrolleras först. En ogiltig version stoppar bygget innan något skrivs.
+- Namnbytet sker sist, eftersom kontrollen att `dist/` bara innehåller en fil förutsätter att den heter `index.html`.
+- Samma version visas i verktygets sidfot via `__APP_VERSION__` (`vite.config.ts`). Om versionen inte finns i den byggda filen, till exempel för att bygget startades utan npm, varnar skriptet.
+
+Skäl: konsulterna ska kunna se vilken version de använder, och flera versioner ska kunna ligga sida vid sida utan att skriva över varandra. Källfilen heter fortfarande `index.html`, eftersom Vite och utvecklingsservern utgår från det namnet.
+
+Rutinen för att dela ut en ny version till konsulterna (var filen läggs och hur de får veta) är inte bestämd, se TODO.md.
 
 ---
 

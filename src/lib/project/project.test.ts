@@ -4,7 +4,7 @@ import raw from '../frameworks/iso27001-2022.yaml'
 import fixture from '../../../tests/fixtures/exempel.grc.json?raw'
 import { FrameworkSchema } from '../frameworks/schema'
 import { ProjectSchema, type Project } from './schema'
-import { checkAgainstFramework, createProject, formatId, parseProject, serializeProject, takeId } from './project'
+import { checkAgainstFramework, createProject, formatId, parseProject, serializeProject, takeId, validateProject } from './project'
 
 const iso = FrameworkSchema.parse(raw)
 
@@ -71,7 +71,7 @@ describe('ogiltiga filer ger begripliga fel', () => {
 
   it('fel sorts fil, till exempel en gammal export', () => {
     const r = parseProject(JSON.stringify({ version: 4, client: 'Kund', data: {} }))
-    expect(r).toEqual({ ok: false, errors: ['Filen är inte en projektfil från GRC-verktyget.'] })
+    expect(r).toEqual({ ok: false, errors: ['Filen är inte en giltig projektfil.'] })
   })
 
   it('nyare format än verktyget', () => {
@@ -118,10 +118,19 @@ describe('fasta ID:n', () => {
 
   it('ID:n återanvänds aldrig, inte ens efter borttagning', () => {
     const p = load() // R-002 är borttagen, R-003 finns
-    expect(takeId(p, 'risk')).toBe('R-004')
-    expect(takeId(p, 'risk')).toBe('R-005')
-    expect(takeId(p, 'action')).toBe('ATG-002')
-    expect(takeId(p, 'evidence')).toBe('EV-002')
+    const first = takeId(p.nextNumber, 'risk')
+    expect(first.id).toBe('R-004')
+    expect(takeId(first.nextNumber, 'risk').id).toBe('R-005')
+    expect(takeId(p.nextNumber, 'action').id).toBe('ATG-002')
+    expect(takeId(p.nextNumber, 'evidence').id).toBe('EV-002')
+  })
+
+  it('takeId ändrar inte projektet eller löpnumren den fick', () => {
+    const p = load()
+    const before = structuredClone(p.nextNumber)
+    const r = takeId(p.nextNumber, 'risk')
+    expect(p.nextNumber).toEqual(before)
+    expect(r.nextNumber).toEqual({ ...before, risk: before.risk + 1 })
   })
 
   it('formatId fyller ut till tre siffror men klarar fler', () => {
@@ -133,6 +142,18 @@ describe('fasta ID:n', () => {
     const s = sample()
     s.risks[0].evidence = [{ ...s.controls['A.8.20'].evidence[0] }]
     expect(errorsFor(s)).toContain('controls: Dubblett-ID för evidens: EV-001')
+  })
+})
+
+describe('validateProject', () => {
+  it('giltigt projekt ger inga fel', () => {
+    expect(validateProject(load())).toEqual([])
+  })
+
+  it('ogiltigt projekt ger fel med sökväg, utan att kasta', () => {
+    const p = load()
+    ;(p.controls['A.8.20'] as { status: string }).status = 'ok'
+    expect(validateProject(p).map((e) => e.slice(0, e.indexOf(': ')))).toEqual(['controls.A.8.20.status'])
   })
 })
 

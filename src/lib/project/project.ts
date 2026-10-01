@@ -1,16 +1,16 @@
 import { z } from 'zod'
 import type { Framework } from '../frameworks/schema'
-import { PROJECT_SCHEMA_VERSION, ProjectSchema, type Project } from './schema'
+import { PROJECT_SCHEMA_VERSION, ProjectSchema, type NextNumber, type Project } from './schema'
 
 // Skapa, läsa in och skriva ut projektfiler. Ren TypeScript utan Svelte,
 // så att allt kan testas utan UI (README avsnitt 2).
 
-/** Zods inbyggda felmeddelanden på svenska. Egna meddelanden i schemat går före. */
+// Zods inbyggda felmeddelanden på svenska. Egna meddelanden i schemat går före.
 const swedish = z.locales.sv()
 
 export type ParseResult = { ok: true; project: Project } | { ok: false; errors: string[] }
 
-/** Ett nytt, tomt projekt. `now` och `id` kan anges för tester. */
+// Ett nytt, tomt projekt. `now` och `id` kan anges för tester, ananrs genereras de automatiskt.
 export function createProject(opts: {
   client: string
   framework: Pick<Framework, 'id' | 'version'>
@@ -30,8 +30,8 @@ export function createProject(opts: {
 }
 
 /**
- * Läser in en projektfil. Kastar aldrig: vid fel returneras en lista med
- * begripliga felmeddelanden, och inget halvt laddat projekt (README, principer).
+ * Läser in en projektfil. Kastar inte obegripliga exceptions: vid fel returneras en lista med
+ * begripliga felmeddelanden, och inget halvt laddat projekt.
  */
 export function parseProject(json: string): ParseResult {
   let raw: unknown
@@ -42,7 +42,7 @@ export function parseProject(json: string): ParseResult {
   }
 
   if (typeof raw !== 'object' || raw === null || (raw as { tool?: unknown }).tool !== 'method-grc')
-    return { ok: false, errors: ['Filen är inte en projektfil från GRC-verktyget.'] }
+    return { ok: false, errors: ['Filen är inte en giltig projektfil.'] }
 
   const version = (raw as { schemaVersion?: unknown }).schemaVersion
   if (typeof version === 'number' && version > PROJECT_SCHEMA_VERSION)
@@ -53,10 +53,21 @@ export function parseProject(json: string): ParseResult {
 
   const result = ProjectSchema.safeParse(raw, { error: swedish.localeError })
   if (result.success) return { ok: true, project: result.data }
-  return {
-    ok: false,
-    errors: result.error.issues.map((i) => (i.path.length ? `${i.path.join('.')}: ${i.message}` : i.message)),
-  }
+  return { ok: false, errors: formatIssues(result.error.issues) }
+}
+
+/**
+ * Felen i ett projekt som ligger i minnet, som text med sökväg. Tom lista = giltigt.
+ * Används av store innan sparande, så att felet kan visas i stället för att
+ * serializeProject kastar (B-23).
+ */
+export function validateProject(project: Project): string[] {
+  const result = ProjectSchema.safeParse(project, { error: swedish.localeError })
+  return result.success ? [] : formatIssues(result.error.issues)
+}
+
+function formatIssues(issues: z.ZodError['issues']): string[] {
+  return issues.map((i) => (i.path.length ? `${i.path.join('.')}: ${i.message}` : i.message))
 }
 
 /** Projektet som text, redo att skrivas till fil. Stabil ordning och indrag ger läsbara diffar. */
@@ -64,20 +75,24 @@ export function serializeProject(project: Project): string {
   return JSON.stringify(ProjectSchema.parse(project), null, 2) + '\n'
 }
 
-/** Formaterar ett löpnummer som ID, t.ex. formatId('R', 4) → "R-004". */
+//Formaterar ett löpnummer som ID, t.ex. formatId('R', 4) → "R-004". */
 export function formatId(prefix: 'R' | 'ATG' | 'EV', n: number): string {
   return `${prefix}-${String(n).padStart(3, '0')}`
 }
 
+export type IdKind = keyof NextNumber
+
 /**
- * Reserverar nästa lediga ID och räknar upp löpnumret. Ändrar `project`.
- * ID:n återanvänds aldrig (ARCHITECTURE B-17).
+ * Nästa lediga ID och de uppräknade löpnumren. Ren funktion: ändrar varken
+ * projektet eller `nextNumber`, utan returnerar nya värden som store sparar
+ * (ARCHITECTURE B-17, B-23). ID:n återanvänds aldrig.
  */
-export function takeId(project: Project, kind: 'risk' | 'action' | 'evidence'): string {
+export function takeId(nextNumber: NextNumber, kind: IdKind): { id: string; nextNumber: NextNumber } {
   const prefix = { risk: 'R', action: 'ATG', evidence: 'EV' } as const
-  const id = formatId(prefix[kind], project.nextNumber[kind])
-  project.nextNumber[kind] += 1
-  return id
+  return {
+    id: formatId(prefix[kind], nextNumber[kind]),
+    nextNumber: { ...nextNumber, [kind]: nextNumber[kind] + 1 },
+  }
 }
 
 /**
