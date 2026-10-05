@@ -93,6 +93,9 @@ grc-tool/
     │   │   ├── target.ts             ✅ gränssnittet SaveTarget och filnamn
     │   │   ├── folder.ts             ✅ vald mapp via File System Access API (Chrome, Edge)
     │   │   ├── download.ts           ✅ reservläge: nedladdning (Safari, Firefox)
+    │   │   ├── backup.ts             ✅ reservkopia i localStorage mellan sparningarna
+    │   │   ├── backup.test.ts        ✅
+    │   │   ├── memory-storage.ts     ✅ localStorage i minnet, för testerna
     │   │   └── target.test.ts        ✅
     │   └── report/                   rapport och SoA för utskrift
     ├── views/                        en komponent per flik (se avsnitt 4)
@@ -305,6 +308,7 @@ Grundkrav och Annex A använder samma vy, med en växlare mellan dem.
 - **Autosparning** var tionde minut, men bara när något har ändrats och bara till en mapp, aldrig som nedladdning.
 - **Sparstatus** visas tydligt: sparat till fil, osparade ändringar, sparar, nedladdad eller fel (ARCHITECTURE B-23).
 - **Ogiltigt projekt i minnet** skrivs aldrig till fil. Felen visas med sökväg i stället.
+- **Reservkopia i webbläsaren.** Varje ändring sparas också i localStorage och rensas när filen är säkert sparad. Öppnas en fil som är äldre än kopian erbjuds de nyare ändringarna. Kopior som finns kvar visas på startsidan (ARCHITECTURE B-25).
 - **Osparade ändringar** ger en varning vid stängning.
 - **Ogiltig projektfil** ger ett tydligt fel om vad som är fel. Filen skrivs aldrig över.
 
@@ -402,7 +406,7 @@ Faserna följer Plan 2.0, som hålls utanför repot. Verktyget ska gå att anvä
 | Fas | Innehåll | Milstolpe | Status |
 |---|---|---|---|
 | **0 · Kodgrund** | Projektuppsättning, ramverk som YAML, projektfilens datamodell, bygge till en HTML-fil | | Klar |
-| **1 · Filsparande** | Spara, Spara som, autospara, sparstatus, varning vid stängning | | |
+| **1 · Filsparande** | Spara, Spara som, autospara, sparstatus, varning vid stängning, reservkopia i webbläsaren | | Klar |
 | **2 · Startsida** | Nytt arbete, öppna från fil, senaste arbeten | **M1:** ersätter dagens verktyg | |
 | **3 · Risk** | Riskmetod, riskregister, riskdetalj, koppling risk ↔ kontroll, typrisker | | |
 | **4 · Bilagor** | Evidens i mapp bredvid projektfilen, kontrollsumma, "saknar evidens" | | |

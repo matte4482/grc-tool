@@ -6,21 +6,25 @@ Småfix och konkreta punkter som ska åtgärdas. Claude läser den här filen in
 - Ange fil och rad när det går, och i vilken fas punkten senast måste vara åtgärdad.
 - Större beslut hör hemma i ARCHITECTURE.md, inte här.
 
-*Senast uppdaterad: 30 september 2026*
+*Senast uppdaterad: 5 oktober 2026*
 
-## Fas 1 (filsparande), pågår
+## Fas 1 (filsparande), klar 5 okt 2026
 
 - [x] **Bestäm mappåtkomst eller filåtkomst.** Mapp, se ARCHITECTURE B-22. *(29 sep 2026)*
-- [x] **`takeId` ändrar projektet direkt.** Nu en ren funktion som tar löpnumren och returnerar nya; store sparar dem via `newId` (B-23). *(29 sep 2026)*
-- [x] **`serializeProject` kastar fel vid ogiltigt projekt.** Store kontrollerar med `validateProject` före sparning, fångar felet och skriver aldrig (B-23). *(29 sep 2026)*
-- [ ] **Prova i riktig webbläsare från `file://`.** Bygg med `npm run build` och öppna `dist/GRC-verktyget-0.1.0.html` från disk:
-  - Chrome och Edge, på Mac och Windows: välj mapp, skapa, ändra kundnamnet, spara, stäng fliken (varning ska visas), öppna igen.
-  - En synkad SharePoint- eller OneDrive-mapp: att skrivningen fungerar och att ingen konfliktkopia uppstår.
-  - Safari eller Firefox: nedladdningsläget, att "Spara" ger en fil och att den går att öppna igen.
-  - Att nedladdningen fungerar med CSP aktiv. Den använder en `blob:`-adress; `img-src` tillåter `blob:`, men nedladdning är inte provad.
-- [ ] **Autosparningen är inte provad med riktig tid.** Logiken är testad (`autosaveTick`), men timern på tio minuter och varningen vid stängning är bara provade i kod. Prova dem i webbläsaren.
-- [ ] **Beslut: localStorage som reservkopia vid krasch.** Filen är det som gäller. Ska varje ändring också skrivas till localStorage och erbjudas vid nästa start om webbläsaren kraschat innan autosparningen? Kunddata skulle då ligga i webbläsaren tills filen sparats (B-02). Om ja: bygg i fas 1 och rensa kopian när filen sparats.
-- [ ] **Rätta kriteriet för fas 1 i Plan 2.0.** "Arbetet överlever att datorn startas om och cachen rensas" stämmer inte som skäl: localStorage överlever omstart. Det verkliga kriteriet är att arbetet finns i kundens mapp och går att öppna på en annan dator.
+- [x] **`takeId` ändrar projektet direkt.** Nu en ren funktion; store sparar löpnumren via `newId` (B-23). *(29 sep 2026)*
+- [x] **`serializeProject` kastar fel vid ogiltigt projekt.** Store kontrollerar med `validateProject` före sparning och skriver aldrig ett ogiltigt projekt (B-23). *(29 sep 2026)*
+- [x] **Beslut: localStorage som reservkopia vid krasch.** Ja: varje ändring sparas i localStorage och rensas när filen är säkert sparad. Byggt i `storage/backup.ts` (B-25). *(5 okt 2026)*
+- [x] **Rätta kriteriet för fas 1 i Plan 2.0.** Rättat i ARCHITECTURE B-19. *(5 okt 2026)*
+
+## Att verifiera i webbläsare
+
+Logiken är testad, men följande är inte provat i riktiga webbläsare. Bocka av när det är gjort.
+
+- [ ] **Chrome och Edge, på Mac och Windows,** med `dist/GRC-verktyget-<version>.html` öppnad från disk: välj mapp, skapa, ändra kundnamnet, spara, stäng fliken (varning ska visas), öppna igen.
+- [ ] **En synkad SharePoint- eller OneDrive-mapp:** att skrivningen fungerar och att ingen konfliktkopia uppstår.
+- [ ] **Safari eller Firefox:** att "Spara" laddar ned en fil, att den går att öppna igen och att nedladdningen fungerar med CSP aktiv (den använder en `blob:`-adress).
+- [ ] **Autosparningen med riktig tid:** att timern på tio minuter sparar och att varningen vid stängning visas.
+- [ ] **Reservkopian:** ändra något, stäng fliken utan att spara (svara "Lämna") och öppna filen igen. Verktyget ska erbjuda att återställa ändringarna. Prova även att kopian syns på startsidan i Safari eller Firefox.
 
 ## Före fas 2 (startsida och vyer)
 
@@ -47,6 +51,7 @@ Småfix och konkreta punkter som ska åtgärdas. Claude läser den här filen in
 
 ## Småfix, när som helst
 
+- [ ] **Uppdatera `plan-2.0.md` i Claude docs med det rättade kriteriet för fas 1** (B-19). Filen ligger på Windows-datorn, utanför repot.
 - [ ] **Externt skript rapporteras två gånger** (`scripts/finalize-build.mjs:36–37`). Samma `<script src>` hittas både av skriptsökningen och attributsökningen. Ta bort dubbletten och uppdatera testet i `scripts/finalize-build.test.mjs`.
 - [ ] **Felmeddelande på engelska** (`src/lib/frameworks/schema.ts`, `Duplication of ID`). Principen är svenska i allt användaren kan se (README, Principer). Meddelandet syns bara om en ramverksfil är trasig, men bör vara `Dubblett-ID: …` för att följa principen.
 - [ ] **Kommentaren "Risknivå 1-5" är missvisande** (`src/lib/project/schema.ts`, ovanför `LevelSchema`). Den gäller nivån på konsekvens- och sannolikhetsskalan. Risknivån (riskvärdet) är 1–25.

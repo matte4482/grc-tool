@@ -1,17 +1,12 @@
 import { FrameworkSchema, type Framework } from './schema'
 import iso27001_2022 from './iso27001-2022.yaml'
 
-// Register över ramverk (README avsnitt 6). Startsidan (fas 2) visar alla
-// poster i FRAMEWORKS; bara de med `framework` satt går att välja.
-//
-// Ramverken valideras när modulen laddas. Ett fel i en YAML-fil stoppar
-// därför både testerna och appen direkt, i stället för att synas senare.
+// Register över tillgängliga ramverk
 
 export interface FrameworkEntry {
   id: string
   version: string
   name: string
-  /** Undefined = visas som "kommer" på startsidan. */
   framework?: Framework
 }
 
@@ -28,12 +23,10 @@ export const FRAMEWORKS: readonly FrameworkEntry[] = [
   ...upcoming,
 ]
 
-/** Ramverket med givet id och version, eller undefined om det inte finns. */
 export function getFramework(id: string, version: string): Framework | undefined {
   return FRAMEWORKS.find((e) => e.id === id && e.version === version)?.framework
 }
 
-/** Antal kontroller i ett avsnitt, t.ex. 93 för Annex A. */
 export function countControls(fw: Framework, sectionId: string): number {
   const section = fw.sections.find((s) => s.id === sectionId)
   return section ? section.groups.reduce((n, g) => n + g.controls.length, 0) : 0

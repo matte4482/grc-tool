@@ -4,6 +4,8 @@ import fixture from '../../../tests/fixtures/exempel.grc.json?raw'
 import type { SaveTarget } from '../storage/target'
 import { createProject } from './project'
 import { ProjectSession, describeStatus } from './session'
+import { localBackupStore } from '../storage/backup'
+import { memoryStorage } from '../storage/memory-storage'
 
 /** Ett sparmål i minnet som minns vad som skrevs. Kan fås att misslyckas eller vänta. */
 function memoryTarget(opts: { fail?: Error; autosave?: boolean; kind?: 'folder' | 'download' } = {}) {
@@ -241,5 +243,146 @@ describe('describeStatus', () => {
   it('visar felet', () => {
     const d = describeStatus({ state: 'error', message: 'Kunde inte skriva.', details: [], since: '' }, null)
     expect(d).toEqual({ text: 'Kunde inte skriva.', tone: 'error' })
+  })
+})
+
+describe('reservkopia i webbläsaren', () => {
+  const setup = (kind: 'folder' | 'download' = 'folder') => {
+    const backup = localBackupStore(memoryStorage())
+    const s = new ProjectSession({ ...clock(), backup })
+    const t = memoryTarget({ kind, autosave: kind === 'folder' })
+    return { backup, s, t }
+  }
+
+  it('varje ändring skrivs till reservkopian', () => {
+    const { backup, s, t } = setup()
+    s.open(fixture, t)
+    s.update((d) => {
+      d.controls['A.8.20'].comment = 'Ny'
+    })
+    const id = s.project!.id
+    expect(JSON.parse(backup.read(id)!.project).controls['A.8.20'].comment).toBe('Ny')
+  })
+
+  it('rensas när projektet sparats till en mapp', async () => {
+    const { backup, s, t } = setup('folder')
+    s.open(fixture, t)
+    s.update(() => {})
+    await s.save()
+    expect(backup.read(s.project!.id)).toBeNull()
+  })
+
+  it('ligger kvar efter nedladdning, med tidpunkten noterad', async () => {
+    const { backup, s, t } = setup('download')
+    s.open(fixture, t)
+    s.update(() => {})
+    await s.save()
+    const b = backup.read(s.project!.id)!
+    expect(b.downloadedAt).toBe(s.project!.updatedAt)
+  })
+
+  it('ligger kvar om sparningen misslyckas', async () => {
+    const backup = localBackupStore(memoryStorage())
+    const s = new ProjectSession({ ...clock(), backup })
+    s.open(fixture, memoryTarget({ fail: new Error('Disken är full') }))
+    s.update(() => {})
+    await s.save()
+    expect(backup.read(s.project!.id)).not.toBeNull()
+  })
+
+  it('ligger kvar om ett ogiltigt projekt inte kunde sparas', async () => {
+    const { backup, s, t } = setup()
+    s.open(fixture, t)
+    s.update((d) => {
+      d.client.name = ''
+    })
+    await s.save()
+    expect(JSON.parse(backup.read(s.project!.id)!.project).client.name).toBe('')
+  })
+
+  it('när filen öppnas igen erbjuds nyare ändringar', () => {
+    const { s, t } = setup()
+    s.open(fixture, t)
+    s.update((d) => {
+      d.controls['A.8.20'].comment = 'Osparad'
+    })
+    // Webbläsaren kraschar; en ny session öppnar samma fil med samma lagring
+    const r = s.open(fixture, t)
+    expect(r.ok && r.newerBackup?.changedAt).toBeTruthy()
+  })
+
+  it('restoreBackup ger tillbaka ändringarna och räknar dem som osparade', () => {
+    const backup = localBackupStore(memoryStorage())
+    const first = new ProjectSession({ ...clock(), backup })
+    first.open(fixture, memoryTarget())
+    first.update((d) => {
+      d.controls['A.8.20'].comment = 'Osparad'
+    })
+
+    const second = new ProjectSession({ ...clock(), backup })
+    const r = second.open(fixture, memoryTarget())
+    expect(r.ok && r.newerBackup).toBeTruthy()
+    expect(second.project!.controls['A.8.20'].comment).not.toBe('Osparad')
+    expect(second.restoreBackup()).toEqual({ ok: true })
+    expect(second.project!.controls['A.8.20'].comment).toBe('Osparad')
+    expect(second.hasUnsavedChanges).toBe(true)
+  })
+
+  it('discardBackup tar bort kopian och behåller filens version', () => {
+    const { backup, s, t } = setup()
+    s.open(fixture, t)
+    s.update(() => {})
+    const id = s.project!.id
+    s.discardBackup()
+    expect(backup.read(id)).toBeNull()
+  })
+
+  it('en nedladdad fil som öppnas igen rensar kopian när den är minst lika ny', async () => {
+    const { backup, s, t } = setup('download')
+    s.open(fixture, t)
+    s.update(() => {})
+    await s.save()
+    const downloaded = t.writes[0]
+    const again = new ProjectSession({ ...clock(), backup })
+    const r = again.open(downloaded, memoryTarget({ kind: 'download', autosave: false }))
+    expect(r.ok && r.newerBackup).toBeFalsy()
+    expect(backup.read(again.project!.id)).toBeNull()
+  })
+
+  it('openBackup öppnar en kopia utan fil och räknar den som osparad', () => {
+    const backup = localBackupStore(memoryStorage())
+    const first = new ProjectSession({ ...clock(), backup })
+    first.open(fixture, memoryTarget())
+    first.update((d) => {
+      d.client.name = 'Från kopian'
+    })
+    const id = first.project!.id
+
+    const second = new ProjectSession({ ...clock(), backup })
+    expect(second.listBackups().map((b) => b.client)).toEqual(['Från kopian'])
+    expect(second.openBackup(id, memoryTarget({ kind: 'download', autosave: false }))).toEqual({ ok: true })
+    expect(second.project!.client.name).toBe('Från kopian')
+    expect(second.status.state).toBe('unsaved')
+  })
+
+  it('en kopia med ogiltigt projekt kan inte öppnas, men ligger kvar', () => {
+    const backup = localBackupStore(memoryStorage())
+    const first = new ProjectSession({ ...clock(), backup })
+    first.open(fixture, memoryTarget())
+    first.update((d) => {
+      d.client.name = ''
+    })
+    const id = first.project!.id
+    const r = new ProjectSession({ ...clock(), backup }).openBackup(id, memoryTarget())
+    expect(r.ok).toBe(false)
+    expect(backup.read(id)).not.toBeNull()
+  })
+
+  it('full lagring syns som backupFailed men stoppar inte arbetet', () => {
+    const s = new ProjectSession({ ...clock(), backup: localBackupStore(memoryStorage({ full: true })) })
+    s.open(fixture, memoryTarget())
+    s.update(() => {})
+    expect(s.backupFailed).toBe(true)
+    expect(s.status.state).toBe('unsaved')
   })
 })

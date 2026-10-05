@@ -1,8 +1,17 @@
 import type { SaveTarget } from '../storage/target'
+import { localBackupStore, type Backup } from '../storage/backup'
 import type { Framework } from '../frameworks/schema'
 import type { Project } from './schema'
 import type { IdKind } from './project'
-import { AUTOSAVE_INTERVAL_MS, ProjectSession, describeStatus, type OpenResult, type SaveResult, type SaveStatus } from './session'
+import {
+  AUTOSAVE_INTERVAL_MS,
+  ProjectSession,
+  describeStatus,
+  type OpenResult,
+  type RestoreResult,
+  type SaveResult,
+  type SaveStatus,
+} from './session'
 
 // Store: appens enda källa för det öppna projektet (ARCHITECTURE B-23).
 //
@@ -12,7 +21,7 @@ import { AUTOSAVE_INTERVAL_MS, ProjectSession, describeStatus, type OpenResult, 
 // bara via metoderna nedan, aldrig direkt i projektet.
 
 class ProjectStore {
-  #session = new ProjectSession({ onChange: () => this.#sync() })
+  #session = new ProjectSession({ onChange: () => this.#sync(), backup: localBackupStore() })
 
   // $state.raw: objekten byts ut vid varje ändring i stället för att ändras på
   // plats, så Svelte behöver inte bevaka varje fält för sig.
@@ -21,6 +30,10 @@ class ProjectStore {
   target = $state.raw<SaveTarget | null>(null)
   status = $state.raw<SaveStatus>({ state: 'empty' })
   hasUnsavedChanges = $state(false)
+  /** Sant om reservkopian i localStorage inte kunde skrivas (B-25). */
+  backupFailed = $state(false)
+  /** Reservkopior i webbläsaren. Uppdateras bara när inget projekt är öppet (startsidan). */
+  backups = $state.raw<Backup[]>(this.#session.listBackups())
 
   /** Sparstatusen som text och färg för sidhuvudet. */
   statusText = $derived(describeStatus(this.status, this.target))
@@ -31,6 +44,9 @@ class ProjectStore {
     this.target = this.#session.target
     this.status = this.#session.status
     this.hasUnsavedChanges = this.#session.hasUnsavedChanges
+    this.backupFailed = this.#session.backupFailed
+    // Listan läses bara när startsidan visas, inte vid varje ändring i ett projekt.
+    if (!this.project) this.backups = this.#session.listBackups()
   }
 
   start(project: Project, target: SaveTarget): Promise<SaveResult> {
@@ -53,6 +69,19 @@ class ProjectStore {
   }
   saveAs(target: SaveTarget): Promise<SaveResult> {
     return this.#session.saveAs(target)
+  }
+  restoreBackup(): RestoreResult {
+    return this.#session.restoreBackup()
+  }
+  discardBackup(): void {
+    this.#session.discardBackup()
+  }
+  openBackup(projectId: string, target: SaveTarget): RestoreResult {
+    return this.#session.openBackup(projectId, target)
+  }
+  removeBackup(projectId: string): void {
+    this.#session.removeBackup(projectId)
+    this.backups = this.#session.listBackups()
   }
 
   /**

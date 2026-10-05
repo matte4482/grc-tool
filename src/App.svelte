@@ -17,6 +17,7 @@
     supportsFolderAccess,
   } from './lib/storage/folder'
   import { projectFileName } from './lib/storage/target'
+  import type { Backup } from './lib/storage/backup'
 
   const version = __APP_VERSION__
   const canUseFolders = supportsFolderAccess()
@@ -93,9 +94,47 @@
     })
 
   function showOpenResult(r: ReturnType<typeof store.open>) {
-    if (!r.ok) messages = ['Filen kunde inte öppnas:', ...r.errors]
-    else if (r.warnings.length) messages = ['Projektet öppnades, men stämmer inte helt med ramverket:', ...r.warnings]
+    if (!r.ok) return void (messages = ['Filen kunde inte öppnas:', ...r.errors])
+    if (r.warnings.length) messages = ['Projektet öppnades, men stämmer inte helt med ramverket:', ...r.warnings]
+
+    // Reservkopian i webbläsaren har ändringar som inte finns i filen (B-25).
+    if (r.newerBackup) {
+      const question =
+        `Webbläsaren har ändringar från ${formatTime(r.newerBackup.changedAt)} som inte finns i filen ` +
+        `(sparad ${formatTime(store.project!.updatedAt)}). Vill du återställa dem?\n\n` +
+        'OK återställer ändringarna. Avbryt använder filen som den är och tar bort ändringarna i webbläsaren.'
+      if (confirm(question)) {
+        const restored = store.restoreBackup()
+        if (!restored.ok) messages = ['Ändringarna kunde inte återställas:', ...restored.errors]
+      } else store.discardBackup()
+    }
   }
+
+  /** Återställer en reservkopia från listan på startsidan och låter konsulten välja var den sparas. */
+  const restoreFromList = (backup: Backup) =>
+    run(async () => {
+      if (!mayLeaveProject()) return
+      const fileName = backup.label || projectFileName(backup.client)
+      let target = downloadTarget(fileName)
+      if (canUseFolders) {
+        const dir = await pickFolder()
+        if (!dir) return
+        if (!(await ensureWriteAccess(dir))) return void (messages = ['Verktyget fick inte skriva i mappen.'])
+        if ((await fileExists(dir, fileName)) && !confirm(`${fileName} finns redan i mappen. Ändringarna i webbläsaren skriver över den när du sparar. Vill du fortsätta?`))
+          return
+        target = folderTarget(dir, fileName)
+      }
+      const r = store.openBackup(backup.projectId, target)
+      if (!r.ok) messages = ['Reservkopian kunde inte öppnas:', ...r.errors]
+    })
+
+  function removeBackup(backup: Backup) {
+    if (confirm(`Ta bort ändringarna för ${backup.client || 'okänd kund'} från webbläsaren? Det går inte att ångra.`))
+      store.removeBackup(backup.projectId)
+  }
+
+  const formatTime = (iso: string) =>
+    new Date(iso).toLocaleString('sv-SE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
   const save = () => run(async () => void (await store.save()))
 
@@ -140,7 +179,8 @@
   {#if !canUseFolders}
     <p class="notice">
       Den här webbläsaren kan inte spara direkt till en mapp. Projektfilen laddas ned i stället och sparas inte
-      automatiskt. Använd Chrome eller Edge för att spara direkt i kundens mapp.
+      automatiskt till fil. Varje ändring sparas som reservkopia i webbläsaren tills du laddar ned filen och öppnar
+      den igen. Använd Chrome eller Edge för att spara direkt i kundens mapp.
     </p>
   {/if}
 
@@ -164,6 +204,13 @@
     </div>
   {/if}
 
+  {#if store.project && store.backupFailed}
+    <p class="notice">
+      Reservkopian i webbläsaren kunde inte sparas, till exempel för att webbläsarens lagring är avstängd eller full.
+      Spara ofta.
+    </p>
+  {/if}
+
   {#if store.project}
     <section class="card">
       <h2>Projekt</h2>
@@ -177,6 +224,34 @@
       </p>
     </section>
   {:else}
+    {#if store.backups.length}
+      <section class="card backups">
+        <h2>Osparade ändringar i webbläsaren</h2>
+        <p class="meta">
+          Ändringar som inte nådde projektfilen, till exempel för att fliken stängdes eller en nedladdning inte
+          sparades. Återställ dem och spara, eller ta bort dem.
+        </p>
+        <ul class="files">
+          {#each store.backups as backup (backup.projectId)}
+            <li class="backup">
+              <span>
+                <strong>{backup.client || 'Okänd kund'}</strong>
+                <span class="meta">
+                  · ändrad {formatTime(backup.changedAt)}{backup.downloadedAt
+                    ? ` · nedladdad ${formatTime(backup.downloadedAt)}`
+                    : ''}
+                </span>
+              </span>
+              <span class="row">
+                <button onclick={() => restoreFromList(backup)} disabled={busy}>Återställ</button>
+                <button onclick={() => removeBackup(backup)} disabled={busy}>Ta bort</button>
+              </span>
+            </li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
+
     <section class="card">
       <h2>Nytt arbete</h2>
       <div class="row">

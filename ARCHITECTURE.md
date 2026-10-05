@@ -19,9 +19,9 @@ Nya beslut läggs till sist, med nästa lediga nummer. Ett beslut som ändras sk
 
 ## Nuläge
 
-*Senast uppdaterad: 30 september 2026*
+*Senast uppdaterad: 5 oktober 2026*
 
-- **Fas:** 1, säkert filsparande, pågår (faser enligt Plan 2.0, se B-19).
+- **Fas:** 1 är klar (5 oktober 2026). Nästa fas är 2, startsidan (faser enligt Plan 2.0, se B-19).
 - **Klart i fas 0:**
   - Projektet är uppsatt med Svelte, TypeScript och Vite.
   - ISO/IEC 27001:2022 är flyttat från det gamla verktyget (`legacy/method-grc-verktyg.html`) till YAML, med schema och test.
@@ -31,14 +31,16 @@ Nya beslut läggs till sist, med nästa lediga nummer. Ett beslut som ändras sk
   - Bygget ger en enda fristående HTML-fil med säkerhetspolicy (B-03, B-20).
   - Vites startmall är ersatt av ett enkelt skal, och det felaktiga beroendet `npm` är borttaget.
   - `npm test` och `npm run build` går igenom lokalt (26 september 2026).
-- **Klart i fas 1 hittills:**
+- **Klart i fas 1:**
   - Konsulten väljer uppdragets mapp, och projektfilen sparas där (B-22).
   - Store med sparstatus, autosparning var tionde minut och varning vid stängning (B-23).
   - `takeId` är en ren funktion; nya ID:n skapas bara via store (B-23).
   - Ett ogiltigt projekt skrivs aldrig till fil; felet visas i sparstatusen (B-23).
   - Mappsparandet och store är provade i Chromium mot webbläsarens privata filyta (OPFS), med CSP aktiv.
   - Versionen är 0.1.0, och bygget döper filen efter versionen (B-24).
-- **Nästa steg:** prova hela flödet i Chrome och Edge med `dist/GRC-verktyget-0.1.0.html` öppnad från disk, på Mac och Windows, och i Safari eller Firefox för nedladdningsläget (se TODO.md).
+  - Varje ändring sparas som reservkopia i webbläsaren och rensas när filen är säkert sparad (B-25).
+- **Att verifiera:** fas 1 är inte provad i alla webbläsare ännu, se "Att verifiera i webbläsare" i TODO.md.
+- **Nästa steg:** fas 2. Läs "Före fas 2" i TODO.md först.
 - **Väntar på beslut:** O-03 (regel för restrisk), senast före fas 3. O-04 (hur åtgärder skapas och hanteras), senast före fas 5.
 
 ---
@@ -282,6 +284,11 @@ Inloggning mot kundens molnmiljö kräver ett riktigt program, eftersom en HTML-
 
 Arbetet följer de nio faserna (0–8) och milstolparna M1–M4 i Plan 2.0, med ändringarna i B-16. Fastabellen i README är uppdaterad. Nya idéer läggs efter M4, inte i pågående fas. Planen och rapporter om arbetet hålls utanför repot.
 
+Ändringar mot Plan 2.0:
+
+- **Fas 0 och 7:** gamla sparfiler läses inte in (B-16).
+- **Fas 1, kriteriet för klar:** planen säger att arbetet ska överleva att webbläsaren stängs, datorn startas om och cachen rensas. Det stämmer inte som skäl, eftersom localStorage överlever omstart. Det verkliga kriteriet är att arbetet finns i kundens mapp, går att öppna på en annan dator och inte försvinner om webbläsaren kraschar mellan sparningarna (B-22, B-23, B-25).
+
 ## B-20 · Säkerhetspolicy (CSP) i den byggda filen
 
 **Status:** Beslutat
@@ -364,7 +371,7 @@ Regler:
 
 Sparstatusen har fem lägen: inget projekt, sparat, osparade ändringar, sparar och fel. `describeStatus` gör om den till text för sidhuvudet, till exempel "Sparat till exempelbolaget-ab.grc.json 14:42".
 
-Öppen fråga: localStorage som reservkopia vid krasch (se TODO.md).
+Reservkopia i webbläsaren mellan sparningarna: se B-25.
 
 ## B-24 · Versionsnummer och filnamn
 
@@ -385,6 +392,26 @@ Den byggda filen döps efter versionen, till exempel `dist/GRC-verktyget-0.1.0.h
 Skäl: konsulterna ska kunna se vilken version de använder, och flera versioner ska kunna ligga sida vid sida utan att skriva över varandra. Källfilen heter fortfarande `index.html`, eftersom Vite och utvecklingsservern utgår från det namnet.
 
 Rutinen för att dela ut en ny version till konsulterna (var filen läggs och hur de får veta) är inte bestämd, se TODO.md.
+
+## B-25 · Reservkopia i webbläsaren
+
+**Status:** Beslutat
+
+Beslutat 5 oktober 2026. Varje ändring i ett projekt sparas också i webbläsarens localStorage, och kopian rensas när ändringarna säkert finns i en fil. Projektfilen är fortfarande det som gäller; reservkopian är ett skyddsnät.
+
+Skäl: autosparningen sker var tionde minut, och i Safari och Firefox finns ingen autosparning till fil alls. Kraschar webbläsaren, eller stängs fliken trots varningen, skulle ändringarna sedan senaste sparningen annars gå förlorade.
+
+Så fungerar det (`src/lib/storage/backup.ts`, `session.ts`):
+
+- **Skrivs vid varje ändring.** `update()` och `start()` skriver hela projektet till localStorage, under nyckeln `grc-verktyget:reservkopia:<projektets id>`. Även ett ogiltigt projekt sparas, så att inget går förlorat.
+- **Rensas vid sparning till mapp.** När filen är skriven (Chrome, Edge) tas kopian bort direkt.
+- **Ligger kvar vid nedladdning.** I Safari och Firefox går det inte att veta om den nedladdade filen verkligen sparades; dialogen kan ha avbrutits. Kopian märks som nedladdad men ligger kvar, och rensas när den nedladdade filen öppnas igen och visar sig vara minst lika ny.
+- **Ligger kvar vid fel.** Misslyckas sparningen, eller är projektet ogiltigt, finns ändringarna kvar i kopian.
+- **Erbjuds vid öppning.** Öppnas en projektfil och kopian har nyare ändringar än filen (`changedAt` senare än filens `updatedAt`) frågar verktyget om de ska återställas. Ja ger ändringarna som osparade, så att de sparas till filen. Nej behåller filen och tar bort kopian.
+- **Listas på startsidan.** Kopior som finns kvar visas under "Osparade ändringar i webbläsaren", med knapparna Återställ och Ta bort. Återställ fungerar även om filen saknas, till exempel om en nedladdning aldrig sparades.
+- **Fungerar utan localStorage.** Om lagringen är avstängd (privat fönster, IT-policy) eller full fortsätter verktyget att fungera, och en ruta uppmanar konsulten att spara ofta.
+
+Konsekvenser för B-02 (kunddata hos kunden): kunddata ligger i webbläsaren på konsultens dator mellan en ändring och nästa sparning. I Chrome och Edge rensas den inom tio minuter, eller direkt vid Spara. I Safari och Firefox ligger den kvar tills den nedladdade filen öppnats igen eller kopian tagits bort. I Chrome och Edge delar alla filer som öppnas från disk samma localStorage, så en annan lokal HTML-fil skulle i princip kunna läsa kopian. Det är en medveten avvägning mot risken att förlora arbete.
 
 ---
 
