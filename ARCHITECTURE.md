@@ -19,9 +19,9 @@ Nya beslut läggs till sist, med nästa lediga nummer. Ett beslut som ändras sk
 
 ## Nuläge
 
-*Senast uppdaterad: 5 oktober 2026*
+*Senast uppdaterad: 12 oktober 2026*
 
-- **Fas:** 1 är klar (5 oktober 2026). Nästa fas är 2, startsidan (faser enligt Plan 2.0, se B-19).
+- **Fas:** 4 är klar i koden (12 oktober 2026): bifogad evidens på kontroller och risker (B-31). Fas 2 och 3 är också klara i koden. Alla tre återstår att prova i riktiga webbläsare, se TODO.md. Nästa fas är 5, åtgärdsplan (faser enligt Plan 2.0, se B-19).
 - **Klart i fas 0:**
   - Projektet är uppsatt med Svelte, TypeScript och Vite.
   - ISO/IEC 27001:2022 är flyttat från det gamla verktyget (`legacy/method-grc-verktyg.html`) till YAML, med schema och test.
@@ -39,9 +39,37 @@ Nya beslut läggs till sist, med nästa lediga nummer. Ett beslut som ändras sk
   - Mappsparandet och store är provade i Chromium mot webbläsarens privata filyta (OPFS), med CSP aktiv.
   - Versionen är 0.1.0, och bygget döper filen efter versionen (B-24).
   - Varje ändring sparas som reservkopia i webbläsaren och rensas när filen är säkert sparad (B-25).
-- **Att verifiera:** fas 1 är inte provad i alla webbläsare ännu, se "Att verifiera i webbläsare" i TODO.md.
-- **Nästa steg:** fas 2. Läs "Före fas 2" i TODO.md först.
-- **Väntar på beslut:** O-03 (regel för restrisk), senast före fas 3. O-04 (hur åtgärder skapas och hanteras), senast före fas 5.
+- **Klart i fas 2:**
+  - Startsidan med Nytt arbete (kund och ramverk; bara ISO 27001 går att välja, övriga visas som "Kommer"), Öppna befintligt arbete och Senaste arbeten med förlopp (B-26).
+  - "Fortsätt" öppnar ett projekt i en sparad mapp med ett klick, plus webbläsarens fråga om behörighet.
+  - Flödena för mapp och fil ligger i `storage/workflow.ts` och är testade utan webbläsare.
+  - Förloppet räknas i `lib/compliance.ts` utifrån ramverkets avsnitt, utan hårdkodade ISO-avsnitt.
+  - "Stäng" i sidhuvudet: sparar först i en mapp, frågar vid nedladdning. Sessionen vägrar stänga med osparade ändringar om inte anroparen uttryckligen godkänt det.
+  - Startsidan enligt skiss, med 15 typrisker som startpunkt och dra och släpp (B-29).
+  - Flikar: Översikt, Grundläggande krav, Annex A och SoA (B-28). Logiken ligger i `lib/assessment.ts` och är testad.
+  - Grundkrav och Annex A: status, motivering, ansvarig, evidensanteckning, valfri teknisk och organisatorisk del, bevisbörda och kopplade risker. Sök, statusfilter, "Dölj ej tillämpliga" och "Behöver uppmärksamhet".
+  - SoA: tillämplighet och motivering per kontroll. Kontroller kopplade till risker är låsta som tillämpliga.
+  - Översikt: uppfyllnadsgrad, fördelning per status, per avsnitt och tema, och genvägar till det som behöver uppmärksamhet.
+  - Egen dialog i stället för `confirm()`. Esc i frågan om reservkopian behåller kopian.
+  - Provat i Chromium med CSP aktiv, både med mappåtkomst och i nedladdningsläge.
+- **Klart i fas 3:**
+  - Riskmetod med redigerbara skalor, konsekvenstyper, matris, acceptansnivå, intervall och fastställande. Standardmetoden gäller tills något ändras.
+  - Riskregister med nyckeltal, värmekarta (före, planerad, faktisk), sök och filter, markering av saknade uppgifter och varning när faktisk restrisk är högre än planerad.
+  - Riskdetalj med bedömning i tre steg, kopplade kontroller med effektivitet och typ, godkännande av restrisk, historik och borttagning.
+  - Restrisken räknas enligt B-27 i `lib/risk/rules.ts`; ändringarna ligger i `lib/risk/operations.ts`. Båda är testade.
+  - Typrisker kan tas bort och importeras igen. "Kopiera från kund" på startsidan.
+  - Annex A visar riskvärde vid kopplade risker och har "Föreslå text från risker". Översikten visar risknyckeltal.
+- **Klart i fas 4:**
+  - Bifoga filer på grundkrav, Annex A-kontroller och risker, med knapp eller dra och släpp. Filerna kopieras till `evidens/<ID>/` bredvid projektfilen (B-31).
+  - Kontrollsumma (SHA-256): samma fil kopieras inte två gånger, och ändrade eller saknade filer markeras. Översikten kan kontrollera alla filer.
+  - Öppna evidensen i en ny flik direkt från kontrollen. Ta bort tar bara bort referensen.
+  - "Saknar evidens" i Behöver uppmärksamhet och på översikten. Antal filer visas på raden.
+  - Konsultens namn sparas i webbläsaren och skrivs vid bifogad fil (B-32).
+  - Filformatet för fynd från automatisk granskning är bestämt och testat (B-33).
+  - Dubblerade ID:n rapporteras med rätt sökväg i projektfilen.
+- **Att verifiera:** fas 1–4 är inte provade i alla webbläsare ännu, se "Att verifiera i webbläsare" i TODO.md.
+- **Nästa steg:** fas 5, åtgärdsplan. Läs TODO.md först.
+- **Väntar på beslut:** O-04 (hur åtgärder skapas och hanteras), senast före fas 5.
 
 ---
 
@@ -287,6 +315,8 @@ Arbetet följer de nio faserna (0–8) och milstolparna M1–M4 i Plan 2.0, med 
 Ändringar mot Plan 2.0:
 
 - **Fas 0 och 7:** gamla sparfiler läses inte in (B-16).
+- **Fas 2:** omfattar även bedömningsvyerna (B-28).
+- **Fas 3:** planerad och faktisk restrisk räknas båda fram enligt B-27. README sa tidigare att planerad restrisk anges för hand.
 - **Fas 1, kriteriet för klar:** planen säger att arbetet ska överleva att webbläsaren stängs, datorn startas om och cachen rensas. Det stämmer inte som skäl, eftersom localStorage överlever omstart. Det verkliga kriteriet är att arbetet finns i kundens mapp, går att öppna på en annan dator och inte försvinner om webbläsaren kraschar mellan sparningarna (B-22, B-23, B-25).
 
 ## B-20 · Säkerhetspolicy (CSP) i den byggda filen
@@ -413,6 +443,137 @@ Så fungerar det (`src/lib/storage/backup.ts`, `session.ts`):
 
 Konsekvenser för B-02 (kunddata hos kunden): kunddata ligger i webbläsaren på konsultens dator mellan en ändring och nästa sparning. I Chrome och Edge rensas den inom tio minuter, eller direkt vid Spara. I Safari och Firefox ligger den kvar tills den nedladdade filen öppnats igen eller kopian tagits bort. I Chrome och Edge delar alla filer som öppnas från disk samma localStorage, så en annan lokal HTML-fil skulle i princip kunna läsa kopian. Det är en medveten avvägning mot risken att förlora arbete.
 
+## B-26 · Senaste arbeten i IndexedDB
+
+**Status:** Beslutat
+
+Beslutat 5 oktober 2026, fas 2. Listan "Senaste arbeten" på startsidan sparas i webbläsarens IndexedDB (`src/lib/storage/recent.ts`), inte i localStorage.
+
+Skäl: bara IndexedDB kan spara mapphandtag (`FileSystemDirectoryHandle`). Med handtaget kan "Fortsätt" öppna projektet igen utan att konsulten letar upp mappen. Webbläsaren frågar bara om behörigheten, en gång per besök.
+
+Så fungerar det:
+
+- **Innehåll:** projektets id, kund, ramverk, filnamn, när det sparades och användes, förlopp (bedömda av tillämpliga) och, för projekt i en mapp, mapphandtaget. Ingen bedömning; den finns bara i projektfilen.
+- **Uppdateras** när ett projekt skapas, öppnas, återställs eller sparas (även av autosparningen). Högst 8 projekt, de äldsta tas bort.
+- **Nedladdade projekt** (Safari, Firefox) har inget mapphandtag. Knappen heter då "Välj fil".
+- **Flyttad eller borttagen fil** ger ett tydligt meddelande. "Ta bort" tar bara bort posten ur listan, aldrig filen.
+- **Utan IndexedDB** (privat fönster, IT-policy) blir listan tom och resten av verktyget fungerar.
+
+Konsekvenser för B-02: kundnamn och förlopp ligger i webbläsaren på konsultens dator tills posten tas bort eller trycks ut av nyare projekt. Det är samma avvägning som i B-25, men mindre känsligt, eftersom inga bedömningar sparas.
+
+
+## B-27 · Regel för restrisk
+
+**Status:** Beslutat · avgör O-03
+
+Beslutat 7 oktober 2026: alternativ B i O-03 med alla fyra justeringarna. Både planerad och faktisk restrisk räknas fram ur kontrollerna; ingen av dem anges för hand.
+
+1. **Grov skala för effektivitet.** Varje koppling mellan risk och kontroll får effektiviteten *Låg 0,25*, *Medel 0,5* eller *Hög 0,75* (fältet `effect` i `RiskControlLinkSchema`).
+2. **Kontrollen sänker sannolikhet eller konsekvens, inte riskvärdet.** Kopplingen anges som *förebyggande* (sänker sannolikheten) eller *begränsande* (sänker konsekvensen), fältet `type`. Den sänkta nivån avrundas uppåt till närmaste hela nivå, lägst 1. Restrisken hamnar därför alltid i en ruta i matrisen.
+3. **Status styr den faktiska effekten.** Planerad restrisk räknar med att alla kopplade kontroller är uppfyllda. Faktisk restrisk multiplicerar effektiviteten med en faktor för status: Uppfylld 1, Delvis uppfylld 0,5, Ej uppfylld 0, Ej bedömd 0.
+4. **Flera kontroller kombineras som lager:** `1 − (1 − e₁) × (1 − e₂) × …`, separat för sannolikhet och konsekvens. Den sammanlagda effekten är högst 0,9.
+
+Formeln, per sida (sannolikhet eller konsekvens):
+
+```
+nivå efter = max(1, avrunda uppåt(nivå före × (1 − sammanlagd effekt)))
+restrisk   = konsekvens efter × sannolikhet efter
+```
+
+Konsekvenser:
+
+- **Datamodellen:** fältet `planned` i `RiskSchema` tas bort, eftersom planerad restrisk räknas fram (B-17). En koppling utan `effect` eller `type` sänker ingenting, och riskregistret markerar den som ofullständig.
+- **Avrundning:** värdet avrundas till sex decimaler innan det avrundas uppåt, som skydd mot flyttalsfel.
+- **Metoden** (skala, faktorer och avrundning) står i riskmetoden och skrivs ut som bilaga i rapporten. Krav 6.1.2 kräver jämförbara och upprepbara riskbedömningar.
+
+Exemplet i O-03 (R-004, K 4 × S 4, A.8.20 förebyggande Hög, Delvis uppfylld) ger planerad restrisk 4 och faktisk 12.
+
+## B-28 · Bedömningsvyerna byggs i fas 2
+
+**Status:** Beslutat · avgör O-05
+
+Beslutat 7 oktober 2026: alternativ A i O-05. Fas 2 omfattar, utöver startsidan, flikarna i sidhuvudet, Grundkrav och Annex A med status per kontroll, SoA och en enkel översikt med uppfyllnadsgrad (README 4.2, 4.3, 4.7 och 4.8). M1 ligger kvar efter fas 2.
+
+Skäl: utan vyerna går det inte att göra en gapanalys, och risk (fas 3) och åtgärder (fas 5) bygger på kontrollernas status. Dashboarden i fas 6 bygger vidare på översikten.
+
+Byggt 7 oktober 2026. Det som README 4.7 och 4.8 beskriver men som hör till senare faser väntar: bifogad evidens och "saknar evidens" (fas 4), "Föreslå text från risker" och riskvärden vid kopplade risker (fas 3), åtgärder från kontroller (fas 5, O-04), utskrift av SoA (fas 8) och vem som senast ändrade (kräver konsultens namn, som saknas än). Till dess finns fältet "Evidens (var finns den?)", som sparas i `evidenceNote`.
+
+
+## B-29 · Startsidans utformning, startpunkt och typrisker
+
+**Status:** Beslutat
+
+Beslutat 7 oktober 2026 utifrån Mateusz skiss av startsidan.
+
+- **Utformning:** Nytt arbete är huvudkortet till vänster. Till höger finns Öppna befintligt arbete och Senaste arbeten. Sidhuvudet visar logga, namn och version; knapparna Bibliotek och Inställningar i skissen utelämnas tills det finns något att visa.
+- **Startpunkt för riskregistret:** *Med typrisker* lägger in typriskerna i projektfilen redan när arbetet skapas. De syns i riskregistret när fas 3 är klar. *Tomt register* ger inga risker. *Kopiera från kund* byggs i fas 3 och visas som "kommer".
+- **Typrisker** är data i `src/lib/risk/typrisker-iso27001.yaml`, med schema i `templates.ts`, på samma sätt som ramverket (B-04). Varje typrisk har förslag på kontroller med effektivitet och typ enligt B-27, men ingen konsekvens eller sannolikhet; de bedöms med kunden. Den första versionen har 15 risker skrivna av Claude och ska granskas och utökas av en senior ISO-konsult. En risk som skapats från en typrisk får typriskens ID i fältet `template`.
+- **Dra och släpp:** i Chrome och Edge kan uppdragets mapp dras in och öppnas som vid val av mapp. En indragen fil öppnas utan mapp, och Spara ber då om mappen. I Safari och Firefox kan bara filen dras in.
+- **Senaste arbeten** visar andelen bedömda kontroller i procent och en stapel delad i uppfylld, delvis och ej uppfylld. En nedladdad eller indragen fil ersätter inte en post som har mappen, så att "Fortsätt" fortsätter att fungera.
+
+
+## B-30 · Riskregistret i fas 3
+
+**Status:** Beslutat
+
+Beslutat 7 oktober 2026, med förslagen i rapporten "Plan för fas 3".
+
+- **Typrisker kan tas bort.** En risk tas bort ur registret efter en bekräftelse. ID:t återanvänds aldrig (B-17). Kontroller som bara var kopplade till risken låses upp i SoA. En borttagen typrisk kan importeras igen och får då ett nytt ID. Det löser frågan om att typrisker låser kontroller direkt: konsulten tar bort de typrisker som inte gäller.
+- **Planerad restrisk anges inte för hand** (B-27). Fältet `planned` är borttaget ur `RiskSchema`; äldre filer med fältet läses ändå, eftersom okända fält ignoreras.
+- **Godkännandet sparar restrisken** (`approval.residual`). Ändras den faktiska restrisken efteråt, till exempel för att en kontroll fått en annan status, visas godkännandet som inaktuellt och kan göras om.
+- **Accepterade risker** behandlas inte, så deras restrisk är risken före behandling.
+- **Ett konsekvensvärde per risk.** Konsekvenstyperna är beskrivningar som hjälper vid bedömningen.
+- **Nyckeltal:** *över acceptansnivå* = risken före behandling är över acceptansnivån. *Restrisk ej uppnådd* = faktisk restrisk är högre än planerad. *Väntar på godkännande* = bedömd risk med beslutad behandling men utan giltigt godkännande.
+- **Saknade uppgifter** markeras: ägare, bedömning, behandling och kopplingar utan effektivitet eller typ.
+- **Historik** skrivs automatiskt när en risk skapas, bedöms, får ny behandling, kopplas eller godkänns. Textändringar skrivs inte, så att historiken inte fylls av varje tangenttryckning.
+- **Kopiera från kund** tar riskmetoden och riskerna (namn, beskrivning, hot, sårbarhet, tillgångar och kopplingar) från en annan projektfil, men inte ägare, bedömningar, behandling eller godkännanden.
+- **Riskmetoden** sparas i projektfilen först när konsulten ändrar något. Till dess gäller standardmetoden.
+
+## B-31 · Evidens i fas 4
+
+**Status:** Beslutat
+
+Beslutat 12 oktober 2026. Koden finns i `lib/evidence/evidence.ts` (ren logik), `lib/storage/evidence-files.ts` (filerna i mappen) och `components/EvidenceList.svelte`.
+
+| Fråga | Beslut | För | Emot |
+|---|---|---|---|
+| Var ligger filerna? | `evidens/<kontroll- eller risk-ID>/` bredvid projektfilen, t.ex. `evidens/A.8.5/policy.pdf`. | Kunden och revisorn hittar filen i SharePoint utan verktyget. Inga namnkrockar mellan kontroller. | En fil som styrker flera kontroller ligger bara i den första mappen (se återanvändning). |
+| Samma fil två gånger? | Kontrollsumman (SHA-256) jämförs. Finns filen redan i projektet och är oförändrad pekar den nya referensen på den, och ingen kopia görs. Samma fil två gånger på samma kontroll nekas. | Ingen dubbellagring, och samma policy kan styrka tio kontroller. | Referensen pekar in i en annan kontrolls mapp. Godtaget, eftersom sökvägen syns i listan. |
+| Namnkrock i mappen? | Ett ledigt namn väljs: `policy.pdf`, `policy (2).pdf` … En befintlig fil skrivs aldrig över. | Inget kan försvinna. | Namnen kan bli otydliga om samma namn används ofta. |
+| Ta bort | Bara referensen tas bort. Filen ligger kvar i kundens mapp. | Verktyget raderar aldrig kunddata (principen *säkert*). Filen kan behövas för andra kontroller eller av kunden. | Mappen kan innehålla filer som inte längre används. Godtaget; kunden städar i SharePoint. |
+| Största fil | 100 MB. Större filer läggs i mappen för hand och anges i fältet *Evidens på annan plats*. | Filen läses in i minnet för kontrollsumman; mycket stora filer gör webbläsaren långsam. | En gräns att förklara. Revisionsevidens är sällan så stor. |
+| Webbläsare | Bifoga och öppna kräver mappåtkomst (Chrome, Edge). I nedladdningsläget (Safari, Firefox) visas listan och en förklaring, men inget kan bifogas. | Samma lösning som sparandet (B-22). Inget nytt lagringsställe. | Safari och Firefox kan inte bifoga. Godtaget, verktyget rekommenderar redan Chrome och Edge. |
+| Kontroll av filerna | När en kontroll öppnas räknas kontrollsumman om för dess filer. Översikten har knappen *Kontrollera att de finns kvar* för alla filer. Ändrade och saknade filer markeras. | Uppfyller kravet att en ändrad eller flyttad fil ska synas (README 4.7). Ingen bakgrundsprocess. | Att öppna en kontroll med stora filer tar en stund. Kontrollen görs inte vid varje sparning. |
+| Öppna | Filen öppnas i en ny flik som en `blob:`-adress. Blockeras fliken laddas filen ned. | Fungerar med CSP utan nätverk (B-20). Uppfyller "en revisor kan öppna evidensen direkt från kontrollen". | Vissa filtyper (Word, Excel) laddas alltid ned i stället för att visas. |
+| "Saknar evidens" | En tillämplig kontroll som är *Uppfylld* eller *Delvis uppfylld* men saknar både bifogad fil och anteckning i *Evidens på annan plats*. | Det är det en revisor frågar efter. Ej bedömda och ej uppfyllda har inget att styrka. | En anteckning räknas som evidens fast den inte kan kontrolleras. Godtaget, all evidens kan inte bifogas. |
+| Risker | Risker kan också ha evidens, t.ex. anteckningar från riskworkshopen. Det skrivs i riskens historik. | Underlag för 6.1.2 och 8.2. Samma komponent som för kontroller. | — |
+
+**Rättat före fasen:** dubblerade ID:n i projektfilen rapporteras nu med den faktiska sökvägen, t.ex. `risks.0.evidence.0.id` (TODO.md).
+
+**Vidareutveckling:** `source: 'automatic'` och `prepareEvidence` kan användas av en framtida import av fynd (B-33). En ny ägare av evidens, till exempel åtgärder i fas 5, kräver bara ett nytt värde i `EvidenceOwner`.
+
+## B-32 · Konsultens namn sparas i webbläsaren
+
+**Status:** Beslutat
+
+Beslutat 12 oktober 2026. Evidens ska visa vem som lade till den (Plan 2.0). Namnet frågas första gången konsulten bifogar en fil och sparas i `localStorage` (`lib/storage/settings.ts`).
+
+- **För:** inget nytt gränssnitt (Inställningar behövs inte än), och namnet är konsultens eget, inte kunddata.
+- **Emot:** namnet följer webbläsaren, inte konsulten, och måste anges på varje dator. Godtaget.
+- **Vidareutveckling:** samma namn kan fylla i `updated.by` och `history.by`, som idag är tomma (TODO.md, före fas 8).
+
+## B-33 · Filformat för fynd från automatisk granskning
+
+**Status:** Beslutat (formatet). Inläsningen byggs senare.
+
+Beslutat 12 oktober 2026, som Plan 2.0 kräver i fas 4 (B-18). Schemat finns i `lib/cloud/findings.ts` och beskrivs i README avsnitt 5.
+
+- **Formatet:** JSON med `format: "grc-fynd"`, `version: 1`, källa (verktyg, version, granskad miljö), tidpunkt och en lista med fynd. Varje fynd har kontroll-ID, status för den tekniska delen, rubrik, detaljer, resurs och filer med kontrollsumma.
+- **Bara den tekniska delen.** Fynden påverkar `parts.technical`, aldrig den övergripande statusen, som konsulten sätter (B-18). `technicalStatus()` väljer den sämsta statusen per kontroll och listar okända kontroll-ID:n.
+- **Inläsningen i gränssnittet väntar** tills det finns ett program som skriver filen. *För:* inget byggs som inte kan provas på riktigt. *Emot:* formatet kan behöva ändras när programmet byggs; då höjs `version`.
+- **Varför en fil och inte ett API:** verktyget har ingen nätverksåtkomst (B-20) och kan inte skydda inloggningsuppgifter. Granskningsprogrammet skriver filen i uppdragets mapp, och verktyget läser den som vilken fil som helst.
+
+
 ---
 
 ## Öppna frågor
@@ -439,7 +600,7 @@ Grundkraven 6.1–6.6 är numrerade i löpordning. I standarden heter de 6.1.1, 
 
 ### O-03 · Regel för faktisk restrisk
 
-*Måste avgöras före fas 3. Datamodellen (B-17) fungerar med båda alternativen.*
+**Avgjord 7 oktober 2026:** alternativ B med justeringarna 1–4, se B-27.
 
 Riskregistret visar två restrisker: den *planerade* (när alla åtgärder är genomförda) och den *faktiska* (utifrån hur kontrollerna faktiskt är uppfyllda just nu). Regeln för uträkningen behöver bestämmas innan riskregistret byggs. Två alternativ finns.
 
@@ -526,3 +687,27 @@ Datamodellen tillåter redan att en åtgärd kopplas till flera kontroller och r
 
 - Förslag eller automatiska åtgärder (fråga 1).
 - Rekommendationerna 2–4 gäller, eller ändras.
+
+### O-05 · Bedömningsvyerna saknas i faserna
+
+**Avgjord 7 oktober 2026:** alternativ A, se B-28. Upptäckt vid kontrollen mot målet 5 oktober 2026.
+
+Målet är ett komplett verktyg för gapanalyser, och M1 (efter fas 2) säger att verktyget ersätter dagens. Men ingen fas i Plan 2.0 bygger vyerna där själva bedömningen görs: Grundkrav och Annex A med status per kontroll (README 4.7), SoA (4.8), Översikt (4.3) och sidhuvudets flikar (4.2). I den ursprungliga planen skulle de flyttas från det gamla verktyget, men det föll bort när vi bestämde att bygga ett nytt verktyg (B-16). Utan dem går det att skapa och spara ett projekt, men inte att göra en gapanalys.
+
+Kontrollen mot målet i övrigt:
+
+- **Allt i ett:** datamodellen (B-17) rymmer redan kontroller, SoA, risker, åtgärder och evidens i samma projektfil.
+- **Enkelt:** en HTML-fil, ingen installation, filen i kundens mapp.
+- **Säkert:** CSP utan nätverksåtkomst (B-20), ogiltiga projekt skrivs aldrig.
+- **Modulärt:** ramverk är data (B-04), logiken ligger i `lib/` och är testad, startsidan räknar utifrån ramverkets avsnitt.
+- **Molnsynk mot t.ex. Azure:** grunden finns (B-18): fasta kontroll-ID:n, `parts.technical` och `evidence.source`. Själva synken väntar på ett skrivbordsprogram som skriver en fil med fynd som verktyget läser in (fas 4).
+
+**Alternativ:**
+
+- *A · Lägg vyerna i fas 2,* före M1. Fas 2 blir större men M1 stämmer.
+- *B · Ny fas 2b* mellan fas 2 och 3, och flytta M1 dit.
+- *C · Flytta M1* till efter fas 5 och bygg vyerna i fas 3.
+
+**Rekommendation:** A. Grundkrav, Annex A och SoA är det konsulten arbetar i varje dag, och risk (fas 3) och åtgärder (fas 5) bygger på kontrollernas status. En enkel Översikt med uppfyllnadsgrad räcker till M1; dashboarden i fas 6 bygger vidare på den. `lib/compliance.ts` är redan förberedd för det.
+
+**Beslut behövs om:** alternativ A, B eller C.

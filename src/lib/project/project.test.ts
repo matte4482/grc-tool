@@ -89,8 +89,8 @@ describe('ogiltiga filer ger begripliga fel', () => {
   it('riskvärde utanför skalan', () => {
     const s = sample()
     s.risks[0].before.likelihood = 6
-    s.risks[0].planned.consequence = 0
-    expect(pathsFor(s)).toEqual(['risks.0.before.likelihood', 'risks.0.planned.consequence'])
+    s.risks[0].before.consequence = 0
+    expect(pathsFor(s)).toEqual(['risks.0.before.consequence', 'risks.0.before.likelihood'])
   })
 
   it('felmeddelandena är på svenska', () => {
@@ -107,7 +107,7 @@ describe('fasta ID:n', () => {
   it('dubbletter underkänns', () => {
     const s = sample()
     s.risks[1].id = 'R-001'
-    expect(errorsFor(s)).toContain('risks: Dubblett-ID för risk: R-001')
+    expect(errorsFor(s)).toContain('risks.1.id: Dubblett-ID för risk: R-001')
   })
 
   it('nextNumber måste ligga över högsta använda nummer', () => {
@@ -141,7 +141,7 @@ describe('fasta ID:n', () => {
   it('evidens-ID är unika över kontroller och risker', () => {
     const s = sample()
     s.risks[0].evidence = [{ ...s.controls['A.8.20'].evidence[0] }]
-    expect(errorsFor(s)).toContain('controls: Dubblett-ID för evidens: EV-001')
+    expect(errorsFor(s)).toContain('risks.0.evidence.0.id: Dubblett-ID för evidens: EV-001')
   })
 })
 

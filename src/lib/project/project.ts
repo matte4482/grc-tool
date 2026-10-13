@@ -10,7 +10,9 @@ const swedish = z.locales.sv()
 
 export type ParseResult = { ok: true; project: Project } | { ok: false; errors: string[] }
 
-// Ett nytt, tomt projekt. `now` och `id` kan anges för tester, ananrs genereras de automatiskt.
+/** 
+ * Ett nytt, tomt projekt. `now` och `id` kan anges för tester, ananrs genereras de automatiskt.
+ */
 export function createProject(opts: {
   client: string
   framework: Pick<Framework, 'id' | 'version'>
@@ -30,8 +32,8 @@ export function createProject(opts: {
 }
 
 /**
- * Läser in en projektfil. Kastar inte obegripliga exceptions: vid fel returneras en lista med
- * begripliga felmeddelanden, och inget halvt laddat projekt.
+ * Läser in en projektfil. Vid fel returneras en lista med
+ * felmeddelanden, och inget halvt laddat projekt.
  */
 export function parseProject(json: string): ParseResult {
   let raw: unknown
@@ -57,9 +59,7 @@ export function parseProject(json: string): ParseResult {
 }
 
 /**
- * Felen i ett projekt som ligger i minnet, som text med sökväg. Tom lista = giltigt.
- * Används av store innan sparande, så att felet kan visas i stället för att
- * serializeProject kastar (B-23).
+ * Sparar fel i en string vid parseProject, så att de kan visas i UI.
  */
 export function validateProject(project: Project): string[] {
   const result = ProjectSchema.safeParse(project, { error: swedish.localeError })
@@ -70,12 +70,12 @@ function formatIssues(issues: z.ZodError['issues']): string[] {
   return issues.map((i) => (i.path.length ? `${i.path.join('.')}: ${i.message}` : i.message))
 }
 
-/** Projektet som text, redo att skrivas till fil. Stabil ordning och indrag ger läsbara diffar. */
+/** Projektet som text för att skriva till fil */
 export function serializeProject(project: Project): string {
   return JSON.stringify(ProjectSchema.parse(project), null, 2) + '\n'
 }
 
-//Formaterar ett löpnummer som ID, t.ex. formatId('R', 4) → "R-004". */
+//Formaterar ett löpnummer som ID, t.ex. "R-004". */
 export function formatId(prefix: 'R' | 'ATG' | 'EV', n: number): string {
   return `${prefix}-${String(n).padStart(3, '0')}`
 }
@@ -83,9 +83,8 @@ export function formatId(prefix: 'R' | 'ATG' | 'EV', n: number): string {
 export type IdKind = keyof NextNumber
 
 /**
- * Nästa lediga ID och de uppräknade löpnumren. Ren funktion: ändrar varken
- * projektet eller `nextNumber`, utan returnerar nya värden som store sparar
- * (ARCHITECTURE B-17, B-23). ID:n återanvänds aldrig.
+ * Nästa lediga löpnummer för ID. 
+ * ID:n återanvänds aldrig.
  */
 export function takeId(nextNumber: NextNumber, kind: IdKind): { id: string; nextNumber: NextNumber } {
   const prefix = { risk: 'R', action: 'ATG', evidence: 'EV' } as const

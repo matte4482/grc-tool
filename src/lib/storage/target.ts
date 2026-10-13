@@ -1,5 +1,3 @@
-// Ett sparmål: vart projektfilen skrivs. Store vet inte om det är en mapp
-// eller en nedladdning, bara att den kan anropa write() (ARCHITECTURE B-22).
 
 export interface SaveTarget {
   /** Visas i sparstatusen, t.ex. "exempelbolaget-ab.grc.json". */
@@ -8,6 +6,11 @@ export interface SaveTarget {
   readonly kind: 'folder' | 'download'
   /** Om autosparning får använda målet. Nedladdningar autosparas aldrig. */
   readonly autosave: boolean
+  /**
+   * Mappen filen ligger i, när kind är 'folder'. Sparas i "Senaste arbeten" så att
+   * projektet kan öppnas igen utan att mappen väljs på nytt (B-26).
+   */
+  readonly dir?: FileSystemDirectoryHandle
   /** Skriver hela filen. Kastar vid fel; store fångar och visar felet. */
   write(text: string): Promise<void>
 }

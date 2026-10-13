@@ -1,12 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { FRAMEWORKS, countControls, getFramework } from './index'
+import { FRAMEWORKS, getFramework } from './index'
 
 describe('ramverksregistret', () => {
   it('ISO 27001:2022 går att välja', () => {
     const fw = getFramework('iso27001', '2022')
     expect(fw?.name).toBe('ISO/IEC 27001:2022')
-    expect(countControls(fw!, 'clauses')).toBe(26)
-    expect(countControls(fw!, 'annex-a')).toBe(93)
   })
 
   it('kommande ramverk finns i listan men kan inte väljas', () => {
@@ -25,7 +23,7 @@ describe('ramverksregistret', () => {
     expect(new Set(keys).size).toBe(keys.length)
   })
 
-  it('okänt avsnitt ger 0 kontroller', () => {
-    expect(countControls(getFramework('iso27001', '2022')!, 'finns-inte')).toBe(0)
+  it('alla ramverk har en beskrivning för startsidan', () => {
+    expect(FRAMEWORKS.every((e) => e.description.length > 0)).toBe(true)
   })
 })

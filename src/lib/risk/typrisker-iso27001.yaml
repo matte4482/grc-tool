@@ -1,0 +1,188 @@
+# Typrisker för ISO/IEC 27001:2022 (ARCHITECTURE B-29).
+# Startpunkt för riskregistret. Konsekvens och sannolikhet bedöms alltid med kunden.
+# effect: low 0,25 · medium 0,5 · high 0,75. type: preventive sänker sannolikhet, limiting sänker konsekvens (B-27).
+# Första versionen, skriven av Claude. Ska granskas och utökas av en senior ISO-konsult.
+
+id: typrisker-iso27001
+version: 1
+framework: { id: iso27001, version: '2022' }
+
+risks:
+  - id: TR-01
+    title: Läckta inloggningsuppgifter
+    description: En angripare får tag på en användares inloggningsuppgifter, till exempel genom nätfiske, och loggar in i e-post, molntjänster eller affärssystem som användaren.
+    threat: Nätfiske, lösenordsattacker, läckta lösenord från andra tjänster
+    vulnerability: Flerfaktorsautentisering saknas eller är inte påtvingad, svaga eller återanvända lösenord
+    assets: [E-post, Molntjänster, Affärssystem]
+    controls:
+      - { control: A.8.5, type: preventive, effect: high }
+      - { control: A.5.17, type: preventive, effect: medium }
+      - { control: A.6.3, type: preventive, effect: medium }
+      - { control: A.8.16, type: limiting, effect: low }
+
+  - id: TR-02
+    title: Ransomware och annan skadlig kod
+    description: Skadlig kod krypterar eller förstör information på datorer och servrar, och verksamheten står still tills systemen är återställda.
+    threat: Skadlig kod via e-post, webb, flyttbara media eller sårbara tjänster
+    vulnerability: Bristande skydd mot skadlig kod, opatchade system, säkerhetskopior som nås från nätverket
+    assets: [Servrar, Arbetsstationer, Filytor]
+    controls:
+      - { control: A.8.7, type: preventive, effect: high }
+      - { control: A.8.8, type: preventive, effect: medium }
+      - { control: A.8.13, type: limiting, effect: high }
+      - { control: A.5.26, type: limiting, effect: medium }
+
+  - id: TR-03
+    title: Obehörig åtkomst genom bristande behörighetshantering
+    description: Personer har åtkomst till information de inte behöver, till exempel för att behörigheter inte tas bort vid byte av roll eller när någon slutar.
+    threat: Obehörig läsning, ändring eller spridning av information
+    vulnerability: Ingen regelbunden granskning av behörigheter, konton avslutas inte i tid
+    assets: [Affärssystem, Filytor, Kunddata]
+    controls:
+      - { control: A.5.15, type: preventive, effect: medium }
+      - { control: A.5.16, type: preventive, effect: medium }
+      - { control: A.5.18, type: preventive, effect: high }
+      - { control: A.8.3, type: preventive, effect: medium }
+
+  - id: TR-04
+    title: Missbruk av administratörskonton
+    description: Ett konto med höga behörigheter används felaktigt eller tas över, vilket ger full kontroll över system och information.
+    threat: Övertagande av administratörskonto, avsiktligt missbruk
+    vulnerability: Många eller delade administratörskonton, administration från vanliga konton, ingen loggning
+    assets: [Katalogtjänst, Servrar, Molnplattform]
+    controls:
+      - { control: A.8.2, type: preventive, effect: high }
+      - { control: A.8.18, type: preventive, effect: low }
+      - { control: A.8.15, type: limiting, effect: medium }
+      - { control: A.8.16, type: limiting, effect: medium }
+
+  - id: TR-05
+    title: Oåtgärdade sårbarheter i system och programvara
+    description: Kända sårbarheter utnyttjas för att ta sig in i nätverket eller ta över system, eftersom säkerhetsuppdateringar inte installeras i tid.
+    threat: Utnyttjande av kända sårbarheter
+    vulnerability: Ingen rutin för sårbarhetshantering, system utan support från leverantören
+    assets: [Servrar, Arbetsstationer, Nätverksutrustning]
+    controls:
+      - { control: A.8.8, type: preventive, effect: high }
+      - { control: A.8.9, type: preventive, effect: medium }
+      - { control: A.8.19, type: preventive, effect: low }
+      - { control: A.8.20, type: limiting, effect: medium }
+
+  - id: TR-06
+    title: Förlust av data utan fungerande säkerhetskopia
+    description: Information går förlorad genom fel, misstag eller angrepp, och kan inte återställas eftersom säkerhetskopior saknas, är ofullständiga eller aldrig har provats.
+    threat: Hårdvarufel, radering av misstag, ransomware
+    vulnerability: Säkerhetskopiering omfattar inte allt, återläsning provas inte
+    assets: [Affärssystem, Filytor, Databaser]
+    controls:
+      - { control: A.8.13, type: limiting, effect: high }
+      - { control: A.8.14, type: limiting, effect: medium }
+      - { control: A.5.30, type: limiting, effect: medium }
+
+  - id: TR-07
+    title: Avbrott hos kritisk leverantör eller molntjänst
+    description: En leverantör eller molntjänst som verksamheten är beroende av slutar fungera eller blir otillgänglig under längre tid.
+    threat: Driftstörning, konkurs eller angrepp hos leverantören
+    vulnerability: Krav på leverantören saknas i avtalet, ingen plan för avbrott eller byte av leverantör
+    assets: [Molntjänster, Driftleverantör, Affärssystem]
+    controls:
+      - { control: A.5.19, type: preventive, effect: medium }
+      - { control: A.5.20, type: preventive, effect: medium }
+      - { control: A.5.22, type: preventive, effect: low }
+      - { control: A.5.30, type: limiting, effect: medium }
+
+  - id: TR-08
+    title: Informationsläckage genom felkonfigurerade molntjänster
+    description: Information blir tillgänglig för obehöriga för att en molntjänst är felaktigt inställd, till exempel en delad länk eller en öppen lagringsyta.
+    threat: Oavsiktlig exponering, automatiserad sökning efter öppna tjänster
+    vulnerability: Inga säkerhetsinställningar som standard, ingen granskning av konfiguration
+    assets: [Molnlagring, Samarbetsytor, Kunddata]
+    controls:
+      - { control: A.5.23, type: preventive, effect: medium }
+      - { control: A.8.9, type: preventive, effect: high }
+      - { control: A.5.12, type: preventive, effect: low }
+      - { control: A.8.12, type: limiting, effect: medium }
+
+  - id: TR-09
+    title: Förlust eller stöld av bärbar enhet
+    description: En dator, telefon eller surfplatta med verksamhetens information tappas bort eller blir stulen.
+    threat: Stöld, kvarglömd utrustning
+    vulnerability: Okrypterade enheter, ingen möjlighet att spärra eller radera på distans
+    assets: [Bärbara datorer, Mobiltelefoner]
+    controls:
+      - { control: A.8.1, type: preventive, effect: medium }
+      - { control: A.7.9, type: preventive, effect: low }
+      - { control: A.6.7, type: preventive, effect: low }
+      - { control: A.8.24, type: limiting, effect: high }
+
+  - id: TR-10
+    title: Avsiktligt missbruk av egen personal
+    description: En anställd eller konsult använder sin åtkomst för att föra ut, ändra eller förstöra information, till exempel i samband med att anställningen upphör.
+    threat: Missnöjd eller illasinnad medarbetare
+    vulnerability: För breda behörigheter, ingen loggning, bristande rutin vid avslutad anställning
+    assets: [Kunddata, Affärshemligheter, Affärssystem]
+    controls:
+      - { control: A.6.1, type: preventive, effect: low }
+      - { control: A.6.5, type: preventive, effect: medium }
+      - { control: A.5.18, type: preventive, effect: medium }
+      - { control: A.8.15, type: limiting, effect: medium }
+
+  - id: TR-11
+    title: Misstag vid hantering av information
+    description: Information skickas till fel mottagare, publiceras av misstag eller hanteras på ett sätt som inte motsvarar dess skyddsvärde.
+    threat: Mänskliga misstag
+    vulnerability: Låg medvetenhet, ingen klassning av information, otydliga regler för hantering
+    assets: [E-post, Kunddata, Personuppgifter]
+    controls:
+      - { control: A.6.3, type: preventive, effect: high }
+      - { control: A.5.10, type: preventive, effect: medium }
+      - { control: A.5.12, type: preventive, effect: medium }
+      - { control: A.8.12, type: limiting, effect: low }
+
+  - id: TR-12
+    title: Incidenter som upptäcks eller hanteras för sent
+    description: Ett angrepp eller fel pågår länge innan det upptäcks, och hanteringen tar lång tid eftersom ansvar och rutiner är oklara.
+    threat: Angrepp, fel och misstag av alla slag
+    vulnerability: Ingen övervakning eller larm, ingen incidentplan, oklart vem som ska rapportera vad
+    assets: [Hela verksamheten]
+    controls:
+      - { control: A.5.24, type: limiting, effect: medium }
+      - { control: A.5.26, type: limiting, effect: high }
+      - { control: A.6.8, type: limiting, effect: low }
+      - { control: A.8.16, type: limiting, effect: medium }
+
+  - id: TR-13
+    title: Brott mot dataskydd och andra krav i lag eller avtal
+    description: Personuppgifter eller annan reglerad information behandlas i strid med GDPR, annan lagstiftning eller avtal med kunder.
+    threat: Sanktionsavgifter, skadestånd, förlorat förtroende
+    vulnerability: Krav är inte kartlagda, ingen översikt över var personuppgifter behandlas
+    assets: [Personuppgifter, Kundavtal]
+    controls:
+      - { control: A.5.31, type: preventive, effect: medium }
+      - { control: A.5.34, type: preventive, effect: high }
+      - { control: A.5.33, type: preventive, effect: low }
+      - { control: A.5.12, type: preventive, effect: low }
+
+  - id: TR-14
+    title: Fysiskt intrång eller skada i lokaler och serverrum
+    description: Obehöriga tar sig in i lokaler eller serverrum, eller brand, vatten eller strömavbrott skadar utrustning.
+    threat: Inbrott, brand, vattenskada, strömavbrott
+    vulnerability: Bristande skalskydd och tillträdeskontroll, inget skydd mot brand och vatten
+    assets: [Kontorslokaler, Serverrum, Nätverksutrustning]
+    controls:
+      - { control: A.7.1, type: preventive, effect: medium }
+      - { control: A.7.2, type: preventive, effect: high }
+      - { control: A.7.4, type: limiting, effect: medium }
+      - { control: A.7.5, type: limiting, effect: medium }
+
+  - id: TR-15
+    title: Fel eller sårbarheter vid utveckling och ändringar
+    description: En ändring i ett system, till exempel en uppdatering eller ny funktion, orsakar avbrott eller öppnar en sårbarhet.
+    threat: Felaktiga ändringar, osäker kod
+    vulnerability: Ingen ändringshantering, otillräcklig test, test i produktionsmiljö
+    assets: [Egenutvecklade system, Affärssystem, Webbplats]
+    controls:
+      - { control: A.8.32, type: preventive, effect: high }
+      - { control: A.8.25, type: preventive, effect: medium }
+      - { control: A.8.29, type: preventive, effect: medium }
+      - { control: A.8.31, type: preventive, effect: low }

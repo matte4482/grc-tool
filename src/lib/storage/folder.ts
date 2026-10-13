@@ -1,4 +1,5 @@
 import { PROJECT_EXTENSION, type SaveTarget } from './target'
+import type { Dropped } from './workflow'
 
 // Sparande via File System Access API (ARCHITECTURE B-22).
 //
@@ -93,6 +94,7 @@ export function folderTarget(dir: FileSystemDirectoryHandle, fileName: string): 
     label: fileName,
     kind: 'folder',
     autosave: true,
+    dir,
     async write(text) {
       const file = await dir.getFileHandle(fileName, { create: true })
       const stream = await file.createWritable()
@@ -105,4 +107,28 @@ export function folderTarget(dir: FileSystemDirectoryHandle, fileName: string): 
       }
     },
   }
+}
+
+interface DropItem {
+  getAsFileSystemHandle?(): Promise<FileSystemHandle | null>
+  webkitGetAsEntry?(): { isDirectory: boolean } | null
+}
+
+/**
+ * Läser det som släppts i en dra-och-släpp-ruta. Måste anropas direkt i
+ * drop-händelsen, innan något await, eftersom webbläsaren tömmer listan efteråt.
+ */
+export function readDrop(data: DataTransfer): Promise<Dropped | null> {
+  const item = [...data.items].find((i) => i.kind === 'file')
+  if (!item) return Promise.resolve(null)
+  const extra = item as unknown as DropItem
+  const file = item.getAsFile()
+  const isFolder = extra.webkitGetAsEntry?.()?.isDirectory ?? false
+  const handle = extra.getAsFileSystemHandle ? extra.getAsFileSystemHandle() : Promise.resolve(null)
+  return handle.then((h): Dropped | null => {
+    if (h?.kind === 'directory') return { kind: 'folder', dir: h as FileSystemDirectoryHandle }
+    if (isFolder) return { kind: 'folder-unsupported' }
+    if (file) return { kind: 'file', name: file.name, text: () => file.text() }
+    return null
+  })
 }

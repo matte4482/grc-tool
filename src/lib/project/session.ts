@@ -5,13 +5,8 @@ import { isNewerThan, noBackup, type Backup, type BackupStore } from '../storage
 import { checkAgainstFramework, parseProject, serializeProject, takeId, validateProject, type IdKind } from './project'
 import type { Project } from './schema'
 
-// Sessionen i det öppna projektet, sparstatusen och
-// allt som ändrar dem (ARCHITECTURE B-23).
+// Sessionen i det öppna projektet (ARCHITECTURE B-23).
 // store.svelte.ts gör den reaktiv för gränssnittet.
-//
-// Regler:
-// - Projektet ändras aldrig direkt.
-// - Ett ogiltigt projekt skrivs aldrig till fil.
 
 export type SaveStatus =
   | { state: 'empty' }              
@@ -39,7 +34,6 @@ export class ProjectSession {
   #savedRevision = 0
   #now: () => Date
   #onChange: () => void
-  /** Reservkopian i localStorage (B-25). */
   #backup: BackupStore
   #backupFailed = false
 
@@ -64,7 +58,6 @@ export class ProjectSession {
   get hasUnsavedChanges(): boolean {
     return this.#project !== null && this.#revision !== this.#savedRevision
   }
-  /** Sant om den senaste reservkopian inte gick att skriva, t.ex. för att localStorage är avstängd eller full. */
   get backupFailed(): boolean {
     return this.#backupFailed
   }
@@ -100,9 +93,8 @@ export class ProjectSession {
     this.#setStatus({ state: 'saved', at: project.updatedAt })
     const warnings = checkAgainstFramework(project, framework)
 
-    // Finns en reservkopia med nyare ändringar än filen frågar gränssnittet om
-    // den ska återställas. Är filen minst lika ny har ändringarna nått filen,
-    // och kopian behövs inte längre.
+    // Kontrollerar om det finns en localStorage kopia som är nyare.
+    // isf varnar
     const backup = this.#backup.read(project.id)
     if (backup && isNewerThan(backup, project.updatedAt))
       return { ok: true, warnings, newerBackup: { changedAt: backup.changedAt, downloadedAt: backup.downloadedAt } }
@@ -110,12 +102,17 @@ export class ProjectSession {
     return { ok: true, warnings }
   }
 
-  close(): void {
+  /**
+   * Stänger projektet och går tillbaka till startsidan.
+   */
+  close(opts: { discard?: boolean } = {}): boolean {
+    if (this.hasUnsavedChanges && !opts.discard) return false
     this.#project = null
     this.#framework = null
     this.#target = null
     this.#savedRevision = this.#revision
     this.#setStatus({ state: 'empty' })
+    return true
   }
 
    //Ändrar projektet genom kopian 'draft'
@@ -132,8 +129,7 @@ export class ProjectSession {
   }
 
   /**
-   * Reserverar nästa ID (R-, ATG- eller EV-) och sparar det uppräknade
-   * löpnumret i projektet. Det enda sättet att skapa ett nytt ID (B-17).
+   * Nästa ID (R-, ATG- eller EV-). Det enda sättet att skapa ett nytt ID (B-17).
    */
   newId(kind: IdKind): string {
     if (!this.#project) throw new Error('Inget projekt är öppet.')
@@ -144,7 +140,6 @@ export class ProjectSession {
     return id
   }
 
-  /** Byter sparmål ("Spara som") och sparar. */
   async saveAs(target: SaveTarget): Promise<SaveResult> {
     this.#target = target
     return this.save()
@@ -152,11 +147,6 @@ export class ProjectSession {
 
   /**
    * Sparar projektet till sparmålet.
-   *
-   * 1. Projektet kontrolleras. Är det ogiltigt skrivs ingenting, och felen visas.
-   * 2. Texten skrivs. Misslyckas skrivningen visas felet och ändringarna räknas
-   *    fortfarande som osparade.
-   * 3. Om projektet ändrades medan filen skrevs räknas det fortfarande som osparat.
    */
   async save(): Promise<SaveResult> {
     const project = this.#project
@@ -165,7 +155,7 @@ export class ProjectSession {
 
     const revision = this.#revision
     const toSave: Project = { ...project, updatedAt: this.#stamp() }
-
+    // Projektet kontrolleras. Är det ogiltigt skrivs ingenting.
     const problems = validateProject(toSave)
     if (problems.length) return this.#fail('Projektet innehåller fel och sparades inte.', problems)
 
@@ -173,25 +163,23 @@ export class ProjectSession {
     try {
       text = serializeProject(toSave)
     } catch (e) {
-      // Ska inte kunna hända efter validateProject, men en ofullständig fil får aldrig skrivas.
+      // en ofullständig fil får aldrig skrivas.
       return this.#fail('Projektet kunde inte göras om till text och sparades inte.', [errorText(e)])
     }
 
     this.#setStatus({ state: 'saving' })
     try {
+      // Texten skrivs. Misslyckas skrivningen visas felet och ändringarna räknas fortfarande som osparade.
       await target.write(text)
     } catch (e) {
       return this.#fail(`Kunde inte skriva till ${target.label}.`, [errorText(e)])
     }
 
-    // Behåll ändringar som gjordes medan filen skrevs, men med den sparade tidsstämpeln.
+    // Om projektet ändrades medan filen skrevs räknas det fortfarande som osparat.
     this.#project = this.#revision === revision ? toSave : { ...this.#project!, updatedAt: toSave.updatedAt }
     this.#savedRevision = revision
 
-    // Reservkopian: i en mapp vet vi att filen är skriven, så kopian rensas. En
-    // nedladdning kan ha avbrutits i webbläsarens dialog, så där får kopian ligga
-    // kvar tills den nedladdade filen öppnas igen (B-25). Har projektet ändrats
-    // under skrivningen innehåller kopian de nya ändringarna och ska vara kvar.
+    // Efter sparningen resnas localStoarage. (eller markeras som sparad)
     if (this.#revision === revision) {
       if (target.kind === 'folder') this.#backup.clear(toSave.id)
       else this.#backup.markDownloaded(toSave.id, toSave.updatedAt)
@@ -204,9 +192,8 @@ export class ProjectSession {
   }
 
   /**
-   * Ersätter det öppna projektet med reservkopians nyare ändringar. Anropas när
-   * open() rapporterat newerBackup och konsulten valt att återställa. Projektet
-   * räknas som osparat, så att ändringarna sparas till filen.
+   * Blir aktuell om localStorage innehåller nyare ändringar.
+   * Anropas vid öppning av projektfil.
    */
   restoreBackup(): RestoreResult {
     if (!this.#project) return { ok: false, errors: ['Inget projekt är öppet.'] }
@@ -215,15 +202,13 @@ export class ProjectSession {
     return this.#loadBackup(backup, this.#target!)
   }
 
-  /** Tar bort reservkopian för det öppna projektet, när konsulten valt filens version. */
   discardBackup(): void {
     if (this.#project) this.#backup.clear(this.#project.id)
   }
 
   /**
-   * Öppnar en reservkopia utan fil, från listan på startsidan. Används när filen
-   * inte går att öppna eller aldrig sparades, till exempel om en nedladdning
-   * avbröts. Projektet räknas som osparat och sparas till `target`.
+   * Öppnar en reservkopia från localStorage.
+   * Används från "senast sparade" på startsidan.
    */
   openBackup(projectId: string, target: SaveTarget): RestoreResult {
     const backup = this.#backup.read(projectId)
@@ -231,12 +216,10 @@ export class ProjectSession {
     return this.#loadBackup(backup, target)
   }
 
-  /** Alla reservkopior i webbläsaren, nyast först. */
   listBackups(): Backup[] {
     return this.#backup.list()
   }
 
-  /** Tar bort en reservkopia. Anroparen ansvarar för att fråga först. */
   removeBackup(projectId: string): void {
     this.#backup.clear(projectId)
   }
@@ -261,8 +244,8 @@ export class ProjectSession {
   }
 
   /**
-   * Anropas av autosparningens timer. Sparar bara om något har ändrats, målet
-   * tillåter autosparning och ingen sparning pågår.
+   * Autosparandets timer.
+   * Kontrollerar om något ändrats, sparmappen och om sparning inte pågår.
    */
   async autosaveTick(): Promise<void> {
     if (!this.hasUnsavedChanges || !this.#target?.autosave || this.#status.state === 'saving') return
@@ -290,7 +273,7 @@ function errorText(e: unknown): string {
   return e instanceof Error ? e.message : String(e)
 }
 
-/** Sparstatusen som text för sidhuvudet, t.ex. "Sparat till kund.grc.json 14:42". */
+/** Sparstatusen i sidhuvudet. */
 export function describeStatus(status: SaveStatus, target: SaveTarget | null): { text: string; tone: 'ok' | 'warn' | 'error' | 'muted' } {
   const time = (iso: string) => new Date(iso).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })
   switch (status.state) {

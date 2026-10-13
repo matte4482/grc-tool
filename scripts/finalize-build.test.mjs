@@ -24,7 +24,6 @@ describe('externalReferences', () => {
       '<img src="logo.png">',
     )
     expect(externalReferences(html)).toEqual([
-      '<script src="/assets/index-abc.js">',
       'src="/assets/index-abc.js"',
       'href="/assets/index-abc.css"',
       'src="logo.png"',

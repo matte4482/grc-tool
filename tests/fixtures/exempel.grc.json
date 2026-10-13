@@ -42,7 +42,6 @@
       "assets": ["Filserver"],
       "owner": "Bertil Berg, IT-chef",
       "before": { "consequence": 4, "likelihood": 4 },
-      "planned": { "consequence": 4, "likelihood": 1 },
       "treatment": "reduce",
       "controls": [
         { "control": "A.8.20", "effect": "high", "type": "preventive" },

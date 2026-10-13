@@ -70,7 +70,7 @@ grc-tool/
 │   └── finalize-build.mjs            ✅ kontroll av bygget + CSP (körs av npm run build)
 ├── tests/fixtures/                   ✅ påhittade projektfiler för tester
 └── src/
-    ├── main.ts / App.svelte          ✅ startpunkt (i fas 1 ett enkelt skal för att skapa, öppna och spara)
+    ├── main.ts / App.svelte          ✅ startpunkt: sidhuvud med sparstatus, visar startsidan eller projektet
     ├── app.css                       ✅ grundstil, färger från det gamla verktyget
     ├── yaml.d.ts / globals.d.ts      ✅ typning av *.yaml-importer och byggkonstanter
     ├── lib/
@@ -87,8 +87,25 @@ grc-tool/
     │   │   ├── session.ts            ✅ store-logiken: projekt, sparstatus, spara, autospara
     │   │   ├── session.test.ts       ✅
     │   │   └── store.svelte.ts       ✅ gör sessionen reaktiv för vyerna (Svelte-runes)
+    │   ├── assessment.ts             ✅ bedömning per kontroll, SoA, filter och "behöver uppmärksamhet"
+    │   ├── assessment.test.ts        ✅
+    │   ├── compliance.ts             ✅ förlopp och uppfyllnad per avsnitt och tema
+    │   ├── compliance.test.ts        ✅
+    │   ├── ui/runner.svelte.ts       ✅ kör en åtgärd från ett klick och samlar meddelanden
+    │   ├── ui/format.ts              ✅ datum som text, till exempel i går 16:40
+    │   ├── ui/dialog.svelte.ts       ✅ bekräftelsedialog i stället för confirm()
     │   ├── zod-setup.ts              ✅ zod utan kodgenerering (krävs av CSP)
+    │   ├── evidence/                 ✅ bifogad evidens (B-31)
+    │   │   ├── evidence.ts           ✅ referenser, sökvägar, "saknar evidens"
+    │   │   └── evidence.test.ts      ✅
+    │   ├── cloud/                    ✅ grunden för automatisk granskning (B-18)
+    │   │   ├── findings.ts           ✅ filformatet för fynd (B-33)
+    │   │   └── findings.test.ts      ✅
     │   ├── risk/                     riskmetod, riskvärden, nivåer, restrisk
+    │   │   ├── typrisker-iso27001.yaml ✅ 15 typrisker med föreslagna kontroller
+    │   │   ├── templates.ts          ✅ schema för typrisker och import till ett projekt
+    │   │   ├── rules.ts              ✅ riskmetod, riskvärden, nivåer, restrisk och nyckeltal (B-27)
+    │   │   └── operations.ts         ✅ ändringar i risker och riskmetod
     │   ├── storage/                  ✅ var projektfilen sparas
     │   │   ├── target.ts             ✅ gränssnittet SaveTarget och filnamn
     │   │   ├── folder.ts             ✅ vald mapp via File System Access API (Chrome, Edge)
@@ -96,10 +113,37 @@ grc-tool/
     │   │   ├── backup.ts             ✅ reservkopia i localStorage mellan sparningarna
     │   │   ├── backup.test.ts        ✅
     │   │   ├── memory-storage.ts     ✅ localStorage i minnet, för testerna
+    │   │   ├── recent.ts             ✅ Senaste arbeten i IndexedDB, med mapphandtag
+    │   │   ├── recent.test.ts        ✅
+    │   │   ├── workflow.ts           ✅ flödena välj mapp → behörighet → läs fil
+    │   │   ├── workflow.test.ts      ✅
+    │   │   ├── evidence-files.ts     ✅ evidensfiler i mappen: kopiera, läsa, kontrollsumma
+    │   │   ├── evidence-files.test.ts ✅
+    │   │   ├── settings.ts           ✅ konsultens namn i webbläsaren (B-32)
     │   │   └── target.test.ts        ✅
     │   └── report/                   rapport och SoA för utskrift
     ├── views/                        en komponent per flik (se avsnitt 4)
+    │   ├── StartPage.svelte          ✅ startsidan (4.1)
+    │   ├── ProjectPage.svelte        ✅ det öppna projektet med flikar
+    │   ├── Overview.svelte           ✅ översikt (4.3)
+    │   ├── RiskMethodView.svelte     ✅ riskmetod (4.4)
+    │   ├── RiskRegisterView.svelte   ✅ riskregister (4.5)
+    │   ├── RiskDetail.svelte         ✅ riskdetalj (4.6)
+    │   ├── ControlsView.svelte       ✅ grundkrav och Annex A (4.7)
+    │   └── SoaView.svelte            ✅ SoA (4.8)
     └── components/                   återanvändbara delar: statusväljare, filter, matris …
+        ├── Notice.svelte             ✅ meddelanden och fel
+        ├── StatusBar.svelte          ✅ stapel för uppfylld, delvis och ej uppfylld
+        ├── StatusPicker.svelte       ✅ val av status
+        ├── StatusBadge.svelte        ✅ status som bricka
+        ├── ControlItem.svelte        ✅ en kontroll med bedömning
+        ├── EvidenceList.svelte       ✅ bifogade filer: lista, öppna, bifoga, ta bort
+        ├── DialogHost.svelte         ✅ visar bekräftelsedialogen
+        ├── Modal.svelte              ✅ modal ruta
+        ├── RiskMatrix.svelte         ✅ riskmatris 5 × 5
+        ├── LevelBadge.svelte         ✅ riskvärde med nivåfärg
+        ├── LinkControlDialog.svelte  ✅ koppla kontroll till risk
+        └── ImportTemplatesDialog.svelte ✅ importera typrisker
 ```
 
 **Tumregel för var koden hör hemma:**
@@ -142,24 +186,26 @@ Funktionerna nedan är det verktyget ska kunna. Skisserna finns hos Mateusz (sk�
 
 ### 4.1 Startsida
 
-- **Nytt arbete**
+Utformningen följer Mateusz skiss (ARCHITECTURE B-29).
+
+- **Nytt arbete** (huvudkortet till vänster)
   - **Kund:** fritext.
-  - **Ramverk:** ett per arbete. Kort visas för ISO 27001:2022, NIS2, CIS Controls v8 och DORA. Bara ramverk som finns i `lib/frameworks/` går att välja, övriga visas som "kommer".
+  - **Ramverk:** ett per arbete. Kort visas för ISO 27001:2022, NIS2, CIS Controls v8 och DORA, med omfattning och en mening om ramverket. Bara ramverk som finns i `lib/frameworks/` går att välja, övriga visas som "Kommer".
   - **Startpunkt för riskregistret:**
-    - *Med typrisker:* ungefär 28 vanliga risker förifyllda.
+    - *Med typrisker:* typriskerna i `lib/risk/` läggs in i projektfilen direkt (i dag 15 risker).
     - *Tomt register.*
-    - *Kopiera från kund:* återanvänder riskmetod och struktur från ett tidigare uppdrag, men inte bedömningarna.
+    - *Kopiera från kund:* återanvänder riskmetod och struktur från ett tidigare uppdrag, men inte bedömningarna. Byggs i fas 3.
   - **Sparplats:** efter valen väljer användaren uppdragets mapp, och projektfilen sparas där med kundens namn (ARCHITECTURE B-22).
-- **Öppna befintligt arbete:** välj uppdragets mapp, så hittar verktyget projektfilen. I Safari och Firefox väljs filen i stället. Exportfiler från det gamla verktyget känns igen och avvisas med ett tydligt meddelande (ARCHITECTURE B-16).
-- **Senaste arbeten:** kund, ramverk, senast ändrad och uppfyllnadsgrad, med knappen "Fortsätt".
-- **Informationsrad:** "Bedömningen sparas som en fil i kundens mapp. Inget lagras hos Method IT."
+- **Öppna befintligt arbete** (till höger): dra in uppdragets mapp eller projektfilen, eller välj mapp. I Safari och Firefox väljs eller dras filen. En indragen fil öppnas utan mapp, och Spara ber då om mappen. Exportfiler från det gamla verktyget avvisas med ett tydligt meddelande (ARCHITECTURE B-16).
+- **Senaste arbeten** (till höger): kund, ramverk, när projektet ändrades, andel bedömda i procent och en stapel för uppfylld, delvis och ej uppfylld, med "Fortsätt". Fyra visas, "Visa alla" visar resten. "Ta bort ur listan" påverkar inte filen. Listan sparas i webbläsaren (ARCHITECTURE B-26). Projekt som laddats ned har "Välj fil" i stället för "Fortsätt".
+- **Osparade ändringar i webbläsaren** visas överst när det finns reservkopior (ARCHITECTURE B-25).
 
 ### 4.2 Sidhuvud (alla vyer)
 
 - Kundnamn och ramverk.
 - **Sparstatus:** "Autosparat till nordvik.grc.json · 14:42" eller "Osparade ändringar sedan 14:32" (i varningsfärg).
 - Knapparna **Rapport** och **Spara**.
-- **Flikar:** Översikt · Riskmetod · Riskregister · Grundkrav · Annex A · SoA · Åtgärdsplan. Flikarna har räknare, till exempel antal risker, krav, kontroller och åtgärder.
+- **Flikar:** Översikt · Riskmetod · Riskregister · Grundkrav · Annex A · SoA · Åtgärdsplan. Flikarna har räknare, till exempel antal risker, krav, kontroller och åtgärder. *(Alla flikar utom Åtgärdsplan finns; den kommer i fas 5. Rapport kommer i fas 8.)*
 
 ### 4.3 Översikt
 
@@ -167,7 +213,8 @@ Funktionerna nedan är det verktyget ska kunna. Skisserna finns hos Mateusz (sk�
   - Visas totalt, per avsnitt (grundkrav, Annex A) och per tema (A.5–A.8).
 - **Fördelning per status:** Uppfylld, Delvis uppfylld, Ej uppfylld, Ej bedömd och Ej tillämplig.
 - **Nyckeltal för risker:** antal, över acceptansnivå, restrisk ej uppnådd och väntar på godkännande.
-- **Genvägar** till det som behöver uppmärksamhet.
+- **Genvägar** till det som behöver uppmärksamhet, bland annat kontroller som saknar evidens.
+- **Kontrollera bifogade filer:** visar filer som saknas eller har ändrats sedan de bifogades.
 
 ### 4.4 Riskmetod (steg 1 i riskarbetet)
 
@@ -218,7 +265,7 @@ Riskregistret är underlag för krav 6.1.1, 6.1.3 och 8.2.
   - Kopplade kontroller **låses som tillämpliga i SoA**.
   - Om en kontroll som är bortvald i SoA kopplas, tas den tillbaka automatiskt och användaren får en tydlig notis om det.
 - **Varning** när faktisk restrisk är högre än planerad, till exempel "▲ Faktisk 12 — A.8.20 delvis".
-- **Ny risk** och **Importera typrisker**.
+- **Ny risk** och **Importera typrisker**. Typrisker som inte gäller tas bort i riskdetaljen och kan importeras igen (ARCHITECTURE B-30).
 - **Markering av saknade uppgifter:** risker som saknar ägare eller behandlingsbeslut markeras.
 
 ### 4.6 Riskdetalj
@@ -234,16 +281,21 @@ Riskregistret är underlag för krav 6.1.1, 6.1.3 och 8.2.
   | Steg | Hur värdet tas fram |
   |---|---|
   | Före behandling | Anges för hand (K × S) |
-  | Planerad restrisk | Anges för hand |
-  | Faktisk restrisk | Räknas fram från status på kopplade kontroller (regeln är en öppen fråga, se ARCHITECTURE O-03) |
+  | Planerad restrisk | Räknas fram från kopplade kontroller, som om alla vore uppfyllda |
+  | Faktisk restrisk | Räknas fram från kopplade kontroller och deras status |
+  | *Accepterad risk* | *Restrisken är risken före behandling* |
+
+  Varje kopplad kontroll har effektivitet (Låg 0,25, Medel 0,5, Hög 0,75) och sänker antingen sannolikheten (förebyggande) eller konsekvensen (begränsande). Regeln står i ARCHITECTURE B-27.
 
 - **Kopplade kontroller:** ref, namn, status och SoA-läge ("Låst tillämplig"). Knappen "+ Koppla kontroll".
 - **Historik** över ändringar, till exempel ändrad status på kopplad kontroll, ny koppling eller risk skapad från typrisk.
 - **Godkännande av restrisk:**
   - Om faktisk restrisk ligger över acceptansnivån kan riskägaren bara godkänna genom ett aktivt beslut att acceptera högre risk. Det beslutet kräver en motivering.
   - Godkännandet sparar namn och datum.
+- **Evidens:** bifogade filer som underlag för bedömningen, på samma sätt som för kontroller (4.7).
 - **Kopplad åtgärd** i åtgärdsplanen.
 - **Navigering** till föregående och nästa risk.
+- **Ta bort risken:** efter en bekräftelse. ID:t återanvänds inte, och kontroller som bara var kopplade till risken låses upp i SoA.
 
 ### 4.7 Grundkrav och Annex A
 
@@ -264,12 +316,15 @@ Grundkrav och Annex A använder samma vy, med en växlare mellan dem.
   - **Motivering och observation:** fritext. Knappen "Föreslå text från risker" hämtar text från kopplade risker.
   - **Ansvarig** och **kopplade risker** (med riskvärde).
   - **Bevisbörda:** texten `guidance` från ramverket, skrivskyddad.
-  - **Bifogad evidens:** dra in filer eller klicka för att bifoga. Filerna sparas i en evidensmapp bredvid projektfilen i kundens mapp. Projektfilen innehåller bara sökväg, storlek, kontrollsumma, källa (manuell eller automatisk), vem som lade till filen och när. Saknas filen, eller har den ändrats, visas en varning.
+  - **Bifogad evidens:** dra in filer eller klicka på "Bifoga fil". Filerna kopieras till `evidens/<kontroll-ID>/` bredvid projektfilen i kundens mapp, och samma fil kopieras aldrig två gånger. Projektfilen innehåller bara sökväg, storlek, kontrollsumma, källa (manuell eller automatisk), vem som lade till filen och när. Saknas filen, eller har den ändrats, visas en varning. Filen öppnas i en ny flik. "Ta bort" tar bara bort referensen; filen ligger kvar i mappen. Kräver Chrome eller Edge med mappåtkomst, och högst 100 MB per fil (ARCHITECTURE B-31).
+  - **Evidens på annan plats:** fritext för evidens som inte bifogas, till exempel en sökväg i kundens intranät.
   - **Teknisk och organisatorisk del (valfritt):** statusen kan delas upp i två delar som underlag. Den övergripande statusen sätts alltid av konsulten (ARCHITECTURE B-18).
   - **Sidfot:** "Senast uppdaterad … av …".
 - **Åtgärd skapas automatiskt** när status sätts till Delvis eller Ej uppfylld. Den föreslås i åtgärdsplanen och länkas med "Visa".
 - **Bortvalda kontroller** i Annex A visas utgråade och kan inte bedömas.
 - **Grundkrav kan aldrig väljas bort.**
+- **Saknar evidens:** en tillämplig kontroll som är Uppfylld eller Delvis uppfylld utan bifogad fil och utan text i *Evidens på annan plats*.
+- *Läge efter fas 4:* åtgärder kommer i fas 5.
 
 ### 4.8 SoA (Statement of Applicability)
 
@@ -334,7 +389,6 @@ Schemat finns i [`src/lib/project/schema.ts`](src/lib/project/schema.ts), och en
     "title": "Obehörig åtkomst via öppen fjärrskrivbordsport",
     "owner": "Bertil Berg, IT-chef",
     "before":  { "consequence": 4, "likelihood": 4 },
-    "planned": { "consequence": 4, "likelihood": 1 },
     "treatment": "reduce",
     "controls": [{ "control": "A.8.20", "effect": "high", "type": "preventive" }],
     "evidence": [],
@@ -349,7 +403,7 @@ Schemat finns i [`src/lib/project/schema.ts`](src/lib/project/schema.ts), och en
       "parts": { "technical": "not_fulfilled", "organizational": "fulfilled" },
       "comment": "…", "owner": "…", "evidenceNote": "",
       "applicable": true, "soaJustification": "",
-      "evidence": [{ "id": "EV-001", "file": "evidens/Natverkspolicy_v2.1.pdf", "size": 348160,
+      "evidence": [{ "id": "EV-001", "file": "evidens/A.8.20/Natverkspolicy_v2.1.pdf", "size": 348160,
                      "sha256": "…", "source": "manual",
                      "addedBy": "Cecilia Carlsson", "addedAt": "2026-09-18T11:20:00Z" }],
       "updated": { "at": "2026-09-22T14:40:00Z", "by": "Konsult K." }
@@ -380,6 +434,32 @@ Schemat finns i [`src/lib/project/schema.ts`](src/lib/project/schema.ts), och en
 - **Fält som saknas** fylls i med standardvärden vid inläsning, så filen behöver inte innehålla tomma fält.
 - **Kopplingar mot ramverket** (okända kontroll-ID:n, bortvald kontroll som är kopplad till en risk) kontrolleras med `checkAgainstFramework()` i `project.ts`.
 
+### Fynd från automatisk granskning
+
+Ett framtida granskningsprogram, till exempel CloudSecComp mot Azure, skriver sina fynd till en fil i uppdragets mapp. Verktyget läser filen; det har ingen nätverksåtkomst. Schemat finns i `src/lib/cloud/findings.ts` (ARCHITECTURE B-33). Inläsningen i gränssnittet byggs när programmet finns.
+
+```jsonc
+{
+  "format": "grc-fynd",
+  "version": 1,
+  "source": { "tool": "CloudSecComp", "toolVersion": "0.1.0", "environment": "Azure-tenant contoso.onmicrosoft.com" },
+  "collectedAt": "2026-10-12T08:00:00Z",
+  "findings": [{
+    "control": "A.8.5",                 // kontroll-ID i ramverket
+    "status": "partial",                // fulfilled, partial eller not_fulfilled
+    "title": "MFA saknas för 3 administratörer",
+    "detail": "…",
+    "resource": "/subscriptions/…",     // resurs i molnmiljön
+    "evidence": [{ "file": "evidens/mfa-rapport.json", "sha256": "…" }]
+  }]
+}
+```
+
+- **Fynden gäller bara den tekniska delen** (`parts.technical`). Den övergripande statusen sätts alltid av konsulten (B-18).
+- **Flera fynd för samma kontroll** ger den sämsta statusen.
+- **Filer från granskningen** får källan `automatic` när de bifogas.
+- **Ändras formatet** höjs `version`, och äldre versioner ska fortsätta gå att läsa.
+
 ## 6. Lägga till ett nytt ramverk
 
 1. **Skapa filen** `src/lib/frameworks/<id>-<version>.yaml` enligt schemat i `schema.ts`. Använd `iso27001-2022.yaml` som mall.
@@ -407,9 +487,9 @@ Faserna följer Plan 2.0, som hålls utanför repot. Verktyget ska gå att anvä
 |---|---|---|---|
 | **0 · Kodgrund** | Projektuppsättning, ramverk som YAML, projektfilens datamodell, bygge till en HTML-fil | | Klar |
 | **1 · Filsparande** | Spara, Spara som, autospara, sparstatus, varning vid stängning, reservkopia i webbläsaren | | Klar |
-| **2 · Startsida** | Nytt arbete, öppna från fil, senaste arbeten | **M1:** ersätter dagens verktyg | |
-| **3 · Risk** | Riskmetod, riskregister, riskdetalj, koppling risk ↔ kontroll, typrisker | | |
-| **4 · Bilagor** | Evidens i mapp bredvid projektfilen, kontrollsumma, "saknar evidens" | | |
+| **2 · Startsida och bedömning** | Nytt arbete, öppna från fil, senaste arbeten. Flikar, Grundkrav, Annex A, SoA och enkel översikt (B-28) | **M1:** ersätter dagens verktyg | Klar i koden, provas i webbläsare |
+| **3 · Risk** | Riskmetod, riskregister, riskdetalj, koppling risk ↔ kontroll, typrisker | | Klar i koden, provas i webbläsare |
+| **4 · Bilagor** | Evidens i mapp bredvid projektfilen, kontrollsumma, "saknar evidens", filformat för fynd | | Klar i koden, provas i webbläsare |
 | **5 · Åtgärdsplan** | Åtgärder från kontroller och risker, riskbehandlingsplan enligt 6.1.3 | **M2:** hela ISO-cykeln | |
 | **6 · Dashboard** | Uppfyllnad, riskprofil, åtgärder, redo för revision | | |
 | **7 · Progress** | Jämförelse mellan två bedömningar | **M3:** uppföljning över tid | |

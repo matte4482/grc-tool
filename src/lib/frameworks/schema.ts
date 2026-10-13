@@ -40,7 +40,7 @@ export const FrameworkSchema = z
     for (const s of fw.sections)
       for (const g of s.groups)
         for (const c of g.controls) {
-          if (seen.has(c.id)) ctx.addIssue({ code: 'custom', message: `Duplication of ID: ${c.id}` })
+          if (seen.has(c.id)) ctx.addIssue({ code: 'custom', message: `Dubblett-ID: ${c.id}` })
           seen.add(c.id)
         }
   })

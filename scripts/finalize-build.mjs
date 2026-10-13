@@ -1,13 +1,4 @@
-// Körs efter `vite build` (se "build" i package.json). Fyra steg:
-//
-// 1. Kontrollerar att dist/ bara innehåller index.html (B-03).
-// 2. Kontrollerar att index.html inte hänvisar till något utanför filen:
-//    inga <script src>, <link href>, bilder eller CSS-url:er utom data:-adresser.
-// 3. Lägger in en Content-Security-Policy som förbjuder all nätverkstrafik och
-//    bara tillåter exakt de skript som finns i filen (B-20).
-// 4. Döper om filen efter versionen i package.json, t.ex.
-//    dist/GRC-verktyget-0.1.0.html (B-24). Det är den filen som delas ut.
-//
+// Sista kontroll efter vite build
 // Om något är fel avslutas bygget med felkod, så att en trasig fil aldrig delas ut.
 
 import { createHash } from 'node:crypto'
@@ -19,18 +10,14 @@ const INLINE_SCRIPT = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi
 const INLINE_STYLE = /<style\b[^>]*>([\s\S]*?)<\/style>/gi
 const CSP_META = /\s*<meta http-equiv="Content-Security-Policy"[^>]*>/i
 
-/**
- * Filnamnet för en version av verktyget, t.ex. "GRC-verktyget-0.1.0.html".
- * Versionen måste ha formen MAJOR.MINOR.PATCH, eventuellt med tillägg som
- * "-beta.1", så att filnamnet alltid går att sortera och känna igen.
- */
+// nämner filen med rätt version.
 export function releaseFileName(version) {
   if (!/^\d+\.\d+\.\d+(-[0-9A-Za-z.]+)?$/.test(version))
     throw new Error(`Ogiltig version i package.json: "${version}". Använd formen 0.1.0.`)
   return `GRC-verktyget-${version}.html`
 }
 
-/** Filer i dist/ som inte är index.html. Tom lista = rätt. */
+// kontroll efter extra filer i dist/
 export function extraFiles(dir) {
   return readdirSync(dir, { recursive: true })
     .map(String)
@@ -38,15 +25,12 @@ export function extraFiles(dir) {
 }
 
 /**
- * Hänvisningar i HTML:en som skulle få webbläsaren att hämta något utifrån.
- * Innehållet i <script> hoppas över: det är kod, inte hänvisningar, och
- * Svelte-runtime innehåller t.ex. namnrymden "http://www.w3.org/2000/svg".
+ * Kontroll efter externa länkar. data:- och # ignoreras, eftersom de inte är nätverksanrop.
  */
 export function externalReferences(html) {
   const found = []
   const markup = html.replace(INLINE_SCRIPT, (_, attrs) => `<script${attrs}></script>`)
 
-  for (const m of markup.matchAll(/<script\b[^>]*\bsrc\s*=\s*["']?([^"'\s>]+)/gi)) found.push(`<script src="${m[1]}">`)
   for (const m of markup.matchAll(/\b(?:src|href|srcset|poster|action)\s*=\s*["']([^"']*)["']/gi)) {
     const url = m[1].trim()
     if (url === '' || url.startsWith('data:') || url.startsWith('#')) continue
@@ -103,8 +87,6 @@ function main() {
 
   if (!existsSync(file)) fail(['dist/index.html saknas. Kör hela bygget med npm run build.'])
 
-  // Versionen läses direkt ur package.json och kontrolleras innan något skrivs,
-  // så att filnamnet blir rätt även om bygget inte startades med npm run build.
   const { version } = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
   let name
   try {
@@ -123,12 +105,8 @@ function main() {
   const out = addCsp(html)
   writeFileSync(file, out, 'utf8')
 
-  // Steg 4: döp om efter versionen. Görs sist, eftersom kontrollen av dist/
-  // i steg 1 förutsätter att filen heter index.html.
   renameSync(file, join(dist, name))
 
-  // Sidfoten visar versionen via __APP_VERSION__ (vite.config.ts), som bara sätts
-  // när bygget körs med npm. Saknas versionen i filen visar sidfoten "dev".
   if (!out.includes(version))
     console.warn(`! Versionen ${version} hittades inte i filen. Kör bygget med npm run build, annars visar sidfoten "dev".`)
 

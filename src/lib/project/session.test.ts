@@ -227,6 +227,39 @@ describe('autosparning', () => {
   })
 })
 
+describe('stäng', () => {
+  it('stänger ett sparat projekt', async () => {
+    const s = new ProjectSession(clock())
+    await s.start(newProject(), memoryTarget())
+    expect(s.close()).toBe(true)
+    expect(s.project).toBeNull()
+    expect(s.status.state).toBe('empty')
+  })
+
+  it('vägrar stänga med osparade ändringar', async () => {
+    const s = new ProjectSession(clock())
+    await s.start(newProject(), memoryTarget())
+    s.update((d) => {
+      d.client.name = 'Nytt namn'
+    })
+    expect(s.close()).toBe(false)
+    expect(s.project?.client.name).toBe('Nytt namn')
+  })
+
+  it('stänger ändå med discard, och reservkopian ligger kvar', async () => {
+    const backup = localBackupStore(memoryStorage())
+    const s = new ProjectSession({ ...clock(), backup })
+    await s.start(newProject(), memoryTarget())
+    s.update((d) => {
+      d.client.name = 'Nytt namn'
+    })
+    expect(s.close({ discard: true })).toBe(true)
+    expect(s.project).toBeNull()
+    expect(s.hasUnsavedChanges).toBe(false)
+    expect(backup.list()).toHaveLength(1)
+  })
+})
+
 describe('describeStatus', () => {
   it('visar var och när det sparades', () => {
     const d = describeStatus({ state: 'saved', at: '2026-09-29T12:42:00Z' }, memoryTarget())

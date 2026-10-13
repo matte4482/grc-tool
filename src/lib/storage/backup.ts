@@ -26,9 +26,8 @@ export interface BackupStore {
 }
 
 /**
- * Reservkopior i localStorage. Alla anrop är skyddade: localStorage kan saknas,
- * vara avstängd (privat fönster, IT-policy) eller full. Då fungerar verktyget
- * ändå, bara utan reservkopia.
+ * localStorage. Returnerar metoder för att spara i webbläsaren.
+ * Alla anrop felhanteras: localStorage kan saknas.
  */
 export function localBackupStore(storage: KeyValueStorage | null = defaultStorage()): BackupStore {
   const key = (id: string) => PREFIX + id
@@ -97,7 +96,7 @@ export function localBackupStore(storage: KeyValueStorage | null = defaultStorag
   }
 }
 
-// Används när localStorage saknas och i tester.
+/**  Används när localStorage saknas och i tester. */
 export const noBackup: BackupStore = {
   write: () => false,
   markDownloaded: () => {},
@@ -110,7 +109,6 @@ function defaultStorage(): KeyValueStorage | null {
   try {
     return typeof localStorage === 'undefined' ? null : localStorage
   } catch {
-    // Vissa webbläsare kastar redan när localStorage nämns, om den är avstängd.
     return null
   }
 }
@@ -132,7 +130,6 @@ function parseBackup(raw: string): Backup | null {
   }
 }
 
-// Om kopian innehåller ändringar som är nyare än filen som öppnas. 
 export function isNewerThan(backup: Backup, fileUpdatedAt: string): boolean {
   return new Date(backup.changedAt).getTime() > new Date(fileUpdatedAt).getTime()
 }

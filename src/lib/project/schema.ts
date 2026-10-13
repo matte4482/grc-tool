@@ -1,13 +1,6 @@
 import { z } from 'zod'
 
 // Projektfil (.grc.json), se ARCHITECTURE B-10 och B-17.
-//
-// Huvudpunkter för design:
-// - Beräknade värden sparas inte. Logiken finns för att de ska räknas fram. 
-// - Nya fält läggs till som valfria, så att äldre projektfiler fortsätter validera.
-// - Kontroller som saknas i `controls` tolkas som ej bedömda och tillämpliga.
-// - Kopplingar mot ramverket (okända kontroll-ID:n, SoA-lås) kontrolleras i
-//   checkAgainstFramework() i project.ts, eftersom schemat inte känner till ramverket.
 
 export const PROJECT_SCHEMA_VERSION = 1
 
@@ -26,7 +19,7 @@ export const TreatmentSchema = z.enum(['undecided', 'reduce', 'share', 'accept',
 
 export const ActionStatusSchema = z.enum(['not_started', 'in_progress', 'done'])
 
-// Risknivå 1-5
+// Riskskala 1-5
 export const LevelSchema = z.int().min(1).max(5)
 
 export const RiskScoreSchema = z.object({
@@ -40,20 +33,18 @@ export const ChangeSchema = z.object({
 })
 
 // Evidens 
-
 export const EvidenceSchema = z.object({
   id: z.string().regex(EVIDENCE_ID, 'Evidens-ID ska ha formen EV-001'),
   file: name, // sökväg till bifogad fil
   size: z.int().min(0),
   sha256: z.string().regex(/^[0-9a-f]{64}$/), // upptäcker flyttad eller ändrad fil
-  source: z.enum(['manual', 'automatic']), // automatic = importerad från t.ex. CloudSecComp
+  source: z.enum(['manual', 'automatic']), // automatic = importerad från t.ex. CloudSync
   addedBy: text,
   addedAt: isoDateTime,
   note: text.optional(),
 })
 
 // Bedömning av kontroller
-
 export const ControlAssessmentSchema = z.object({
   status: StatusSchema,
   parts: z
@@ -73,17 +64,16 @@ export const ControlAssessmentSchema = z.object({
 })
 
 // Riskmetod - risknivåer, sannolikhet, konsekvens, acceptans.
-
 export const RiskMethodSchema = z
   .object({
     consequence: z.object({
-      types: z.array(name).min(1), // t.ex. "Verksamhet och ekonomi"
+      types: z.array(name).min(1), 
       levels: z
         .array(
           z.object({
             level: LevelSchema,
             name: name,
-            descriptions: z.array(text), // en per konsekvenstyp
+            descriptions: z.array(text), 
           }),
         )
         .length(5),
@@ -136,7 +126,6 @@ export const RiskSchema = z.object({
   assets: z.array(name).default([]),
   owner: text.default(''),
   before: RiskScoreSchema.optional(),
-  planned: RiskScoreSchema.optional(),
   treatment: TreatmentSchema.default('undecided'),
   treatmentPlan: text.default(''),
   controls: z.array(RiskControlLinkSchema).default([]),
@@ -153,6 +142,8 @@ export const RiskSchema = z.object({
       // Aktivt beslut att acceptera restrisk över acceptansnivån. Kräver motivering.
       aboveThreshold: z.boolean().default(false),
       justification: text.default(''),
+      // Faktisk restrisk när risken godkändes. Visar om godkännandet blivit inaktuellt (B-27).
+      residual: z.int().min(1).max(25).optional(),
     })
     .refine((a) => !a.aboveThreshold || a.justification.trim() !== '', {
       message: 'Godkännande över acceptansnivån kräver en motivering',
@@ -164,7 +155,6 @@ export const RiskSchema = z.object({
 })
 
 // Åtgärder 
-
 export const ActionSchema = z.object({
   id: z.string().regex(ACTION_ID, 'Åtgärds-ID ska ha formen ATG-001'),
   title: name,
@@ -192,7 +182,7 @@ export const ProjectSchema = z
     tool: z.literal('method-grc'),
     // Unikt ID för projektfilen. 
     id: z.uuid(),
-    // ID på tidigare projektfil vid eventuell jämförelse och spårning av arbete. Uppfyller ISO27001 10.1 Continual improvement.
+    // ID på tidigare projektfil vid eventuell jämförelse.
     previousId: z.uuid().optional(),
     client: z.object({ name: name }),
     framework: z.object({ id: name, version: name }),
@@ -215,18 +205,22 @@ export const ProjectSchema = z
   })
   .superRefine((p, ctx) => {
     // hjälpfunktion för att kontrollera ID i projektet. Inga dubletter får förekomma.
-    const unique = (ids: string[], kind: string, path: string) => {
+    const unique = (items: { id: string; path: (string | number)[] }[], kind: string) => {
       const seen = new Set<string>()
-      for (const id of ids) {
-        if (seen.has(id)) ctx.addIssue({ code: 'custom', path: [path], message: `Dubblett-ID för ${kind}: ${id}` })
+      for (const { id, path } of items) {
+        if (seen.has(id)) ctx.addIssue({ code: 'custom', path, message: `Dubblett-ID för ${kind}: ${id}` })
         seen.add(id)
       }
     }
-    unique(p.risks.map((r) => r.id), 'risk', 'risks') // kontrollerar risk ID:n
-    unique(p.actions.map((a) => a.id), 'åtgärd', 'actions') // kontrollerar åtgärds ID:n
+    unique(p.risks.map((r, i) => ({ id: r.id, path: ['risks', i, 'id'] })), 'risk') // kontrollerar risk ID:n
+    unique(p.actions.map((a, i) => ({ id: a.id, path: ['actions', i, 'id'] })), 'åtgärd') // kontrollerar åtgärds ID:n
     //samlar evidens från kontroller och risker (de kan förekomma på två platser)
-    const evidenceIds = [...Object.values(p.controls), ...p.risks].flatMap((x) => x.evidence.map((e) => e.id))
-    unique(evidenceIds, 'evidens', 'controls') // kontrollerar evidens ID:n
+    const evidence = [
+      ...Object.entries(p.controls).flatMap(([c, a]) => a.evidence.map((e, i) => ({ id: e.id, path: ['controls', c, 'evidence', i, 'id'] }))),
+      ...p.risks.flatMap((r, ri) => r.evidence.map((e, i) => ({ id: e.id, path: ['risks', ri, 'evidence', i, 'id'] }))),
+    ]
+    unique(evidence, 'evidens') // kontrollerar evidens ID:n
+    const evidenceIds = evidence.map((e) => e.id)
 
     // kontrollerar att nästa löpnummer är större än högsta använda nummer.
     const numberOf = (id: string) => Number(id.slice(id.lastIndexOf('-') + 1))
