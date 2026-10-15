@@ -1,16 +1,9 @@
+// "Senaste arbeten" på startsidan (ARCHITECTURE B-26).
+
 import type { Framework } from '../frameworks/schema'
 import type { Project } from '../project/schema'
 import { assessmentProgress } from '../compliance'
 import type { SaveTarget } from './target'
-
-// "Senaste arbeten" på startsidan (ARCHITECTURE B-26).
-//
-// Listan sparas i webbläsarens IndexedDB, och kan
-// öppnas igen med ett klick.
-//
-// Listan innehåller bara det som syns på startsidan: kund, ramverk, filnamn,
-// när det sparades och hur långt bedömningen kommit. Själva bedömningen finns
-// bara i projektfilen.
 
 export interface RecentEntry {
   projectId: string
@@ -24,7 +17,7 @@ export interface RecentEntry {
   progress: RecentProgress
 }
 
-/** Förloppet som visas i listan. Statusfälten saknas i poster sparade före 7 okt 2026. */
+/** Progress som visas */
 export type RecentProgress = { assessed: number; applicable: number; fulfilled?: number; partial?: number; notFulfilled?: number }
 
 export interface RecentStore {

@@ -1,12 +1,12 @@
-import { downloadTarget } from './download'
-import type { RecentEntry } from './recent'
-import type { SaveTarget } from './target'
-import { ensureWriteAccess, fileExists, folderTarget, listProjectFiles, pickFolder, readFile } from './folder'
-
 // Flödena för att välja mapp och fil, utan gränssnitt.
 //
 // Alla flöden måste anropas från ett klick, eftersom webbläsaren bara visar
 // mappdialogen och behörighetsfrågan som svar på något användaren gjort.
+
+import { downloadTarget } from './download'
+import type { RecentEntry } from './recent'
+import type { SaveTarget } from './target'
+import { ensureWriteAccess, fileExists, folderTarget, listProjectFiles, pickFolder, readFile } from './folder'
 
 /** Mappfunktionerna i folder.ts. Byts ut i tester. */
 export interface FolderAccess {

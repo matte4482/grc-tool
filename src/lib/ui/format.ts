@@ -14,3 +14,13 @@ export function relativeTime(iso: string, now: Date = new Date()): string {
   if (d.getFullYear() !== now.getFullYear()) opts.year = 'numeric'
   return d.toLocaleDateString('sv-SE', opts).replace('.', '')
 }
+
+/** Dagens datum i webbläsarens tidszon som ÅÅÅÅ-MM-DD. */
+export function localDate(d: Date = new Date()): string {
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
+/** ÅÅÅÅ-MM-DD som kort text, t.ex. "15 okt 2026". */
+export const shortDate = (date: string): string =>
+  new Date(`${date}T12:00:00`).toLocaleDateString('sv-SE', { day: 'numeric', month: 'short', year: 'numeric' }).replace('.', '')

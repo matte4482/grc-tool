@@ -1,12 +1,12 @@
+// Sessionen i det öppna projektet (ARCHITECTURE B-23).
+// store.svelte.ts gör den reaktiv för gränssnittet.
+
 import type { Framework } from '../frameworks/schema'
 import { getFramework } from '../frameworks'
 import type { SaveTarget } from '../storage/target'
 import { isNewerThan, noBackup, type Backup, type BackupStore } from '../storage/backup'
 import { checkAgainstFramework, parseProject, serializeProject, takeId, validateProject, type IdKind } from './project'
 import type { Project } from './schema'
-
-// Sessionen i det öppna projektet (ARCHITECTURE B-23).
-// store.svelte.ts gör den reaktiv för gränssnittet.
 
 export type SaveStatus =
   | { state: 'empty' }              

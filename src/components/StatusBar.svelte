@@ -1,7 +1,8 @@
 <script lang="ts">
+  // Stapel delad i uppfylld, delvis och ej uppfylld, av alla tillämpliga.
+
   import { percent } from '../lib/compliance'
 
-  // Stapel delad i uppfylld, delvis och ej uppfylld, av alla tillämpliga.
   let {
     applicable,
     assessed,

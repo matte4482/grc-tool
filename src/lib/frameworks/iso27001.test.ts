@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest'
 // Samma import som appen kommer att använda (via @rollup/plugin-yaml i vite.config.ts)
 import raw from './iso27001-2022.yaml'
-import { FrameworkSchema } from './schema'
+import { FrameworkSchema, allControls, controlTitles } from './schema'
+import { getFramework } from './index'
 
 describe('iso27001-2022.yaml', () => {
   const fw = FrameworkSchema.parse(raw) // kastar om formatet är fel eller ID:n dubblerade
@@ -38,5 +39,21 @@ describe('iso27001-2022.yaml', () => {
 
   it('endast Annex A ingår i SoA', () => {
     expect(fw.sections.filter((s) => s.soa).map((s) => s.id)).toEqual(['annex-a'])
+  })
+})
+
+describe('ramverksschemat', () => {
+  it('avsnitts-ID får inte krocka med en flik', () => {
+    const fw = getFramework('iso27001', '2022')!
+    const bad = { ...fw, sections: [{ ...fw.sections[0], id: 'risks' }, ...fw.sections.slice(1)] }
+    expect(FrameworkSchema.safeParse(bad).success).toBe(false)
+  })
+
+  it('allControls och controlTitles går igenom alla kontroller i ordning', () => {
+    const fw = getFramework('iso27001', '2022')!
+    const all = allControls(fw)
+    expect(all).toHaveLength(26 + 93)
+    expect(all[0].control.id).toBe('4.1')
+    expect(controlTitles(fw).get('A.8.5')).toBe(all.find((x) => x.control.id === 'A.8.5')!.control.title)
   })
 })

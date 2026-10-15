@@ -60,6 +60,8 @@ Filer markerade med ✅ finns redan. Resten är målbilden som byggs upp fas fö
 ```
 grc-tool/
 ├── ARCHITECTURE.md                   ✅ designbeslut
+├── DATAFLOW.md                       ✅ beroenden och dataflöde
+├── TODO.md                           ✅ småfix och det som ska provas
 ├── README.md                         ✅ den här filen
 ├── index.html                        ✅ HTML-mallen som Vite bygger från
 ├── package.json / package-lock.json  ✅
@@ -91,9 +93,20 @@ grc-tool/
     │   ├── assessment.test.ts        ✅
     │   ├── compliance.ts             ✅ förlopp och uppfyllnad per avsnitt och tema
     │   ├── compliance.test.ts        ✅
+    │   ├── actions.ts                ✅ åtgärdsförslag, åtgärder, riskbehandlingsplan (B-34)
+    │   ├── actions.test.ts           ✅
+    │   ├── dashboard.ts              ✅ redo för revision (B-37)
+    │   ├── dashboard.test.ts         ✅
+    │   ├── compare.ts                ✅ jämförelse mellan två bedömningar (B-38)
+    │   ├── compare.test.ts           ✅
+    │   ├── report/                   ✅ rapporternas CSS, Word-fil och CSV-export (B-39)
     │   ├── ui/runner.svelte.ts       ✅ kör en åtgärd från ett klick och samlar meddelanden
     │   ├── ui/format.ts              ✅ datum som text, till exempel i går 16:40
     │   ├── ui/dialog.svelte.ts       ✅ bekräftelsedialog i stället för confirm()
+    │   ├── ui/logo.jpg               ✅ Method-logotypen (sidhuvud och rapporter, B-42)
+    │   ├── ui/nav.svelte.ts          ✅ aktiv flik och genvägar mellan flikar (B-35)
+    │   ├── ui/print.svelte.ts        ✅ utskrift och Word-export (B-39)
+    │   ├── ui/comparison.svelte.ts   ✅ den tidigare bedömningen som jämförs (B-38)
     │   ├── zod-setup.ts              ✅ zod utan kodgenerering (krävs av CSP)
     │   ├── evidence/                 ✅ bifogad evidens (B-31)
     │   │   ├── evidence.ts           ✅ referenser, sökvägar, "saknar evidens"
@@ -121,7 +134,6 @@ grc-tool/
     │   │   ├── evidence-files.test.ts ✅
     │   │   ├── settings.ts           ✅ konsultens namn i webbläsaren (B-32)
     │   │   └── target.test.ts        ✅
-    │   └── report/                   rapport och SoA för utskrift
     ├── views/                        en komponent per flik (se avsnitt 4)
     │   ├── StartPage.svelte          ✅ startsidan (4.1)
     │   ├── ProjectPage.svelte        ✅ det öppna projektet med flikar
@@ -130,7 +142,10 @@ grc-tool/
     │   ├── RiskRegisterView.svelte   ✅ riskregister (4.5)
     │   ├── RiskDetail.svelte         ✅ riskdetalj (4.6)
     │   ├── ControlsView.svelte       ✅ grundkrav och Annex A (4.7)
-    │   └── SoaView.svelte            ✅ SoA (4.8)
+    │   ├── SoaView.svelte            ✅ SoA (4.8)
+    │   ├── ActionPlanView.svelte     ✅ åtgärdsplan (4.9)
+    │   ├── ReportsView.svelte        ✅ rapporter (4.10)
+    │   └── FollowUpView.svelte       ✅ uppföljning (4.12)
     └── components/                   återanvändbara delar: statusväljare, filter, matris …
         ├── Notice.svelte             ✅ meddelanden och fel
         ├── StatusBar.svelte          ✅ stapel för uppfylld, delvis och ej uppfylld
@@ -138,6 +153,11 @@ grc-tool/
         ├── StatusBadge.svelte        ✅ status som bricka
         ├── ControlItem.svelte        ✅ en kontroll med bedömning
         ├── EvidenceList.svelte       ✅ bifogade filer: lista, öppna, bifoga, ta bort
+        ├── ActionItem.svelte         ✅ en åtgärd med alla fält
+        ├── LinkedActions.svelte      ✅ åtgärder vid en kontroll eller risk
+        ├── HelpDialog.svelte         ✅ instruktion för konsulter
+        ├── MenuButton.svelte         ✅ knapp med en lista med val ("Lägg till i …", konsekvenstyp)
+        ├── reports/                  ✅ rapporterna och PrintHost som skriver ut dem
         ├── DialogHost.svelte         ✅ visar bekräftelsedialogen
         ├── Modal.svelte              ✅ modal ruta
         ├── RiskMatrix.svelte         ✅ riskmatris 5 × 5
@@ -182,11 +202,10 @@ Verktyget bygger på tre lager:
 
 ## 4. Funktioner
 
-Funktionerna nedan är det verktyget ska kunna. Skisserna finns hos Mateusz (skärm 1–5 och 7).
+Funktionerna nedan är det verktyget erbjuder i dagsläget. (skärm 1–5 och 7).
 
 ### 4.1 Startsida
 
-Utformningen följer Mateusz skiss (ARCHITECTURE B-29).
 
 - **Nytt arbete** (huvudkortet till vänster)
   - **Kund:** fritext.
@@ -194,7 +213,7 @@ Utformningen följer Mateusz skiss (ARCHITECTURE B-29).
   - **Startpunkt för riskregistret:**
     - *Med typrisker:* typriskerna i `lib/risk/` läggs in i projektfilen direkt (i dag 15 risker).
     - *Tomt register.*
-    - *Kopiera från kund:* återanvänder riskmetod och struktur från ett tidigare uppdrag, men inte bedömningarna. Byggs i fas 3.
+    - *Kopiera från kund:* återanvänder riskmetod och struktur från ett tidigare uppdrag med samma ramverk, men inte bedömningarna.
   - **Sparplats:** efter valen väljer användaren uppdragets mapp, och projektfilen sparas där med kundens namn (ARCHITECTURE B-22).
 - **Öppna befintligt arbete** (till höger): dra in uppdragets mapp eller projektfilen, eller välj mapp. I Safari och Firefox väljs eller dras filen. En indragen fil öppnas utan mapp, och Spara ber då om mappen. Exportfiler från det gamla verktyget avvisas med ett tydligt meddelande (ARCHITECTURE B-16).
 - **Senaste arbeten** (till höger): kund, ramverk, när projektet ändrades, andel bedömda i procent och en stapel för uppfylld, delvis och ej uppfylld, med "Fortsätt". Fyra visas, "Visa alla" visar resten. "Ta bort ur listan" påverkar inte filen. Listan sparas i webbläsaren (ARCHITECTURE B-26). Projekt som laddats ned har "Välj fil" i stället för "Fortsätt".
@@ -202,19 +221,32 @@ Utformningen följer Mateusz skiss (ARCHITECTURE B-29).
 
 ### 4.2 Sidhuvud (alla vyer)
 
-- Kundnamn och ramverk.
+- Method-logotypen, verktygets namn, kundnamn och ramverk.
 - **Sparstatus:** "Autosparat till nordvik.grc.json · 14:42" eller "Osparade ändringar sedan 14:32" (i varningsfärg).
-- Knapparna **Rapport** och **Spara**.
-- **Flikar:** Översikt · Riskmetod · Riskregister · Grundkrav · Annex A · SoA · Åtgärdsplan. Flikarna har räknare, till exempel antal risker, krav, kontroller och åtgärder. *(Alla flikar utom Åtgärdsplan finns; den kommer i fas 5. Rapport kommer i fas 8.)*
+- Knapparna **Spara**, **Spara som** och **Stäng**.
+- **Flikar:** Översikt · Riskmetod · Riskregister · Grundläggande krav · Annex A · SoA · Åtgärdsplan · Uppföljning · Rapporter. Flikarna har räknare, till exempel antal risker, krav, kontroller och öppna eller försenade åtgärder. Avsnittens flikar kommer från ramverket.
+- **Sidfoten** har version och länken **Instruktion**: arbetsgång, sparande i SharePoint och vad som gäller när två personer arbetar i samma fil.
 
-### 4.3 Översikt
+### 4.3 Översikt (dashboard)
 
-- **Uppfyllnadsgrad:** `uppfyllda / tillämpliga`, där bortvalda kontroller i SoA inte räknas.
-  - Visas totalt, per avsnitt (grundkrav, Annex A) och per tema (A.5–A.8).
-- **Fördelning per status:** Uppfylld, Delvis uppfylld, Ej uppfylld, Ej bedömd och Ej tillämplig.
-- **Nyckeltal för risker:** antal, över acceptansnivå, restrisk ej uppnådd och väntar på godkännande.
-- **Genvägar** till det som behöver uppmärksamhet, bland annat kontroller som saknar evidens.
-- **Kontrollera bifogade filer:** visar filer som saknas eller har ändrats sedan de bifogades.
+Översikten är dashboarden för konsulten och kundens ledning (fas 6, ARCHITECTURE B-37).
+
+- **Redo för revision:** en procentsats och ett omdöme (Redo, Nära, Inte redo), byggt av upp till sju delar som var och en visar *x av y*:
+  - alla krav och kontroller bedömda
+  - grundkrav uppfyllda
+  - tillämpliga kontroller uppfyllda
+  - evidens för uppfyllda
+  - bortval i SoA motiverade
+  - risker behandlade och godkända
+  - brister med planerad åtgärd (ansvarig och deadline)
+
+  Helheten är medelvärdet av delarna som gäller. *Redo* kräver minst 90 % och att alla grundkrav är uppfyllda. Varje del länkar till det som återstår.
+- **Uppfyllnadsgrad:** `uppfyllda / tillämpliga`, där bortvalda kontroller i SoA inte räknas. Visas totalt med fördelning per status, per avsnitt och per tema.
+- **Åtgärder:** öppna, försenade, klara och brister utan åtgärd.
+- **Riskprofil:** matrisen före behandling och med faktisk restrisk, och risknyckeltalen.
+- **Behöver uppmärksamhet:** ej bedömda, saknar ansvarig och saknar evidens per avsnitt, och SoA-bortval utan motivering. Bifogade filer kan kontrolleras.
+- **Projekt:** kundnamn, ditt namn (sparas i webbläsaren), omfattning, deltagare och sammanfattning till rapporterna (ARCHITECTURE B-40).
+- **Skriv ut lägesbild:** dashboarden på en sida.
 
 ### 4.4 Riskmetod (steg 1 i riskarbetet)
 
@@ -223,7 +255,7 @@ Riskmetoden är underlag för krav 6.1.2 och 8.2 och skrivs ut som bilaga i rapp
 - **Konsekvensskala 1–5**
   - Nivåerna heter Försumbar, Begränsad, Måttlig, Allvarlig och Kritisk.
   - Det finns en kolumn per konsekvenstyp. Standard är "Verksamhet och ekonomi" samt "Information och anseende".
-  - Användaren kan lägga till konsekvenstyper, till exempel hälsa och säkerhet.
+  - Knappen "+ Lägg till konsekvenstyp" öppnar en lista: Människa och Hälsa, Miljö, Förtroende och Varumärke, Lagar och Regler (Compliance), eller en egen typ. Typer som redan finns går inte att välja igen.
   - Alla texter går att redigera genom att klicka i en ruta. Knappen "Återställ standard" finns.
 - **Sannolikhetsskala 1–5**
   - Nivåerna heter Mycket osannolik, Osannolik, Möjlig, Sannolik och Mycket sannolik.
@@ -239,7 +271,7 @@ Riskmetoden är underlag för krav 6.1.2 och 8.2 och skrivs ut som bilaga i rapp
 
 - **Acceptanskriterium:** risker med värde upp till gränsen (standard 6) är acceptabla. Risker över gränsen kräver behandlingsbeslut och ägare.
 - **Intervall för ny bedömning:** standard är var 12:e månad och vid väsentlig förändring. "Nästa bedömning" räknas fram.
-- **Fastställd av:** namn, roll och datum.
+- **Fastställd av:** namn, roll och datum. Knappen **Klar** kräver ett namn, sätter dagens datum om det saknas och visar acceptansnivå, intervall och fastställande som text. "Ändra" öppnar fälten igen.
 
 ### 4.5 Riskregister (steg 2 i riskarbetet)
 
@@ -318,13 +350,12 @@ Grundkrav och Annex A använder samma vy, med en växlare mellan dem.
   - **Bevisbörda:** texten `guidance` från ramverket, skrivskyddad.
   - **Bifogad evidens:** dra in filer eller klicka på "Bifoga fil". Filerna kopieras till `evidens/<kontroll-ID>/` bredvid projektfilen i kundens mapp, och samma fil kopieras aldrig två gånger. Projektfilen innehåller bara sökväg, storlek, kontrollsumma, källa (manuell eller automatisk), vem som lade till filen och när. Saknas filen, eller har den ändrats, visas en varning. Filen öppnas i en ny flik. "Ta bort" tar bara bort referensen; filen ligger kvar i mappen. Kräver Chrome eller Edge med mappåtkomst, och högst 100 MB per fil (ARCHITECTURE B-31).
   - **Evidens på annan plats:** fritext för evidens som inte bifogas, till exempel en sökväg i kundens intranät.
-  - **Teknisk och organisatorisk del (valfritt):** statusen kan delas upp i två delar som underlag. Den övergripande statusen sätts alltid av konsulten (ARCHITECTURE B-18).
+  - **Teknisk och organisatorisk del (valfritt):** statusen kan delas upp i två delar som underlag. Den övergripande statusen sätts alltid av konsulten (ARCHITECTURE B-18). "Ta bort uppdelningen" tar bort delarna igen.
   - **Sidfot:** "Senast uppdaterad … av …".
-- **Åtgärd skapas automatiskt** när status sätts till Delvis eller Ej uppfylld. Den föreslås i åtgärdsplanen och länkas med "Visa".
+- **Åtgärder:** kopplade åtgärder visas vid kontrollen. En brist utan åtgärd har knappen "Skapa åtgärd" (ARCHITECTURE B-34).
 - **Bortvalda kontroller** i Annex A visas utgråade och kan inte bedömas.
 - **Grundkrav kan aldrig väljas bort.**
 - **Saknar evidens:** en tillämplig kontroll som är Uppfylld eller Delvis uppfylld utan bifogad fil och utan text i *Evidens på annan plats*.
-- *Läge efter fas 4:* åtgärder kommer i fas 5.
 
 ### 4.8 SoA (Statement of Applicability)
 
@@ -337,25 +368,33 @@ Grundkrav och Annex A använder samma vy, med en växlare mellan dem.
 
 ### 4.9 Åtgärdsplan
 
-- **Åtgärder** skapas automatiskt från kontroller som är Delvis eller Ej uppfyllda, och från risker över acceptansnivån. De kan också skapas för hand. Om de skapas direkt eller först föreslås är en öppen fråga (ARCHITECTURE O-04).
-- **Fält per åtgärd:**
-  - beskrivning och ansvarig
-  - deadline
-  - status: Ej påbörjad, Pågår eller Klar
-  - källa, till exempel "Genererad från A.8.20"
-- **Sortering och filter:** ansvarig, deadline, status och försenade.
-- **Koppling tillbaka:** en klar åtgärd föreslår att kontrollens status ses över. Status ändras inte automatiskt.
+Åtgärder föreslås och godkänns av konsulten (ARCHITECTURE B-34).
 
-### 4.10 Rapport
+- **Förslag:** varje brist utan åtgärd ger ett förslag. Risker vars faktiska restrisk är över acceptansnivån (och inte accepteras) föreslås med hög prioritet och tar med sina bristande kontroller. Kontroller som är Ej uppfyllda får hög prioritet, Delvis uppfyllda medel. Förslag sparas inte i filen.
+- **Godkänna:** "Skapa åtgärd" ger en åtgärd med eget ID (ATG-001). Med "Lägg till i …" läggs förslaget till en befintlig öppen åtgärd, så att en åtgärd täcker flera brister.
+- **Fält per åtgärd:** rubrik, beskrivning, ansvarig, deadline, prioritet (valfri), status (Ej påbörjad grå, Pågår blå, Klar grön, Avbruten röd), kopplade kontroller och risker, källa och datum.
+- **Inget tas bort.** En åtgärd som inte behövs sätts till Avbruten, så att historiken finns kvar till uppföljningen.
+- **Varningar:** försenad, saknar ansvarig eller deadline, "underlaget är åtgärdat, stäng?" och "klar men bristen finns kvar". Status ändras aldrig automatiskt.
+- **Filter och sortering:** sök, status, ansvarig och bara försenade. Sorteras på prioritet, deadline och ID.
+- **Riskbehandlingsplan** (krav 6.1.3 e–f) kan skrivas ut direkt från fliken.
+- **Länkar** till kontrollen eller risken, och från dem tillbaka till åtgärdsplanen.
 
-- **Utskriftsvänlig rapport** (webbläsarens "Skriv ut → Spara som PDF"). Den innehåller:
-  - sammanfattning och uppfyllnadsgrad
-  - riskmetoden som bilaga
-  - riskregistret
-  - grundkrav och Annex A med status, motivering och ansvarig
-  - SoA
-  - åtgärdsplan
-- **Kundnamn, datum och ramverk** står på varje sida.
+### 4.10 Rapporter
+
+Rapporterna förhandsvisas i fliken Rapporter och har samma sidhuvud: Method-logotypen, rubrik, kund, ramverk, datum, konsult och version (ARCHITECTURE B-39).
+
+| Rapport | Innehåll |
+|---|---|
+| Komplett rapport | Om bedömningen, lägesbild, progress (om en jämförelse finns), gapanalys, SoA och riskbehandlingsplan med riskmetoden som bilaga |
+| Lägesbild | Dashboarden på en sida |
+| Gapanalys | Om bedömningen, brister med åtgärder, och alla krav och kontroller med status, observation, evidens och ansvarig |
+| SoA | Tillämplighet, motivering och genomförande per kontroll (krav 6.1.3 d) |
+| Riskbehandlingsplan | Risker med behandling, restrisk, åtgärder och godkännande, med riskmetoden som bilaga |
+| Progressrapport | Ändringar sedan förra bedömningen (4.12) |
+
+- **PDF:** "Skriv ut eller spara som PDF" använder webbläsarens utskrift. Bara rapporten skrivs ut.
+- **Word:** "Ladda ned för Word" ger en .doc-fil som Word öppnar och kan redigera.
+- **Excel:** krav och kontroller, risker och åtgärder kan exporteras som CSV som svenska Excel öppnar direkt.
 
 ### 4.11 Spara och öppna
 
@@ -366,6 +405,18 @@ Grundkrav och Annex A använder samma vy, med en växlare mellan dem.
 - **Reservkopia i webbläsaren.** Varje ändring sparas också i localStorage och rensas när filen är säkert sparad. Öppnas en fil som är äldre än kopian erbjuds de nyare ändringarna. Kopior som finns kvar visas på startsidan (ARCHITECTURE B-25).
 - **Osparade ändringar** ger en varning vid stängning.
 - **Ogiltig projektfil** ger ett tydligt fel om vad som är fel. Filen skrivs aldrig över.
+
+### 4.12 Uppföljning
+
+Jämförelse mellan två bedömningar av samma kund (fas 7, ARCHITECTURE B-38).
+
+- **Starta nästa bedömning:** skapar en ny projektfil med dagens datum i namnet, med allt från den öppna bedömningen. Allt behåller sina ID:n. Godkännanden av restrisk tas bort. Den gamla filen ändras inte, och den blir direkt jämförelsen.
+- **Jämför med en tidigare fil:** välj projektfilen från förra bedömningen. Filen läses bara in i minnet.
+- **Sammanfattning** i en mening, till exempel "Uppfyllnaden har ökat från 58 % till 71 %. 14 kontroller har förbättrats och 2 har försämrats.", och uppfyllnad per avsnitt före och nu.
+- **Kontroller:** förbättrade, försämrade, nybedömda och inte längre bedömda, som en lista som går att filtrera.
+- **Även:** SoA-ändringar, nya, borttagna och ändrade risker, avslutade, nya och försenade åtgärder, och ny evidens.
+- **Varningar** om filerna gäller olika kunder eller om ordningen verkar fel. Olika ramverk kan inte jämföras.
+- **Progressrapport** kan skrivas ut.
 
 ## 5. Projektfilens format
 
@@ -426,10 +477,12 @@ Schemat finns i [`src/lib/project/schema.ts`](src/lib/project/schema.ts), och en
 - **Tillåtna värden:**
   - status: `not_assessed`, `fulfilled`, `partial` eller `not_fulfilled`
   - behandling: `undecided`, `reduce`, `share`, `accept` eller `avoid`
-  - åtgärdsstatus: `not_started`, `in_progress` eller `done`
+  - åtgärdsstatus: `not_started`, `in_progress`, `done` eller `cancelled`
+  - åtgärdens prioritet (valfri): `high`, `medium` eller `low`
   - evidensens källa: `manual` eller `automatic`
 - **Fasta ID:n.** Risker (`R-001`), åtgärder (`ATG-001`) och evidens (`EV-001`) får löpnummer från `nextNumber`. Ett ID återanvänds aldrig, inte ens när posten tas bort.
-- **Beräknade värden sparas aldrig.** Det gäller riskvärde, nivå, faktisk restrisk och uppfyllnadsgrad.
+- **Beräknade värden sparas aldrig.** Det gäller riskvärde, nivå, faktisk restrisk, uppfyllnadsgrad, åtgärdsförslag och redo för revision.
+- **`engagement`** (valfritt) har uppdragets omfattning, deltagare och sammanfattning. **`previousId`** pekar på bedömningen som en uppföljning startades från.
 - **Kontroller som inte finns i `controls`** tolkas som `not_assessed`, alltså tillämpliga men ännu inte bedömda.
 - **Fält som saknas** fylls i med standardvärden vid inläsning, så filen behöver inte innehålla tomma fält.
 - **Kopplingar mot ramverket** (okända kontroll-ID:n, bortvald kontroll som är kopplad till en risk) kontrolleras med `checkAgainstFramework()` i `project.ts`.
@@ -470,29 +523,3 @@ Ett framtida granskningsprogram, till exempel CloudSecComp mot Azure, skriver si
 4. **Kör kontrollerna:** `npm test` och `npm run check`.
 5. **Dokumentera ändringar** i ARCHITECTURE.md om ramverket kräver ändringar i schemat. Nya fält är alltid valfria.
 
-## 7. Arbetssätt
-
-- **Designbeslut** skrivs in i [ARCHITECTURE.md](ARCHITECTURE.md) i samma commit som koden som följer av beslutet.
-- **Nya paket** installeras med `npm install`, och både `package.json` och `package-lock.json` committas.
-- **Planer, rapporter och andra dokument** hålls utanför repot. Repot innehåller bara kod och det som beskriver koden: README och ARCHITECTURE.
-- **Kunddata committas aldrig.** `*.grc.json` och `exports/` är ignorerade. Testfiler läggs avidentifierade i `tests/fixtures/`.
-- **Sökvägar i skript** byggs med `node:path` (`join`, `resolve`), aldrig med hårdkodade snedstreck. Utvecklingen sker på både Mac och Windows.
-- **Innan commit:** kör `npm test` och `npm run check`.
-
-## 8. Faser
-
-Faserna följer Plan 2.0, som hålls utanför repot. Verktyget ska gå att använda efter varje milstolpe.
-
-| Fas | Innehåll | Milstolpe | Status |
-|---|---|---|---|
-| **0 · Kodgrund** | Projektuppsättning, ramverk som YAML, projektfilens datamodell, bygge till en HTML-fil | | Klar |
-| **1 · Filsparande** | Spara, Spara som, autospara, sparstatus, varning vid stängning, reservkopia i webbläsaren | | Klar |
-| **2 · Startsida och bedömning** | Nytt arbete, öppna från fil, senaste arbeten. Flikar, Grundkrav, Annex A, SoA och enkel översikt (B-28) | **M1:** ersätter dagens verktyg | Klar i koden, provas i webbläsare |
-| **3 · Risk** | Riskmetod, riskregister, riskdetalj, koppling risk ↔ kontroll, typrisker | | Klar i koden, provas i webbläsare |
-| **4 · Bilagor** | Evidens i mapp bredvid projektfilen, kontrollsumma, "saknar evidens", filformat för fynd | | Klar i koden, provas i webbläsare |
-| **5 · Åtgärdsplan** | Åtgärder från kontroller och risker, riskbehandlingsplan enligt 6.1.3 | **M2:** hela ISO-cykeln | |
-| **6 · Dashboard** | Uppfyllnad, riskprofil, åtgärder, redo för revision | | |
-| **7 · Progress** | Jämförelse mellan två bedömningar | **M3:** uppföljning över tid | |
-| **8 · Lansering** | Rapporter, kundtest, test på Mac och Windows, instruktion | **M4:** skarp version | |
-
-Fas 3 och 4 kan göras parallellt, liksom fas 6 och 7. Fler ramverk (NIS2, CIS Controls v8, DORA), CloudSecComp och en skrivbordsversion kommer efter M4.

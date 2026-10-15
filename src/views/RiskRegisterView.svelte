@@ -1,4 +1,7 @@
 <script lang="ts">
+  // Riskregister med nyckeltal, värmekarta och tabell (README 4.5). Riskdetaljen öppnas här.
+
+  import { untrack } from 'svelte'
   import ImportTemplatesDialog from '../components/ImportTemplatesDialog.svelte'
   import LevelBadge from '../components/LevelBadge.svelte'
   import Notice from '../components/Notice.svelte'
@@ -22,8 +25,8 @@
   import { templatesFor } from '../lib/risk/templates'
   import RiskDetail from './RiskDetail.svelte'
 
-  // Riskregister med nyckeltal, värmekarta och tabell (README 4.5). Riskdetaljen öppnas här.
-  let selected = $state<string | null>(null)
+  let { initialRisk }: { initialRisk?: string } = $props()
+  let selected = $state<string | null>(untrack(() => initialRisk) ?? null)
   let mode = $state<'before' | 'planned' | 'actual'>('before')
   let cell = $state<string | undefined>()
   let query = $state('')

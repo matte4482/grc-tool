@@ -1,8 +1,8 @@
-import type { Framework, Group, Section } from './frameworks/schema'
-import type { Project } from './project/schema'
-
 // Beräkningar av hur långt en bedömning har kommit. Ren TypeScript, så att
 // startsidan, dashboarden och rapporten räknar likadant.
+
+import type { Framework, Group, Section } from './frameworks/schema'
+import type { Project } from './project/schema'
 
 export interface SectionSummary {
   id: string

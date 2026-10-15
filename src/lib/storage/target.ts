@@ -1,3 +1,4 @@
+// Sparmål för projektfilen och filnamn.
 
 export interface SaveTarget {
   /** Visas i sparstatusen, t.ex. "exempelbolaget-ab.grc.json". */
@@ -20,7 +21,7 @@ export interface SaveTarget {
  * → "exempelbolaget-ab.grc.json". Bara a–z, 0–9 och bindestreck, så att
  * namnet fungerar i SharePoint, OneDrive, Windows och macOS.
  */
-export function projectFileName(client: string): string {
+export function projectFileName(client: string, suffix = ''): string {
   const slug = client
     .toLowerCase()
     .normalize('NFD')
@@ -29,7 +30,7 @@ export function projectFileName(client: string): string {
     .replace(/^-+|-+$/g, '')
     .slice(0, 60)
     .replace(/-+$/, '')
-  return `${slug || 'projekt'}${PROJECT_EXTENSION}`
+  return `${slug || 'projekt'}${suffix ? `-${suffix}` : ''}${PROJECT_EXTENSION}`
 }
 
 export const PROJECT_EXTENSION = '.grc.json'

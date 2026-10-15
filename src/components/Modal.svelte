@@ -1,7 +1,8 @@
 <script lang="ts">
+  // Modal ruta med rubrik och innehåll. Stängs med Esc eller onclose.
+
   import type { Snippet } from 'svelte'
 
-  // Modal ruta med rubrik och innehåll. Stängs med Esc eller onclose.
   let { open, title, onclose, children, wide = false }: { open: boolean; title: string; onclose: () => void; children: Snippet; wide?: boolean } = $props()
   let el = $state<HTMLDialogElement>()
 

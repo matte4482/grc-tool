@@ -1,7 +1,7 @@
-import type { Project } from '../project/schema'
-
 // Reservkopia i webbläsarens localStorage (ARCHITECTURE B-25).
 // Viktigast i Safari och Firefox, där autosparning till fil inte finns.
+
+import type { Project } from '../project/schema'
 
 const PREFIX = 'grc-verktyget:reservkopia:'
 

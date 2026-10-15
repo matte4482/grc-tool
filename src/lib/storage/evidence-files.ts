@@ -1,8 +1,8 @@
+// Evidensfiler i uppdragets mapp (B-31). Kräver mappåtkomst (Chrome, Edge).
+
 import type { Project } from '../project/schema'
 import { fileExists } from './folder'
 import { MAX_EVIDENCE_BYTES, candidateNames, evidenceOf, findByHash, formatSize, ownerFolder, type EvidenceOwner, type NewEvidence } from '../evidence/evidence'
-
-// Evidensfiler i uppdragets mapp (B-31). Kräver mappåtkomst (Chrome, Edge).
 
 /** SHA-256 som hex, för att upptäcka flyttade eller ändrade filer. */
 export async function sha256Hex(blob: Blob): Promise<string> {

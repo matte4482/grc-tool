@@ -1,8 +1,9 @@
 <script lang="ts">
+  // Statement of Applicability: tillämplighet och motivering per Annex A-kontroll (README 4.8).
+
   import { answerFor, filterSoa, linkedRisks, setApplicable, setText, soaSummary, type SoaFilter } from '../lib/assessment'
   import { store } from '../lib/project/store.svelte'
 
-  // Statement of Applicability: tillämplighet och motivering per Annex A-kontroll (README 4.8).
   let filter = $state<SoaFilter>('all')
   let query = $state('')
 

@@ -1,6 +1,6 @@
-import type { Project, Risk, RiskMethod, Status } from '../project/schema'
-
 // Riskmetod, riskvärden och restrisk (B-27). Ren TypeScript, inget sparas.
+
+import type { Project, Risk, RiskMethod, Status } from '../project/schema'
 
 /** Standardmetoden i README 4.4. Används tills konsulten ändrar metoden. */
 export function defaultRiskMethod(): RiskMethod {
@@ -29,6 +29,14 @@ export function defaultRiskMethod(): RiskMethod {
     approvedBy: '',
   }
 }
+
+/** Konsekvenstyper att välja bland när en typ läggs till i riskmetoden. */
+export const CONSEQUENCE_CATEGORIES = [
+  'Människa och Hälsa',
+  'Miljö',
+  'Förtroende och Varumärke',
+  'Lagar och Regler (Compliance)',
+]
 
 /** Projektets riskmetod, eller standardmetoden om ingen är fastställd. */
 export function methodOf(project: Project): RiskMethod {

@@ -1,3 +1,4 @@
+// Startpunkt: zod utan kodgenerering, global stil och appen.
 import './lib/zod-setup'
 import { mount } from 'svelte'
 import './app.css'

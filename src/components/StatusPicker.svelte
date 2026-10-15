@@ -1,8 +1,9 @@
 <script lang="ts">
+  // Val av status som knappar i rad. `allowNone` lägger till "Ingen" (för delstatus).
+
   import { STATUSES, STATUS_LABELS } from '../lib/assessment'
   import type { Status } from '../lib/project/schema'
 
-  // Val av status som knappar i rad. `allowNone` lägger till "Ingen" (för delstatus).
   let {
     value,
     onchange,

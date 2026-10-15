@@ -1,14 +1,17 @@
 <script lang="ts">
+  // Bifogade filer för en kontroll eller risk (B-31): lista, öppna, bifoga och ta bort.
+
+  import { untrack } from 'svelte'
   import { addEvidence, evidenceOf, formatSize, ownerFolder, removeEvidence, type EvidenceOwner } from '../lib/evidence/evidence'
   import type { Evidence } from '../lib/project/schema'
   import { store } from '../lib/project/store.svelte'
   import { checkEvidence, prepareEvidence, readEvidenceFile, type EvidenceState } from '../lib/storage/evidence-files'
   import { consultantName, setConsultantName } from '../lib/storage/settings'
   import { dialog } from '../lib/ui/dialog.svelte'
+  import { shortDate } from '../lib/ui/format'
   import { Runner } from '../lib/ui/runner.svelte'
   import Notice from './Notice.svelte'
 
-  // Bifogade filer för en kontroll eller risk (B-31): lista, öppna, bifoga och ta bort.
   let { owner }: { owner: EvidenceOwner } = $props()
 
   const runner = new Runner()
@@ -23,12 +26,13 @@
 
   const STATE_LABELS: Record<EvidenceState, string> = { ok: '', changed: 'Ändrad sedan den bifogades', missing: 'Saknas i mappen' }
   const baseName = (path: string) => path.split('/').pop() ?? path
-  const date = (iso: string) => new Date(iso).toLocaleDateString('sv-SE', { day: 'numeric', month: 'short', year: 'numeric' })
 
-  // Kontrollerar filerna när listan visas eller ändras.
+  // Kontrollerar filerna när listan visas eller en fil läggs till eller tas bort, inte vid varje ändring.
+  const fileKey = $derived(list.map((e) => e.id).join())
   $effect(() => {
+    void fileKey
     const d = dir
-    const items = list
+    const items = untrack(() => list)
     if (!d) return
     for (const ev of items) void checkEvidence(d, ev).then((s) => (states[ev.id] = s))
   })
@@ -96,7 +100,7 @@
         {@const state = states[ev.id]}
         <li>
           <button type="button" class="link" title={ev.file} aria-label="Öppna {baseName(ev.file)}" disabled={!dir} onclick={() => open(ev)}>{baseName(ev.file)}</button>
-          <span class="meta">{formatSize(ev.size)} · {date(ev.addedAt)}{ev.addedBy ? ` · ${ev.addedBy}` : ''}</span>
+          <span class="meta">{formatSize(ev.size)} · {shortDate(ev.addedAt.slice(0, 10))}{ev.addedBy ? ` · ${ev.addedBy}` : ''}</span>
           {#if ev.source === 'automatic'}<span class="badge">automatisk</span>{/if}
           {#if state && state !== 'ok'}<span class="badge warn">{STATE_LABELS[state]}</span>{/if}
           <button type="button" class="link muted" aria-label="Ta bort {baseName(ev.file)}" onclick={() => remove(ev)}>Ta bort</button>

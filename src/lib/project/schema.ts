@@ -1,6 +1,6 @@
-import { z } from 'zod'
-
 // Projektfil (.grc.json), se ARCHITECTURE B-10 och B-17.
+
+import { z } from 'zod'
 
 export const PROJECT_SCHEMA_VERSION = 1
 
@@ -17,7 +17,9 @@ export const StatusSchema = z.enum(['not_assessed', 'fulfilled', 'partial', 'not
 
 export const TreatmentSchema = z.enum(['undecided', 'reduce', 'share', 'accept', 'avoid'])
 
-export const ActionStatusSchema = z.enum(['not_started', 'in_progress', 'done'])
+// cancelled = avbruten. Åtgärder tas aldrig bort, så att historiken finns kvar (B-34).
+export const ActionStatusSchema = z.enum(['not_started', 'in_progress', 'done', 'cancelled'])
+export const PrioritySchema = z.enum(['high', 'medium', 'low'])
 
 // Riskskala 1-5
 export const LevelSchema = z.int().min(1).max(5)
@@ -162,6 +164,7 @@ export const ActionSchema = z.object({
   owner: text.default(''),
   due: isoDate.optional(),
   status: ActionStatusSchema.default('not_started'),
+  priority: PrioritySchema.optional(),
   // Varifrån åtgärden kom. `id` är kontroll- eller risk-ID.
   source: z.discriminatedUnion('type', [
     z.object({ type: z.literal('control'), id: name }),
@@ -192,6 +195,10 @@ export const ProjectSchema = z
     risks: z.array(RiskSchema).default([]),
     controls: z.record(z.string(), ControlAssessmentSchema).default({}),
     actions: z.array(ActionSchema).default([]),
+    // Uppdraget: omfattning, deltagare och konsultens sammanfattning till rapporten (B-40).
+    engagement: z
+      .object({ scope: text.default(''), participants: text.default(''), summary: text.default('') })
+      .default({ scope: '', participants: '', summary: '' }),
     /**
      Nästa lediga nummer för risk, åtgärd eller evidens. Inga ID:n återanvänds för att kunna spåra arbetet. 
      */
@@ -242,6 +249,7 @@ export const ProjectSchema = z
 export type Status = z.infer<typeof StatusSchema>
 export type Treatment = z.infer<typeof TreatmentSchema>
 export type ActionStatus = z.infer<typeof ActionStatusSchema>
+export type Priority = z.infer<typeof PrioritySchema>
 export type Evidence = z.infer<typeof EvidenceSchema>
 export type ControlAssessment = z.infer<typeof ControlAssessmentSchema>
 export type RiskMethod = z.infer<typeof RiskMethodSchema>

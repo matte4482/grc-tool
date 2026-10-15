@@ -1,7 +1,8 @@
 <script lang="ts">
+  // Visar dialogen från lib/ui/dialog.svelte.ts. Läggs en gång i App.
+
   import { dialog } from '../lib/ui/dialog.svelte'
 
-  // Visar dialogen från lib/ui/dialog.svelte.ts. Läggs en gång i App.
   let el = $state<HTMLDialogElement>()
 
   $effect(() => {

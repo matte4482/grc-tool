@@ -1,9 +1,10 @@
 <script lang="ts">
+  // Importera typrisker som inte redan finns i registret (README 4.5).
+
   import { store } from '../lib/project/store.svelte'
   import { addTemplateRisks, templatesFor, unusedTemplates } from '../lib/risk/templates'
   import Modal from './Modal.svelte'
 
-  // Importera typrisker som inte redan finns i registret (README 4.5).
   let { open, onclose, ondone }: { open: boolean; onclose: () => void; ondone: (count: number) => void } = $props()
 
   const set = $derived(templatesFor(store.framework!))

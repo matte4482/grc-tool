@@ -19,9 +19,9 @@ Nya beslut läggs till sist, med nästa lediga nummer. Ett beslut som ändras sk
 
 ## Nuläge
 
-*Senast uppdaterad: 12 oktober 2026*
+*Senast uppdaterad: 15 oktober 2026*
 
-- **Fas:** 4 är klar i koden (12 oktober 2026): bifogad evidens på kontroller och risker (B-31). Fas 2 och 3 är också klara i koden. Alla tre återstår att prova i riktiga webbläsare, se TODO.md. Nästa fas är 5, åtgärdsplan (faser enligt Plan 2.0, se B-19).
+- **Fas:** 5–8 är klara i koden (14 oktober 2026): åtgärdsplan, dashboard, uppföljning och rapporter (B-34–B-41). Version 0.8.0. Det som återstår till M4 är att prova i riktiga webbläsare, ett kundtest och rutinen för nya versioner (O-06), se TODO.md.
 - **Klart i fas 0:**
   - Projektet är uppsatt med Svelte, TypeScript och Vite.
   - ISO/IEC 27001:2022 är flyttat från det gamla verktyget (`legacy/method-grc-verktyg.html`) till YAML, med schema och test.
@@ -67,9 +67,15 @@ Nya beslut läggs till sist, med nästa lediga nummer. Ett beslut som ändras sk
   - Konsultens namn sparas i webbläsaren och skrivs vid bifogad fil (B-32).
   - Filformatet för fynd från automatisk granskning är bestämt och testat (B-33).
   - Dubblerade ID:n rapporteras med rätt sökväg i projektfilen.
-- **Att verifiera:** fas 1–4 är inte provade i alla webbläsare ännu, se "Att verifiera i webbläsare" i TODO.md.
-- **Nästa steg:** fas 5, åtgärdsplan. Läs TODO.md först.
-- **Väntar på beslut:** O-04 (hur åtgärder skapas och hanteras), senast före fas 5.
+- **Klart i fas 5:** åtgärdsförslag och åtgärder enligt B-34, åtgärdsplanen med filter och varningar, åtgärder vid kontroller och risker, länkar mellan flikarna (B-35), utskrift av riskbehandlingsplanen. Vem som ändrade skrivs in (B-36).
+- **Klart i fas 6:** översikten är dashboard med "redo för revision" (B-37), åtgärder, riskprofil och lägesbild på en sida.
+- **Klart i fas 7:** starta nästa bedömning, jämförelse med en tidigare fil och progressrapport (B-38).
+- **Klart i fas 8:** rapporterna (komplett, lägesbild, gapanalys, SoA, riskbehandlingsplan med riskmetoden, progress) som PDF och Word, export till Excel (B-39), uppdragsuppgifter (B-40), instruktion i verktyget och version 0.8.0 (B-41).
+- **Utseende (15 okt):** Method-logotypen, större text, ny layout på översikten och rymligare textfält (B-42). Menyknapp, statusfärger, Klar i riskmetoden och val av konsekvenstyp (B-43).
+- **Kodkvalitet:** gemensamma hjälpfunktioner, kommentar överst i varje fil och DATAFLOW.md (B-41). 197 enhetstester, svelte-check utan fel, alla flöden provade i Chromium.
+- **Att verifiera:** fas 1–8 i riktiga webbläsare, se TODO.md.
+- **Nästa steg:** prova i Chrome och Edge på Mac och Windows, kundtest (M4), O-06. Därefter fler ramverk och CloudSecComp.
+- **Väntar på beslut:** O-06 (rutin för nya versioner), vem som granskar typriskerna, testkund.
 
 ---
 
@@ -574,6 +580,143 @@ Beslutat 12 oktober 2026, som Plan 2.0 kräver i fas 4 (B-18). Schemat finns i `
 - **Varför en fil och inte ett API:** verktyget har ingen nätverksåtkomst (B-20) och kan inte skydda inloggningsuppgifter. Granskningsprogrammet skriver filen i uppdragets mapp, och verktyget läser den som vilken fil som helst.
 
 
+## B-34 · Åtgärder föreslås och godkänns (O-04)
+
+**Status:** Beslutat
+
+Beslutat 14 oktober 2026 av Claude på Mateusz uppdrag, enligt rekommendationen i O-04. Koden finns i `lib/actions.ts`.
+
+| Fråga | Beslut | För | Emot |
+|---|---|---|---|
+| Skapas eller föreslås? | **Föreslås.** Förslagen räknas fram ur kontrollernas status och riskernas restrisk och sparas aldrig. "Skapa åtgärd" gör ett förslag till en åtgärd med ID. | Ingen lista med halvfärdiga åtgärder, inga förbrukade ID:n, samma princip som andra beräknade värden (B-17). | Ett klick extra per brist. |
+| Vad ger förslag? | Tillämpliga kontroller som är Delvis eller Ej uppfyllda, och risker vars faktiska restrisk är över acceptansnivån och som inte accepteras. Ett riskförslag tar med riskens bristande kontroller, så att de inte föreslås en gång till. | Riskbehandlingsplanen (6.1.3) får åtgärder per risk, och kontroller som behandlar risken samlas där. | En kontroll som hör till en risk syns inte som eget förslag. Den syns i riskförslaget. |
+| När räknas en brist som omhändertagen? | När någon åtgärd, oavsett status, är kopplad till den. | Inga dubbletter, och ett aktivt beslut (Avbruten) respekteras. | En brist vars åtgärd är klar men som finns kvar föreslås inte igen. I stället varnar åtgärden "Klar, men bristen finns kvar". |
+| Ändras underlaget? | En åtgärd tas aldrig bort eller stängs automatiskt. Den varnar "Underlaget är åtgärdat. Stäng åtgärden?". | Konsulten beslutar, och historiken finns kvar till jämförelsen i fas 7. | Konsulten måste stänga själv. |
+| Ta bort? | Nej. Status **Avbruten** (`cancelled`, nytt värde i `ActionStatusSchema`). Avbrutna döljs i standardfiltret. | Historiken finns kvar. | En felskapad åtgärd ligger kvar som avbruten. |
+| En åtgärd för flera brister? | Ett förslag kan läggas till en befintlig öppen åtgärd. En koppling kan tas bort. | "Inför MFA" kan täcka flera kontroller och risker. | Kopplingar läggs bara till via förslag, inte fritt. |
+| Prioritet? | Valfritt fält `priority`: Hög, Medel eller Låg. Förslaget sätter Hög för risker och Ej uppfyllda, Medel för Delvis. | Ledningen ser vad som ska göras först. Gamla filer fungerar, fältet är valfritt. | — |
+
+Schemaändringarna är bakåtkompatibla: gamla filer läses som förut.
+
+## B-35 · Navigering mellan flikarna
+
+**Status:** Beslutat
+
+Beslutat 14 oktober 2026. Åtgärdsplanen, kontrollerna och riskerna länkar till varandra. Aktiv flik och vad som ska öppnas ligger i `lib/ui/nav.svelte.ts` (`nav.go`, `nav.show`).
+
+- **För:** komponenter långt ned i trädet (en åtgärd, en kontroll) kan länka utan att funktioner skickas genom alla mellanliggande komponenter. Nya flikar läggs till på ett ställe.
+- **Emot:** ett delat tillstånd till. Det nollställs när ett projekt öppnas.
+- **Avsnittens ID:n** är också flik-ID:n. Ramverksschemat avvisar avsnitt som heter som en fast flik (`RESERVED_SECTION_IDS`), så att ett nytt ramverk inte kan krocka.
+
+## B-36 · Vem som ändrade
+
+**Status:** Beslutat
+
+Beslutat 14 oktober 2026. Konsultens namn (B-32) skrivs i `updated.by` på kontroller och i `history.by` på risker. Ändringsfunktionerna i `lib/` hämtar namnet själva via `consultantName()`.
+
+- **För:** inga extra parametrar i ett tjugotal funktioner, och namnet finns överallt där det behövs. I testerna finns ingen localStorage, och namnet blir tomt.
+- **Emot:** funktionerna läser en inställning i webbläsaren och är därför inte helt rena. Godtaget, eftersom det bara gäller ett textfält.
+- **Namnet anges** på översikten (kortet Projekt) eller första gången en fil bifogas. Det visas i sidfoten på kontrollen, i riskhistoriken och i rapporternas sidhuvud.
+
+## B-37 · Dashboard och "redo för revision"
+
+**Status:** Beslutat
+
+Beslutat 14 oktober 2026 (fas 6). Översikten är dashboarden och kan skrivas ut som en lägesbild på en sida. "Redo för revision" räknas i `lib/dashboard.ts`.
+
+- **Delar:** bedömda, grundkrav uppfyllda, tillämpliga kontroller uppfyllda, evidens för uppfyllda, motiverade SoA-bortval, behandlade och godkända risker, brister med planerad åtgärd. Delar utan innehåll (till exempel inga bortval) räknas inte. Risker räknas alltid, eftersom en certifiering kräver en riskbedömning.
+- **Helhet:** medelvärdet av delarna. **Redo** = minst 90 % och alla grundkrav uppfyllda. **Nära** = minst 70 %. Annars **Inte redo**.
+- **För:** varje del går att förklara och följs av en länk till det som återstår. Grundkraven (kapitel 4–10) är obligatoriska vid certifiering, därav kravet.
+- **Emot:** lika vikt för alla delar är en förenkling, och 90 % är ett valt tröskelvärde. Delarna visas alltid, så att ingen behöver lita på bara en siffra.
+- **Generellt:** grundkrav är avsnitt utan SoA och kontroller är avsnitt med SoA, så samma regel fungerar för andra ramverk.
+
+## B-38 · Uppföljning och jämförelse
+
+**Status:** Beslutat
+
+Beslutat 14 oktober 2026 (fas 7). Koden finns i `lib/compare.ts`, `followUp()` i `project.ts` och vyn `FollowUpView.svelte`.
+
+| Fråga | Beslut | För | Emot |
+|---|---|---|---|
+| Hur startar nästa bedömning? | "Starta nästa bedömning" kopierar hela projektet till en ny fil med nytt `id`, `previousId` och dagens datum i filnamnet. | Allt behåller sina ID:n, så jämförelsen blir exakt. Konsulten uppdaterar i stället för att börja om. | Inaktuella kommentarer följer med och måste ses över. |
+| Vad nollställs? | Bara godkännanden av restrisk. Historiken får en rad. | Riskägaren ska godkänna på nytt varje period. | — |
+| Evidens? | Referenserna följer med. Den nya filen sparas i samma mapp, så filerna hittas. | Ingen kopiering av filer. | Sparas den nya filen i en annan mapp markeras evidensen som saknad. |
+| Vad jämförs? | Kontroller (förbättrade, försämrade, nybedömda, inte längre bedömda), SoA, risker (nya, borttagna, ändrad faktisk restrisk), åtgärder (avslutade, nya, försenade) och ny evidens. | Täcker tabellen i Plan 2.0. | — |
+| Var finns den tidigare filen? | Bara i minnet, tills projektet stängs. | Inget nytt sparas, ingen risk att filerna blandas ihop. | Filen väljs igen nästa gång. |
+| Olika filer? | Olika ramverk kan inte jämföras. Annan kund, fel ursprung eller omvänd ordning ger en varning. | Fel jämförelse upptäcks. | — |
+
+## B-39 · Rapporter: PDF, Word och Excel
+
+**Status:** Beslutat
+
+Beslutat 14 oktober 2026 (fas 8). Rapporterna är Svelte-komponenter i `components/reports/` och förhandsvisas i fliken Rapporter.
+
+| Fråga | Beslut | För | Emot |
+|---|---|---|---|
+| PDF | Webbläsarens utskrift ("Spara som PDF"). `PrintHost` ritar rapporten direkt under `body`, och resten av sidan döljs vid utskrift. | Inget bibliotek, inget nätverk, fungerar med CSP (B-20). | Sidbrytningar styrs av webbläsaren. |
+| Word | HTML-dokument med rapportens CSS, nedladdat som `.doc`. Word öppnar och kan redigera det. | Konsulten kan anpassa texten före leverans, utan ett stort bibliotek i filen. | Inte en äkta .docx. Word kan visa en fråga om formatet. Utseendet blir enklare än i PDF. |
+| Excel | CSV med semikolon, BOM och CRLF för kontroller, risker och åtgärder. Värden som börjar med = + - @ får en apostrof först. | Öppnas direkt i svenska Excel. Skyddar mot formelinjektion från fritext. | Ingen formatering. |
+| Layout | Gemensam CSS (`lib/report/style.ts`) och sidhuvud med Method IT, kund, ramverk, datum, konsult och version. | Samma utseende i alla rapporter och i Word. | Logotypen var text. *Ändrat i B-42: nu Method-logotypen som bild.* |
+| Innehåll | Komplett rapport, lägesbild, gapanalys, SoA, riskbehandlingsplan med riskmetoden som bilaga, progressrapport. | Täcker Plan 2.0 fas 8 och README 4.10. SoA kan skrivas ut separat (6.1.3 d). | — |
+
+## B-40 · Uppdragsuppgifter i projektfilen
+
+**Status:** Beslutat
+
+Beslutat 14 oktober 2026. Rapporterna behöver konsultens sammanfattning, omfattning och deltagare. Nytt valfritt fält `engagement: { scope, participants, summary }` i projektfilen, redigerat på översikten.
+
+- **För:** rapporten blir komplett utan efterarbete i Word, och uppgifterna följer med vid uppföljning.
+- **Emot:** fler fält på översikten. De är valfria och visas bara i rapporten när de är ifyllda.
+
+## B-41 · Version 0.8.0, instruktion och gemensamma hjälpfunktioner
+
+**Status:** Beslutat
+
+Beslutat 14 oktober 2026.
+
+- **Version 0.8.0** i `package.json` och `package-lock.json`: en MINOR per fas enligt B-24 (fas 8 → 0.8). 1.0.0 sätts vid M4, efter kundtestet. Det löser att `package.json` och `package-lock.json` hade olika versioner.
+- **Instruktionen** finns i verktyget (länken Instruktion i sidfoten), inte bara i README, eftersom konsulterna inte läser repot.
+- **Kodkvalitet.** Upprepad kod samlades i hjälpfunktioner:
+  - `allControls` och `controlTitles` (ramverk)
+  - `nextId` och `emptyAnswer` (projekt)
+  - `isDeficient` och `totalAttention` (bedömning)
+  - `downloadFile` (nedladdning)
+- **Ny utbyggnad** behöver då bara ändras på ett ställe, och logiken utgår från ramverkets avsnitt i stället för ISO-specifika ID:n.
+- **Prestanda.** Obedömda kontroller delar en fryst standardbedömning i stället för att skapa en ny vid varje uppslag. Bifogade filer kontrolleras bara när listan ändras.
+- **Kommentarer:** en kommentar överst i varje fil och korta kommentarer på huvudfunktionerna.
+- **DATAFLOW.md:** kartan över beroenden och dataflöde ligger i repot, som den fjärde dokumentationsfilen.
+
+
+## B-42 · Logotyp, större text och rymligare fält
+
+**Status:** Beslutat
+
+Beslutat 15 oktober 2026 på Mateusz begäran, inför testningen.
+
+- **Logotyp:** `src/lib/ui/logo.jpg` (Method, vit text på svart) visas i sidhuvudet och i rapporternas sidhuvud. Den importeras och bäddas in i HTML-filen som `data:`-adress, vilket CSP redan tillåter (`img-src data:`). Sidhuvudet är svart, så att logotypens bakgrund smälter in. Bilden beskärs med `object-fit` till texten. *För:* ingen ny fil bredvid verktyget. *Emot:* filen blir 16 kB större.
+- **Text:** grundstorleken är 16 px i stället för 15, och alla mindre storlekar är 1 px större. Länkknappar (`button.link`) är större och har lite luft.
+- **Översikten:** tre kolumner där korten staplas, så att det inte blir luckor: redo för revision och åtgärder, uppfyllnad och riskprofil, avsnitt och det som behöver uppmärksamhet. Projektkortet går över hela bredden med fälten i två kolumner. På smalare skärmar blir det två kolumner och sedan en.
+- **Textfält:**
+  - Textrutorna växer med innehållet (`field-sizing: content` i Chrome och Edge) och kan bara dras ut på höjden. Då kan de inte längre skjuta ut över grannfältet.
+  - I riskdetaljen har hot och sårbarhet var sin rad i full bredd.
+  - I Safari och Firefox gäller antalet rader som förut.
+
+
+## B-43 · Förbättringar i gränssnittet inför testningen
+
+**Status:** Beslutat
+
+Beslutat 15 oktober 2026 på Mateusz begäran.
+
+- **Menyknapp i stället för rullista.** "Lägg till i …" och "+ Lägg till konsekvenstyp" använder samma komponent (`MenuButton.svelte`). Den öppnar en lista som stängs vid val, med Esc eller vid klick utanför. *För:* ser likadan ut som verktygets andra knappar, visar hela rubriken och ansvarig, och kan återanvändas. *Emot:* en egen komponent i stället för webbläsarens rullista.
+- **Konsekvenstyper att välja bland:** Människa och Hälsa, Miljö, Förtroende och Varumärke, Lagar och Regler (Compliance), eller en egen typ. (Ekonomi och Tillgångar samt Verksamhet och Drift togs bort 15 okt 2026 på Mateusz begäran; standardmetoden täcker dem redan med "Verksamhet och ekonomi".) Listan finns i `CONSEQUENCE_CATEGORIES` i `risk/rules.ts`. Standardmetodens två typer är oförändrade.
+- **Klar vid acceptans och fastställande.** Ändringarna sparas fortfarande direkt. Klar kräver vem som fastställt metoden, sätter dagens datum om det saknas och visar uppgifterna som text tills konsulten trycker Ändra.
+- **Statusfärger för åtgärder:** Ej påbörjad grå, Pågår blå (ny färg `--blue`), Klar grön, Avbruten röd. Samma färger i statusknapparna.
+- **Ta bort uppdelningen** i teknisk och organisatorisk del (`clearParts`), med en fråga om delarna har värden.
+- **Rullistor** har samma stil som textfälten.
+- **Kortet "Så räknas restrisken" är borttaget** från riskmetoden, eftersom användarna redan kan regeln. Regeln står kvar i B-27 och i rapporternas bilaga.
+
+
 ---
 
 ## Öppna frågor
@@ -655,6 +798,8 @@ Metoden (skala, faktorer och avrundning) ska stå i riskmetoden och skrivas ut s
 
 ### O-04 · Hur åtgärder skapas och hanteras
 
+**Avgjord 14 oktober 2026:** rekommendationerna 1–4, se B-34.
+
 *Måste avgöras före fas 5 (åtgärdsplan). Datamodellen (B-17) klarar alla alternativen nedan, eventuellt med ett nytt valfritt fält.*
 
 Plan 2.0 och README beskriver vad åtgärdsplanen ska visa, men inte hur åtgärderna uppstår och vad som händer när underlaget ändras. README säger på ett ställe att en åtgärd *skapas* automatiskt när en kontroll sätts till Delvis eller Ej uppfylld (4.7), och på ett annat att den *föreslås* (4.9). Fyra frågor behöver besvaras.
@@ -711,3 +856,13 @@ Kontrollen mot målet i övrigt:
 **Rekommendation:** A. Grundkrav, Annex A och SoA är det konsulten arbetar i varje dag, och risk (fas 3) och åtgärder (fas 5) bygger på kontrollernas status. En enkel Översikt med uppfyllnadsgrad räcker till M1; dashboarden i fas 6 bygger vidare på den. `lib/compliance.ts` är redan förberedd för det.
 
 **Beslut behövs om:** alternativ A, B eller C.
+
+### O-06 · Rutin för att dela ut nya versioner
+
+*Bör avgöras före M4.* Den byggda filen heter `GRC-verktyget-<version>.html` (B-24), men det är inte bestämt hur konsulterna får den.
+
+- **Var ligger filen?** Förslag: en gemensam SharePoint-mapp "GRC-verktyget" med en undermapp per version. Den senaste ligger också överst som `GRC-verktyget.html`.
+- **Hur får konsulterna veta?** Förslag: ett kort meddelande i teamets kanal med vad som är nytt, hämtat ur ARCHITECTURE.
+- **Gamla versioner?** Förslag: de ligger kvar. Projektfilerna är bakåtkompatibla inom samma MAJOR-version (B-24), så en äldre fil kan alltid öppnas i en nyare version.
+
+**Beslut behövs om:** plats, kanal och om gamla versioner ska ligga kvar.

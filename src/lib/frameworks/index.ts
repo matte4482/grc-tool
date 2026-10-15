@@ -1,7 +1,7 @@
+// Register över tillgängliga ramverk
+
 import { FrameworkSchema, type Framework } from './schema'
 import iso27001_2022 from './iso27001-2022.yaml'
-
-// Register över tillgängliga ramverk
 
 export interface FrameworkEntry {
   id: string

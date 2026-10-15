@@ -1,4 +1,6 @@
 <script lang="ts">
+  // Dialog för att koppla Annex A-kontroller till en risk (README 4.5).
+
   import { answerFor } from '../lib/assessment'
   import type { RiskControlLink } from '../lib/project/schema'
   import { store } from '../lib/project/store.svelte'
@@ -7,7 +9,6 @@
   import Modal from './Modal.svelte'
   import StatusBadge from './StatusBadge.svelte'
 
-  // Dialog för att koppla Annex A-kontroller till en risk (README 4.5).
   let { open, riskId, onclose, onlink }: { open: boolean; riskId: string; onclose: () => void; onlink: (link: RiskControlLink) => void } = $props()
 
   let query = $state('')
@@ -23,7 +24,9 @@
   })
   const controls = $derived.by(() => {
     const q = query.trim().toLowerCase()
-    const all = store.framework!.sections.filter((s) => s.soa).flatMap((s) => s.groups.flatMap((g) => g.controls))
+    // Risker behandlas med SoA-kontrollerna (Annex A). Har ramverket ingen SoA går alla att koppla.
+    const soa = store.framework!.sections.filter((s) => s.soa)
+    const all = (soa.length ? soa : store.framework!.sections).flatMap((s) => s.groups.flatMap((g) => g.controls))
     return all
       .filter((c) => !linked.has(c.id) && (!q || `${c.id} ${c.title}`.toLowerCase().includes(q)))
       .sort((a, b) => Number(suggested.has(b.id)) - Number(suggested.has(a.id)))

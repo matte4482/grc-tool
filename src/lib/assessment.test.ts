@@ -6,6 +6,7 @@ import {
   NO_FILTER,
   answerFor,
   attention,
+  clearParts,
   filterControls,
   filterSoa,
   linkedRisks,
@@ -110,5 +111,17 @@ describe('sammanställningar', () => {
     const a6 = groupProgress(p, annex).find((g) => g.id === 'A.6')!
     expect(a6.total).toBe(8)
     expect(a6.notFulfilled).toBe(1)
+  })
+})
+
+describe('uppdelning', () => {
+  it('kan tas bort helt', () => {
+    const p = fresh()
+    setPart(p, 'A.8.5', 'technical', 'fulfilled', NOW)
+    setPart(p, 'A.8.5', 'organizational', 'partial', NOW)
+    clearParts(p, 'A.8.5', NOW)
+    expect(p.controls['A.8.5'].parts).toBeUndefined()
+    clearParts(p, 'A.5.1', NOW)
+    expect(p.controls['A.5.1']).toBeUndefined()
   })
 })

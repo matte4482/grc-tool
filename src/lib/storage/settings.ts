@@ -1,6 +1,6 @@
-import type { KeyValueStorage } from './backup'
-
 // Inställningar för konsulten i den här webbläsaren. Ingen kunddata.
+
+import type { KeyValueStorage } from './backup'
 
 const NAME_KEY = 'grc-verktyget:konsult'
 

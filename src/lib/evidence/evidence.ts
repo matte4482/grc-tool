@@ -1,8 +1,8 @@
-import type { Evidence, Project } from '../project/schema'
-import { takeId } from '../project/project'
-
 // Bifogad evidens på kontroller och risker.
 // Filerna ligger i mappen evidens/ bredvid projektfilen; projektfilen har bara referensen.
+
+import type { Evidence, Project } from '../project/schema'
+import { emptyAnswer, nextId } from '../project/project'
 
 export const EVIDENCE_DIR = 'evidens'
 export const MAX_EVIDENCE_BYTES = 100 * 1024 * 1024
@@ -50,19 +50,10 @@ export type NewEvidence = Pick<Evidence, 'file' | 'size' | 'sha256' | 'source' |
 
 /** Lägger till en referens med nytt EV-ID. Kontrollen skapas om den saknas. Returnerar ID:t. */
 export function addEvidence(draft: Project, owner: EvidenceOwner, data: NewEvidence, now: string): string {
-  const { id, nextNumber } = takeId(draft.nextNumber, 'evidence')
-  draft.nextNumber = nextNumber
+  const id = nextId(draft, 'evidence')
   const evidence: Evidence = { id, ...data, addedAt: now }
   if (owner.kind === 'control') {
-    const answer = (draft.controls[owner.id] ??= {
-      status: 'not_assessed',
-      comment: '',
-      owner: '',
-      evidenceNote: '',
-      evidence: [],
-      applicable: true,
-      soaJustification: '',
-    })
+    const answer = (draft.controls[owner.id] ??= emptyAnswer())
     answer.evidence.push(evidence)
     answer.updated = { at: now, by: data.addedBy }
   } else {

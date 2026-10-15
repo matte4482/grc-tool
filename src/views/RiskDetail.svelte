@@ -1,11 +1,15 @@
 <script lang="ts">
+  // Riskdetalj: information, bedömning i tre steg, kopplade kontroller och godkännande (README 4.6).
+
   import EvidenceList from '../components/EvidenceList.svelte'
   import LevelBadge from '../components/LevelBadge.svelte'
+  import LinkedActions from '../components/LinkedActions.svelte'
   import LinkControlDialog from '../components/LinkControlDialog.svelte'
   import Notice from '../components/Notice.svelte'
   import RiskMatrix from '../components/RiskMatrix.svelte'
   import StatusBadge from '../components/StatusBadge.svelte'
   import { answerFor } from '../lib/assessment'
+  import { allControls, controlTitles } from '../lib/frameworks/schema'
   import type { RiskControlLink, Treatment } from '../lib/project/schema'
   import { store } from '../lib/project/store.svelte'
   import {
@@ -24,8 +28,8 @@
   } from '../lib/risk/operations'
   import { EFFECT_LABELS, TYPE_LABELS, approvalState, methodOf, nextReview, residualRisk, riskValue, riskWarnings } from '../lib/risk/rules'
   import { dialog } from '../lib/ui/dialog.svelte'
+  import { nav } from '../lib/ui/nav.svelte'
 
-  // Riskdetalj: information, bedömning i tre steg, kopplade kontroller och godkännande (README 4.6).
   let { riskId, onselect }: { riskId: string; onselect: (id: string | null) => void } = $props()
 
   const project = $derived(store.project!)
@@ -37,7 +41,8 @@
   const warn = $derived(riskWarnings(project, risk))
   const appr = $derived(approvalState(project, risk))
   const above = $derived(actual ? riskValue(actual) > method.acceptanceThreshold : false)
-  const controlTitle = $derived(new Map(store.framework!.sections.flatMap((s) => s.groups.flatMap((g) => g.controls.map((c) => [c.id, c.title])))))
+  const controlTitle = $derived(controlTitles(store.framework!))
+  const soaControls = $derived(new Set(allControls(store.framework!).filter((x) => x.section.soa).map((x) => x.control.id)))
 
   let linking = $state(false)
   let messages = $state<string[]>([])
@@ -115,17 +120,11 @@
   <section class="card">
     <h2>Riskinformation</h2>
     <label class="field-label" for="r-desc">Beskrivning</label>
-    <textarea id="r-desc" rows="3" value={risk.description} oninput={(e) => text('description', e.currentTarget.value)}></textarea>
-    <div class="two">
-      <div>
-        <label class="field-label" for="r-threat">Hot</label>
-        <textarea id="r-threat" rows="2" value={risk.threat} oninput={(e) => text('threat', e.currentTarget.value)}></textarea>
-      </div>
-      <div>
-        <label class="field-label" for="r-vuln">Sårbarhet</label>
-        <textarea id="r-vuln" rows="2" value={risk.vulnerability} oninput={(e) => text('vulnerability', e.currentTarget.value)}></textarea>
-      </div>
-    </div>
+    <textarea id="r-desc" rows="4" value={risk.description} oninput={(e) => text('description', e.currentTarget.value)}></textarea>
+    <label class="field-label" for="r-threat">Hot</label>
+    <textarea id="r-threat" rows="3" value={risk.threat} oninput={(e) => text('threat', e.currentTarget.value)}></textarea>
+    <label class="field-label" for="r-vuln">Sårbarhet</label>
+    <textarea id="r-vuln" rows="3" value={risk.vulnerability} oninput={(e) => text('vulnerability', e.currentTarget.value)}></textarea>
     <label class="field-label" for="r-assets">Tillgångar och processer <span>— skilj med komma</span></label>
     <input id="r-assets" value={risk.assets.join(', ')} onchange={(e) => store.update((d) => setAssets(d, riskId, e.currentTarget.value.split(',')))} />
     <div class="two">
@@ -141,7 +140,7 @@
       </div>
     </div>
     <label class="field-label" for="r-plan">Behandlingsplan</label>
-    <textarea id="r-plan" rows="2" value={risk.treatmentPlan} oninput={(e) => text('treatmentPlan', e.currentTarget.value)}></textarea>
+    <textarea id="r-plan" rows="3" value={risk.treatmentPlan} oninput={(e) => text('treatmentPlan', e.currentTarget.value)}></textarea>
     <p class="meta dates">
       Identifierad {fmt(risk.identifiedAt)} · senast bedömd {fmt(risk.lastAssessedAt)} · nästa bedömning {fmt(nextReview(project, risk))}
     </p>
@@ -196,9 +195,9 @@
           {#each risk.controls as l (l.control)}
             {@const a = answerFor(project, l.control)}
             <tr>
-              <td><strong>{l.control}</strong> {controlTitle.get(l.control) ?? 'Okänd kontroll'}</td>
+              <td><button type="button" class="link" onclick={() => nav.show('control', l.control)}>{l.control}</button> {controlTitle.get(l.control) ?? 'Okänd kontroll'}</td>
               <td><StatusBadge status={a.status} /></td>
-              <td class="meta">Låst tillämplig</td>
+              <td class="meta">{soaControls.has(l.control) ? 'Låst tillämplig' : '–'}</td>
               <td>
                 <select value={l.effect ?? ''} aria-label="Effekt för {l.control}" onchange={(e) => store.update((d) => setLink(d, riskId, l.control, { effect: (e.currentTarget.value || undefined) as RiskControlLink['effect'] }))}>
                   <option value="">Välj</option>
@@ -220,6 +219,11 @@
   {:else}
     <p class="meta">Inga kontroller kopplade. Utan kopplingar blir restrisken samma som risken före behandling.</p>
   {/if}
+</section>
+
+<section class="card">
+  <h2>Åtgärder</h2>
+  <LinkedActions kind="risk" id={riskId} />
 </section>
 
 <section class="card">
@@ -257,7 +261,7 @@
     <h2>Historik</h2>
     <ul class="history">
       {#each [...risk.history].reverse() as h, i (i)}
-        <li><span class="meta">{new Date(h.at).toLocaleString('sv-SE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span> {h.text}</li>
+        <li><span class="meta">{new Date(h.at).toLocaleString('sv-SE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span> {h.text}{h.by ? ` (${h.by})` : ''}</li>
       {:else}
         <li class="meta">Ingen historik.</li>
       {/each}

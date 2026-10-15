@@ -1,9 +1,10 @@
 <script lang="ts">
+  // Riskmatris 5 × 5: sannolikhet uppåt, konsekvens åt höger.
+  // Visar antal risker per ruta, eller en risks markeringar (före, planerad, faktisk).
+
   import type { RiskMethod } from '../lib/project/schema'
   import { riskLevel, type Score } from '../lib/risk/rules'
 
-  // Riskmatris 5 × 5: sannolikhet uppåt, konsekvens åt höger.
-  // Visar antal risker per ruta, eller en risks markeringar (före, planerad, faktisk).
   let {
     method,
     counts,

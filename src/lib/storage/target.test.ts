@@ -24,4 +24,8 @@ describe('projectFileName', () => {
     const name = projectFileName('a'.repeat(59) + ' bolaget')
     expect(name).toBe('a'.repeat(59) + '.grc.json')
   })
+
+  it('tillägg för uppföljning, t.ex. datum', () => {
+    expect(projectFileName('Exempelbolaget AB', '2027-10-14')).toBe('exempelbolaget-ab-2027-10-14.grc.json')
+  })
 })

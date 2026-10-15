@@ -1,6 +1,6 @@
-import type { KeyValueStorage } from './backup'
-
 // Används bara av testerna: en localStorage i minnet.
+
+import type { KeyValueStorage } from './backup'
 
 /** En localStorage i minnet. `full` gör att alla skrivningar misslyckas, som när lagringen är full. */
 export function memoryStorage(opts: { full?: boolean } = {}): KeyValueStorage & { data: Map<string, string> } {

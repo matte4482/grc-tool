@@ -1,3 +1,5 @@
+// Reaktiva vyer för projektets session. 
+
 import type { SaveTarget } from '../storage/target'
 import { localBackupStore, type Backup } from '../storage/backup'
 import { idbRecentStore, mergeRecent, recentEntry, type RecentEntry, type RecentStore } from '../storage/recent'
@@ -14,34 +16,20 @@ import {
   type SaveStatus,
 } from './session'
 
-// Store: appens enda källa för det öppna projektet (ARCHITECTURE B-23).
-//
-// All logik ligger i ProjectSession (session.ts) och testas där. Den här filen
-// gör bara värdena reaktiva: varje gång sessionen ändras kopieras projekt och
-// status till $state, och vyerna ritas om. Vyerna läser härifrån och ändrar
-// bara via metoderna nedan, aldrig direkt i projektet.
-
 class ProjectStore {
   #session = new ProjectSession({ onChange: () => this.#sync(), backup: localBackupStore() })
-  /** "Senaste arbeten" i IndexedDB (B-26). */
   #recentStore: RecentStore
 
-  // $state.raw: objekten byts ut vid varje ändring i stället för att ändras på
-  // plats, så Svelte behöver inte bevaka varje fält för sig.
   project = $state.raw<Project | null>(null)
   framework = $state.raw<Framework | null>(null)
   target = $state.raw<SaveTarget | null>(null)
   status = $state.raw<SaveStatus>({ state: 'empty' })
   hasUnsavedChanges = $state(false)
-  /** Sant om reservkopian i localStorage inte kunde skrivas (B-25). */
   backupFailed = $state(false)
-  /** Reservkopior i webbläsaren. Uppdateras bara när inget projekt är öppet (startsidan). */
   backups = $state.raw<Backup[]>(this.#session.listBackups())
 
-  /** Senaste arbeten på startsidan, senast använda först (B-26). */
   recent = $state.raw<RecentEntry[]>([])
 
-  /** Sparstatusen som text och färg för sidhuvudet. */
   statusText = $derived(describeStatus(this.status, this.target))
 
   constructor(recentStore: RecentStore = idbRecentStore()) {
@@ -56,7 +44,6 @@ class ProjectStore {
     this.status = this.#session.status
     this.hasUnsavedChanges = this.#session.hasUnsavedChanges
     this.backupFailed = this.#session.backupFailed
-    // Listan läses bara när startsidan visas, inte vid varje ändring i ett projekt.
     if (!this.project) this.backups = this.#session.listBackups()
   }
 

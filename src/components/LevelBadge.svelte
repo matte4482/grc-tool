@@ -1,7 +1,8 @@
 <script lang="ts">
+  // Riskvärde med färg efter nivå, t.ex. "16 Mycket hög".
+
   import { LEVEL_LABELS, riskLevel, riskValue, type Score } from '../lib/risk/rules'
 
-  // Riskvärde med färg efter nivå, t.ex. "16 Mycket hög".
   let { score, showLabel = true }: { score: Score | undefined; showLabel?: boolean } = $props()
   const value = $derived(score ? riskValue(score) : undefined)
 </script>

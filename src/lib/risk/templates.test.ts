@@ -52,3 +52,13 @@ describe('addTemplateRisks', () => {
     expect(p.risks[0].id).toBe('R-005')
   })
 })
+
+describe('typrisk och SoA', () => {
+  it('en bortvald kontroll blir tillämplig igen när en typrisk kopplar den', () => {
+    const p = createProject({ client: 'X', framework: iso })
+    const control = set.risks[0].controls[0].control
+    p.controls[control] = { ...p.controls[control], status: 'not_assessed', comment: '', owner: '', evidenceNote: '', evidence: [], applicable: false, soaJustification: '' }
+    addTemplateRisks(p, set.risks.slice(0, 1), '2026-10-14')
+    expect(p.controls[control].applicable).toBe(true)
+  })
+})

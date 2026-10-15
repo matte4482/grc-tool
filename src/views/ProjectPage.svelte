@@ -1,10 +1,17 @@
 <script lang="ts">
   // Det öppna projektet med flikar (README 4.2).
-  import { soaSummary, type Attention } from '../lib/assessment'
+  import { actionSummary } from '../lib/actions'
+  import { soaSummary } from '../lib/assessment'
   import { assessmentProgress, percent } from '../lib/compliance'
   import { store } from '../lib/project/store.svelte'
   import { supportsFolderAccess } from '../lib/storage/folder'
+  import { localDate } from '../lib/ui/format'
+  import { nav } from '../lib/ui/nav.svelte'
+  import ActionPlanView from './ActionPlanView.svelte'
+  import { comparison } from '../lib/ui/comparison.svelte'
   import ControlsView from './ControlsView.svelte'
+  import FollowUpView from './FollowUpView.svelte'
+  import ReportsView from './ReportsView.svelte'
   import Overview from './Overview.svelte'
   import RiskMethodView from './RiskMethodView.svelte'
   import RiskRegisterView from './RiskRegisterView.svelte'
@@ -16,8 +23,9 @@
   const soa = $derived(soaSummary(project, framework))
   const hasSoa = $derived(framework.sections.some((s) => s.soa))
 
-  let tab = $state('overview')
-  let attention = $state<Attention | undefined>()
+  const actions = $derived(actionSummary(project, localDate()))
+  nav.go('overview')
+  comparison.clear()
 
   const tabs = $derived([
     { id: 'overview', label: 'Översikt', count: `${percent(total.fulfilled, total.applicable)} %` },
@@ -25,13 +33,11 @@
     { id: 'risks', label: 'Riskregister', count: String(project.risks.length) },
     ...framework.sections.map((s) => ({ id: s.id, label: s.title, count: String(s.groups.reduce((n, g) => n + g.controls.length, 0)) })),
     ...(hasSoa ? [{ id: 'soa', label: 'SoA', count: soa.missing ? `${soa.missing} saknar motivering` : String(soa.applicable) }] : []),
+    { id: 'actions', label: 'Åtgärdsplan', count: actions.overdue ? `${actions.overdue} försenade` : String(actions.open) },
+    { id: 'followup', label: 'Uppföljning', count: comparison.previous ? 'jämförs' : '' },
+    { id: 'reports', label: 'Rapporter', count: '' },
   ])
-  const section = $derived(framework.sections.find((s) => s.id === tab))
-
-  function go(next: string, a?: Attention) {
-    attention = a
-    tab = next
-  }
+  const section = $derived(framework.sections.find((s) => s.id === nav.tab))
 </script>
 
 {#if supportsFolderAccess() && store.target?.kind === 'download'}
@@ -49,23 +55,30 @@
 
 <nav class="tabs" aria-label="Flikar">
   {#each tabs as t (t.id)}
-    <button type="button" class:active={tab === t.id} aria-current={tab === t.id ? 'page' : undefined} onclick={() => go(t.id)}>
+    <button type="button" class:active={nav.tab === t.id} aria-current={nav.tab === t.id ? 'page' : undefined} onclick={() => nav.go(t.id)}>
       {t.label} <span class="tab-count">{t.count}</span>
     </button>
   {/each}
-  <span class="tabs-later" title="Byggs i fas 5">Åtgärdsplan kommer</span>
 </nav>
 
-{#if tab === 'overview'}
-  <Overview {go} />
-{:else if tab === 'method'}
+{#if nav.tab === 'overview'}
+  <Overview />
+{:else if nav.tab === 'method'}
   <RiskMethodView />
-{:else if tab === 'risks'}
-  <RiskRegisterView />
-{:else if tab === 'soa'}
+{:else if nav.tab === 'risks'}
+  {#key nav.focus}
+    <RiskRegisterView initialRisk={nav.focus} />
+  {/key}
+{:else if nav.tab === 'actions'}
+  <ActionPlanView />
+{:else if nav.tab === 'followup'}
+  <FollowUpView />
+{:else if nav.tab === 'reports'}
+  <ReportsView />
+{:else if nav.tab === 'soa'}
   <SoaView />
 {:else if section}
-  {#key tab}
-    <ControlsView {section} initialAttention={attention} />
+  {#key nav.tab + (nav.focus ?? '')}
+    <ControlsView {section} initialAttention={nav.attention} initialOpen={nav.focus} />
   {/key}
 {/if}

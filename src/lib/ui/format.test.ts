@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { relativeTime } from './format'
+import { localDate, relativeTime, shortDate } from './format'
 
 const now = new Date(2026, 9, 7, 10, 0)
 const at = (y: number, m: number, d: number, h = 12, min = 0) => new Date(y, m, d, h, min).toISOString()
@@ -13,5 +13,12 @@ describe('relativeTime', () => {
   it('äldre datum utan klockslag, med år om det är ett annat år', () => {
     expect(relativeTime(at(2026, 8, 18), now)).toBe('18 sep')
     expect(relativeTime(at(2025, 8, 18), now)).toBe('18 sep 2025')
+  })
+})
+
+describe('datum', () => {
+  it('lokalt datum och kort text', () => {
+    expect(localDate(new Date(2026, 0, 5, 23, 30))).toBe('2026-01-05')
+    expect(shortDate('2026-10-15')).toBe('15 okt 2026')
   })
 })

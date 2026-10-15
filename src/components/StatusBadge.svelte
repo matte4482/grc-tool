@@ -1,8 +1,9 @@
 <script lang="ts">
+  // Status som liten bricka i en rad. `excluded` = bortvald i SoA.
+
   import { STATUS_LABELS } from '../lib/assessment'
   import type { Status } from '../lib/project/schema'
 
-  // Status som liten bricka i en rad. `excluded` = bortvald i SoA.
   let { status, excluded = false }: { status: Status; excluded?: boolean } = $props()
 </script>
 

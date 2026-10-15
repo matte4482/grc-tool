@@ -1,9 +1,9 @@
-import { z } from 'zod'
-import type { Framework } from '../frameworks/schema'
-import { PROJECT_SCHEMA_VERSION, ProjectSchema, type NextNumber, type Project } from './schema'
-
 // Skapa, läsa in och skriva ut projektfiler. Ren TypeScript utan Svelte,
 // så att allt kan testas utan UI (README avsnitt 2).
+
+import { z } from 'zod'
+import type { Framework } from '../frameworks/schema'
+import { ControlAssessmentSchema, PROJECT_SCHEMA_VERSION, ProjectSchema, type ControlAssessment, type NextNumber, type Project } from './schema'
 
 // Zods inbyggda felmeddelanden på svenska. Egna meddelanden i schemat går före.
 const swedish = z.locales.sv()
@@ -29,6 +29,25 @@ export function createProject(opts: {
     createdAt: now,
     updatedAt: now,
   })
+}
+
+/**
+ * Ny bedömning som följer upp en tidigare (fas 7). Allt följer med och behåller
+ * sina ID:n, så att bedömningarna kan jämföras. Godkännanden av restrisk tas bort,
+ * eftersom riskägaren ska godkänna på nytt i den nya perioden.
+ */
+export function followUp(previous: Project, now: Date = new Date()): Project {
+  const at = now.toISOString()
+  const p = structuredClone(previous)
+  p.id = crypto.randomUUID()
+  p.previousId = previous.id
+  p.createdAt = at
+  p.updatedAt = at
+  for (const r of p.risks) {
+    r.approval = null
+    r.history.push({ at, by: '', text: 'Överförd till uppföljande bedömning' })
+  }
+  return ProjectSchema.parse(p)
 }
 
 /**
@@ -94,6 +113,18 @@ export function takeId(nextNumber: NextNumber, kind: IdKind): { id: string; next
   }
 }
 
+/** Tar nästa ID ur projektet och räknar upp löpnumret. Ändrar `draft`. */
+export function nextId(draft: Project, kind: IdKind): string {
+  const { id, nextNumber } = takeId(draft.nextNumber, kind)
+  draft.nextNumber = nextNumber
+  return id
+}
+
+/** Bedömningen för en kontroll som inte bedömts än. */
+export function emptyAnswer(): ControlAssessment {
+  return ControlAssessmentSchema.parse({ status: 'not_assessed' })
+}
+
 /**
  * Kontrollerar projektet mot sitt ramverk. Returnerar en lista med problem;
  * tom lista betyder att allt stämmer.
@@ -134,8 +165,8 @@ export function checkAgainstFramework(project: Project, framework: Framework): s
   for (const a of project.actions) {
     for (const c of a.controls) known(c, a.id)
     if (a.source.type === 'control') known(a.source.id, a.id)
-    const risks = a.source.type === 'risk' ? [...a.risks, a.source.id] : a.risks
-    for (const r of risks) if (!riskIds.has(r)) problems.push(`${a.id}: okänd risk ${r}`)
+    // Källan kontrolleras inte: den visar var åtgärden kom ifrån, även om risken tagits bort.
+    for (const r of a.risks) if (!riskIds.has(r)) problems.push(`${a.id}: okänd risk ${r}`)
   }
 
   return problems

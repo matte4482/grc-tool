@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { untrack } from 'svelte'
+  // Grundkrav eller Annex A: bedömning per krav och kontroll (README 4.7).
+
+  import { onMount, untrack } from 'svelte'
   import ControlItem from '../components/ControlItem.svelte'
   import StatusBar from '../components/StatusBar.svelte'
   import { NO_FILTER, STATUSES, STATUS_LABELS, attention, filterControls, isExcluded, linkedRisks, type Attention, type ControlFilter } from '../lib/assessment'
@@ -7,8 +9,7 @@
   import type { Section } from '../lib/frameworks/schema'
   import { store } from '../lib/project/store.svelte'
 
-  // Grundkrav eller Annex A: bedömning per krav och kontroll (README 4.7).
-  let { section, initialAttention }: { section: Section; initialAttention?: ControlFilter['attention'] } = $props()
+  let { section, initialAttention, initialOpen }: { section: Section; initialAttention?: ControlFilter['attention']; initialOpen?: string } = $props()
 
   const ATTENTION_NOTE: Record<Attention, string> = {
     not_assessed: ' som inte är bedömda',
@@ -17,7 +18,10 @@
   }
 
   let filter = $state<ControlFilter>({ ...NO_FILTER, attention: untrack(() => initialAttention) })
-  let openIds = $state<Record<string, boolean>>({})
+  let openIds = $state<Record<string, boolean>>(untrack(() => (initialOpen ? { [initialOpen]: true } : {})))
+  onMount(() => {
+    if (initialOpen) document.getElementById(`ctrl-${initialOpen}`)?.scrollIntoView({ block: 'center' })
+  })
 
   const project = $derived(store.project!)
   const groups = $derived(filterControls(project, section, filter))

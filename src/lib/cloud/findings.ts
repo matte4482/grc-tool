@@ -1,10 +1,9 @@
+// Filformat för fynd från en automatisk granskning, t.ex. CloudSecComp mot Azure (B-18, B-33).
+// Inläsningen i gränssnittet byggs när det finns ett program som skriver filen.
+
 import { z } from 'zod'
 import type { Framework } from '../frameworks/schema'
 import type { Status } from '../project/schema'
-
-// Filformat för fynd från en automatisk granskning, t.ex. CloudSecComp mot Azure (B-18, B-31).
-// Formatet är bestämt nu så att granskningen kan byggas för sig. Inläsningen i verktyget byggs
-// när det finns ett program som skriver filen.
 
 const finding = z.object({
   /** Annex A-kontroll, t.ex. "A.8.5". */

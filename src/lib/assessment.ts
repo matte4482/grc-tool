@@ -1,9 +1,11 @@
-import type { Control, Framework, Group, Section } from './frameworks/schema'
-import { needsEvidence } from './evidence/evidence'
-import { ControlAssessmentSchema, type ControlAssessment, type Project, type Status } from './project/schema'
-
 // Bedömning av krav och kontroller, och SoA (B-28). Ren TypeScript.
 // Ändringsfunktionerna ändrar ett utkast och anropas via store.update.
+
+import { consultantName } from './storage/settings'
+import type { Control, Framework, Group, Section } from './frameworks/schema'
+import { needsEvidence } from './evidence/evidence'
+import { emptyAnswer } from './project/project'
+import type { ControlAssessment, Project, Status } from './project/schema'
 
 export const STATUS_LABELS: Record<Status, string> = {
   fulfilled: 'Uppfylld',
@@ -15,14 +17,23 @@ export const STATUS_LABELS: Record<Status, string> = {
 /** Statusarna i den ordning de visas. */
 export const STATUSES: Status[] = ['fulfilled', 'partial', 'not_fulfilled', 'not_assessed']
 
+// Delas av alla obedömda kontroller och får därför inte ändras.
+const EMPTY: ControlAssessment = Object.freeze({ ...emptyAnswer(), evidence: Object.freeze([]) as unknown as ControlAssessment['evidence'] })
+
 /** Bedömningen av en kontroll. Saknas den räknas kontrollen som ej bedömd och tillämplig. */
 export function answerFor(project: Project, controlId: string): ControlAssessment {
-  return project.controls[controlId] ?? ControlAssessmentSchema.parse({ status: 'not_assessed' })
+  return project.controls[controlId] ?? EMPTY
 }
 
 /** Om kontrollen är bortvald i SoA. Bara kontroller i ett SoA-avsnitt kan vara bortvalda. */
 export function isExcluded(project: Project, section: Section, controlId: string): boolean {
   return section.soa && project.controls[controlId]?.applicable === false
+}
+
+/** Tillämplig och delvis eller ej uppfylld, alltså en brist. */
+export function isDeficient(project: Project, section: Section, controlId: string): boolean {
+  const status = answerFor(project, controlId).status
+  return !isExcluded(project, section, controlId) && (status === 'partial' || status === 'not_fulfilled')
 }
 
 /** Risker kopplade till varje kontroll, som kontroll-ID → risker. */
@@ -43,9 +54,9 @@ export function linkedRisks(project: Project): Map<string, { id: string; title: 
 export type AnswerText = 'comment' | 'owner' | 'evidenceNote' | 'soaJustification'
 
 function edit(draft: Project, controlId: string, now: string, change: (a: ControlAssessment) => void): void {
-  const answer = (draft.controls[controlId] ??= ControlAssessmentSchema.parse({ status: 'not_assessed' }))
+  const answer = (draft.controls[controlId] ??= emptyAnswer())
   change(answer)
-  answer.updated = { at: now, by: '' }
+  answer.updated = { at: now, by: consultantName() }
 }
 
 export function setStatus(draft: Project, controlId: string, status: Status, now: string): void {
@@ -63,6 +74,11 @@ export function setPart(draft: Project, controlId: string, part: 'technical' | '
     if (status === undefined) delete parts[part]
     a.parts = parts.technical || parts.organizational ? parts : undefined
   })
+}
+
+/** Tar bort uppdelningen i teknisk och organisatorisk del. */
+export function clearParts(draft: Project, controlId: string, now: string): void {
+  if (draft.controls[controlId]?.parts) edit(draft, controlId, now, (a) => (a.parts = undefined))
 }
 
 /**
@@ -124,6 +140,13 @@ export function attention(project: Project, section: Section): { notAssessed: nu
       if (needsAttention(a, 'no_evidence')) count.noEvidence += 1
     }
   return count
+}
+
+/** Summan av det som behöver uppmärksamhet i alla avsnitt. */
+export function totalAttention(project: Project, framework: Framework): ReturnType<typeof attention> {
+  return framework.sections
+    .map((s) => attention(project, s))
+    .reduce((a, b) => ({ notAssessed: a.notAssessed + b.notAssessed, noOwner: a.noOwner + b.noOwner, noEvidence: a.noEvidence + b.noEvidence }))
 }
 
 export type SoaFilter = 'all' | 'applicable' | 'excluded' | 'missing'

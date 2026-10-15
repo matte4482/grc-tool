@@ -3,7 +3,10 @@
   // Startsidan när inget projekt är öppet, annars projektet.
   import { onMount } from 'svelte'
   import DialogHost from './components/DialogHost.svelte'
+  import logo from './lib/ui/logo.jpg'
+  import HelpDialog from './components/HelpDialog.svelte'
   import Notice from './components/Notice.svelte'
+  import PrintHost from './components/reports/PrintHost.svelte'
   import { PROJECT_SCHEMA_VERSION } from './lib/project/schema'
   import { store } from './lib/project/store.svelte'
   import { downloadTarget } from './lib/storage/download'
@@ -18,6 +21,7 @@
   const version = __APP_VERSION__
   const canUseFolders = supportsFolderAccess()
   const ui = new Runner()
+  let helpOpen = $state(false)
 
   onMount(() => store.startAutosave())
 
@@ -65,11 +69,8 @@
 <header class="app">
   <div class="wrap head-row">
     <div class="brand">
-      <span class="logo" aria-hidden="true">M</span>
-      <div>
-        <div class="eyebrow">Method IT</div>
-        <div class="app-name">GRC-verktyget</div>
-      </div>
+      <img class="logo" src={logo} alt="Method" />
+      <div class="app-name">GRC-verktyget</div>
       {#if store.project}
         <div class="client">{store.project.client.name} · {store.framework?.name}</div>
       {/if}
@@ -106,7 +107,11 @@
 </main>
 
 <DialogHost />
+<PrintHost />
 
 <footer class="wrap">
-  Version {version} · projektfilformat {PROJECT_SCHEMA_VERSION}
+  Version {version} · projektfilformat {PROJECT_SCHEMA_VERSION} ·
+  <button type="button" class="link muted" onclick={() => (helpOpen = true)}>Instruktion</button>
 </footer>
+
+<HelpDialog open={helpOpen} onclose={() => (helpOpen = false)} />

@@ -1,15 +1,20 @@
 <script lang="ts">
-  import { answerFor, setPart, setStatus, setText, type AnswerText } from '../lib/assessment'
+  // En rad i Grundkrav eller Annex A, med bedömningen när den är öppnad.
+
+  import { answerFor, clearParts, setPart, setStatus, setText, type AnswerText } from '../lib/assessment'
   import type { Control } from '../lib/frameworks/schema'
   import type { Status } from '../lib/project/schema'
   import { store } from '../lib/project/store.svelte'
+  import { actionsFor } from '../lib/actions'
+  import { dialog } from '../lib/ui/dialog.svelte'
+  import { nav } from '../lib/ui/nav.svelte'
   import { residualRisk, riskTextFor } from '../lib/risk/rules'
   import EvidenceList from './EvidenceList.svelte'
   import LevelBadge from './LevelBadge.svelte'
+  import LinkedActions from './LinkedActions.svelte'
   import StatusBadge from './StatusBadge.svelte'
   import StatusPicker from './StatusPicker.svelte'
 
-  // En rad i Grundkrav eller Annex A, med bedömningen när den är öppnad.
   let {
     control,
     excluded,
@@ -18,6 +23,7 @@
   }: { control: Control; excluded: boolean; risks: { id: string; title: string }[]; open?: boolean } = $props()
 
   const answer = $derived(answerFor(store.project!, control.id))
+  const linkedCount = $derived(actionsFor(store.project!, 'control', control.id).length)
   let showParts = $state(false)
   const partsOpen = $derived(showParts || answer.parts !== undefined)
   const now = () => new Date().toISOString()
@@ -26,6 +32,15 @@
   const status = (s: Status | undefined) => s && store.update((d) => setStatus(d, control.id, s, now()))
   const part = (p: 'technical' | 'organizational', s: Status | undefined) => store.update((d) => setPart(d, control.id, p, s, now()))
   const text = (field: AnswerText, value: string) => store.update((d) => setText(d, control.id, field, value, now()))
+
+  async function removeParts() {
+    if (answer.parts) {
+      const ok = await dialog.ask({ title: 'Ta bort uppdelningen?', message: `Statusen för teknisk och organisatorisk del för ${control.id} tas bort. Den övergripande statusen ändras inte.`, confirm: 'Ta bort' })
+      if (!ok) return
+      store.update((d) => clearParts(d, control.id, now()))
+    }
+    showParts = false
+  }
 
   function suggest() {
     const extra = riskTextFor(store.project!, control.id)
@@ -82,6 +97,7 @@
                 <span class="field-label">Organisatorisk del</span>
                 <StatusPicker label="Organisatorisk del för {control.id}" compact allowNone value={answer.parts?.organizational} onchange={(s) => part('organizational', s)} />
                 <p class="meta">Underlag. Den övergripande statusen sätts alltid ovan.</p>
+                <button type="button" class="link muted" onclick={removeParts}>Ta bort uppdelningen</button>
               </div>
             {:else}
               <button type="button" class="link muted" onclick={() => (showParts = true)}>Dela upp i teknisk och organisatorisk del</button>
@@ -98,14 +114,18 @@
               <ul class="linked">
                 {#each risks as r (r.id)}
                   {@const full = store.project!.risks.find((x) => x.id === r.id)}
-                  <li><strong>{r.id}</strong> {r.title} {#if full}<LevelBadge score={residualRisk(store.project!, full, 'actual')} showLabel={false} />{/if}</li>
+                  <li><button type="button" class="link" onclick={() => nav.show('risk', r.id)}>{r.id}</button> {r.title} {#if full}<LevelBadge score={residualRisk(store.project!, full, 'actual')} showLabel={false} />{/if}</li>
                 {/each}
               </ul>
               <button type="button" class="link muted" onclick={suggest}>Föreslå text från risker</button>
             {/if}
+            {#if answer.status === 'partial' || answer.status === 'not_fulfilled' || linkedCount > 0}
+              <div class="field-label">Åtgärder</div>
+              <LinkedActions kind="control" id={control.id} />
+            {/if}
           </aside>
         </div>
-        {#if updated}<p class="meta updated">Senast uppdaterad {updated}</p>{/if}
+        {#if updated}<p class="meta updated">Senast uppdaterad {updated}{answer.updated?.by ? ` av ${answer.updated.by}` : ''}</p>{/if}
       {/if}
     </div>
   {/if}

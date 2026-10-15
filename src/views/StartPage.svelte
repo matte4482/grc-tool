@@ -1,4 +1,5 @@
 <script lang="ts">
+  // Startsidan: nytt arbete, öppna befintligt, senaste arbeten och reservkopior (README 4.1).
   import Notice from '../components/Notice.svelte'
   import StatusBar from '../components/StatusBar.svelte'
   import { percent, sectionSummaries } from '../lib/compliance'
@@ -68,6 +69,8 @@
       const framework = selected
       if (!framework) return ui.show('Välj ett ramverk.')
       if (startpoint === 'copy' && !copySource) return ui.show('Välj projektfilen att kopiera från.')
+      if (startpoint === 'copy' && copySource && (copySource.framework.id !== framework.id || copySource.framework.version !== framework.version))
+        return ui.show('Projektfilen att kopiera från gäller ett annat ramverk. Välj samma ramverk eller en annan fil.')
       const fileName = projectFileName(name)
 
       let target: SaveTarget = downloadTarget(fileName)

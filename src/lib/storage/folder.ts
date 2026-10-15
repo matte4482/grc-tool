@@ -1,16 +1,8 @@
+// Sparande i uppdragets mapp via File System Access API (Chrome, Edge), se B-22.
+// Typerna för API:t saknas i TypeScript och beskrivs därför här.
+
 import { PROJECT_EXTENSION, type SaveTarget } from './target'
 import type { Dropped } from './workflow'
-
-// Sparande via File System Access API (ARCHITECTURE B-22).
-//
-// Konsulten väljer uppdragets mapp, till exempel kundens synkade SharePoint-mapp.
-// Verktyget får då läsa och skriva i just den mappen: projektfilen nu, och
-// evidensmappen i fas 4. API:t finns i Chrome och Edge, inte i Safari och Firefox;
-// där används download.ts i stället.
-//
-// Typerna för showDirectoryPicker och behörigheter finns inte i TypeScripts
-// standardbibliotek, eftersom API:t inte finns i alla webbläsare. De beskrivs
-// därför lokalt här i stället för som globala tillägg.
 
 type Mode = { mode: 'read' | 'readwrite' }
 

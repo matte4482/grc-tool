@@ -1,8 +1,9 @@
-import { takeId } from '../project/project'
+// Ändringar i riskregistret och riskmetoden. Ändrar ett utkast och anropas via store.update.
+
+import { consultantName } from '../storage/settings'
+import { nextId } from '../project/project'
 import { RiskSchema, type Project, type Risk, type RiskControlLink, type RiskMethod, type Treatment } from '../project/schema'
 import { methodOf, residualRisk, riskValue, type Score } from './rules'
-
-// Ändringar i riskregistret och riskmetoden. Ändrar ett utkast och anropas via store.update.
 
 function find(draft: Project, riskId: string): Risk {
   const r = draft.risks.find((x) => x.id === riskId)
@@ -11,13 +12,12 @@ function find(draft: Project, riskId: string): Risk {
 }
 
 function log(risk: Risk, now: string, text: string): void {
-  risk.history.push({ at: now, by: '', text })
+  risk.history.push({ at: now, by: consultantName(), text })
 }
 
 /** Ny tom risk med nästa lediga ID. Returnerar ID:t. */
 export function addRisk(draft: Project, title: string, now: string): string {
-  const { id, nextNumber } = takeId(draft.nextNumber, 'risk')
-  draft.nextNumber = nextNumber
+  const id = nextId(draft, 'risk')
   const risk = RiskSchema.parse({ id, title: title.trim() || 'Ny risk', identifiedAt: now.slice(0, 10) })
   log(risk, now, 'Risk skapad')
   draft.risks.push(risk)
@@ -143,8 +143,7 @@ export function removeConsequenceType(m: RiskMethod, index: number): void {
 export function copyFromProject(draft: Project, source: Project, now: string): number {
   if (source.riskMethod) draft.riskMethod = structuredClone(source.riskMethod)
   for (const s of source.risks) {
-    const { id, nextNumber } = takeId(draft.nextNumber, 'risk')
-    draft.nextNumber = nextNumber
+    const id = nextId(draft, 'risk')
     const risk = RiskSchema.parse({
       id,
       title: s.title,

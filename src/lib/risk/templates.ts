@@ -1,9 +1,10 @@
+// Typrisker: färdiga risker som startpunkt för riskregistret (B-29).
+
+import { consultantName } from '../storage/settings'
 import { z } from 'zod'
-import { takeId } from '../project/project'
+import { nextId } from '../project/project'
 import { RiskSchema, type Project, type Risk } from '../project/schema'
 import typriskerIso27001 from './typrisker-iso27001.yaml'
-
-// Typrisker: färdiga risker som startpunkt för riskregistret (B-29).
 
 const TemplateLinkSchema = z.object({
   control: z.string().min(1),
@@ -46,12 +47,11 @@ export function templatesFor(framework: { id: string; version: string }): RiskTe
   return sets.find((s) => s.framework.id === framework.id && s.framework.version === framework.version)
 }
 
-/** Lägger till typrisker som nya risker med egna ID:n. Ändrar `draft`. */
+/** Lägger till typrisker som nya risker med egna ID:n. Bortvalda kontroller blir tillämpliga igen. Ändrar `draft`. */
 export function addTemplateRisks(draft: Project, templates: RiskTemplate[], today: string, now = new Date().toISOString()): Risk[] {
   const added: Risk[] = []
   for (const t of templates) {
-    const { id, nextNumber } = takeId(draft.nextNumber, 'risk')
-    draft.nextNumber = nextNumber
+    const id = nextId(draft, 'risk')
     const risk = RiskSchema.parse({
       id,
       title: t.title,
@@ -62,10 +62,14 @@ export function addTemplateRisks(draft: Project, templates: RiskTemplate[], toda
       controls: t.controls,
       template: t.id,
       identifiedAt: today,
-      history: [{ at: now, by: '', text: `Skapad från typrisk ${t.id}` }],
+      history: [{ at: now, by: consultantName(), text: `Skapad från typrisk ${t.id}` }],
     })
     draft.risks.push(risk)
     added.push(risk)
+    for (const link of t.controls) {
+      const answer = draft.controls[link.control]
+      if (answer) answer.applicable = true
+    }
   }
   return added
 }
