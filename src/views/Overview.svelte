@@ -107,7 +107,6 @@
           </li>
         {/each}
       </ul>
-      <p class="meta">Medelvärdet av delarna som gäller. Redo kräver minst 90 % och att alla grundkrav är uppfyllda (B-37).</p>
     </section>
     <section class="card">
       <div class="card-head">
@@ -193,7 +192,7 @@
       {#if evidence.length && store.target?.dir}
         <p class="meta">
           {evidence.length} bifogade filer.
-          <button type="button" class="link" disabled={checking} onclick={checkAll}>{checking ? 'Kontrollerar …' : 'Kontrollera att de finns kvar'}</button>
+          <button type="button" class="link" disabled={checking} onclick={checkAll}>{checking ? 'Kontrollerar …' : 'Kontrollera'}</button>
         </p>
         {#if checked && checked.length === 0}<p class="meta">Alla filer finns kvar och är oförändrade.</p>{/if}
         {#if checked?.length}
@@ -217,18 +216,14 @@
       <p class="meta">{framework.name} · {store.target?.label ?? ''}</p>
       <label class="field-label" for="consultant-name">Ditt namn</label>
       <input id="consultant-name" bind:value={name} onchange={() => setConsultantName(name)} autocomplete="name" />
-      <p class="meta">Sparas i webbläsaren och skrivs in när du ändrar något, bifogar en fil och i rapporterna.</p>
-      <p class="meta">
-        Ändringar sparas automatiskt var tionde minut{store.target?.autosave ? '' : ' (inte vid nedladdning)'}. Stäng inte fliken med osparade ändringar.
-      </p>
     </div>
     <div>
       <label class="field-label" for="eng-scope">Omfattning</label>
-      <textarea id="eng-scope" placeholder="Verksamhet, platser och system som bedömningen gäller" value={project.engagement.scope} oninput={(e) => engagement('scope', e.currentTarget.value)}></textarea>
+      <textarea id="eng-scope" placeholder="Verksamhet, platser, system" value={project.engagement.scope} oninput={(e) => engagement('scope', e.currentTarget.value)}></textarea>
       <label class="field-label" for="eng-participants">Deltagare och intervjuade</label>
       <textarea id="eng-participants" value={project.engagement.participants} oninput={(e) => engagement('participants', e.currentTarget.value)}></textarea>
     </div>
   </div>
   <label class="field-label" for="eng-summary">Sammanfattning och slutsats</label>
-  <textarea id="eng-summary" class="summary-field" placeholder="Visas först i rapporterna" value={project.engagement.summary} oninput={(e) => engagement('summary', e.currentTarget.value)}></textarea>
+  <textarea id="eng-summary" class="summary-field" value={project.engagement.summary} oninput={(e) => engagement('summary', e.currentTarget.value)}></textarea>
 </section>

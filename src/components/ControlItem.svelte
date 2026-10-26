@@ -67,7 +67,7 @@
   {#if open}
     <div class="control-body">
       {#if excluded}
-        <p class="meta">Kontrollen är bortvald i SoA och bedöms inte. Ändra under fliken SoA.</p>
+        <p class="meta">Bortvald i SoA.</p>
       {:else}
         <StatusPicker label="Status för {control.id}" value={answer.status} onchange={status} />
 
@@ -96,7 +96,6 @@
                 <StatusPicker label="Teknisk del för {control.id}" compact allowNone value={answer.parts?.technical} onchange={(s) => part('technical', s)} />
                 <span class="field-label">Organisatorisk del</span>
                 <StatusPicker label="Organisatorisk del för {control.id}" compact allowNone value={answer.parts?.organizational} onchange={(s) => part('organizational', s)} />
-                <p class="meta">Underlag. Den övergripande statusen sätts alltid ovan.</p>
                 <button type="button" class="link muted" onclick={removeParts}>Ta bort uppdelningen</button>
               </div>
             {:else}

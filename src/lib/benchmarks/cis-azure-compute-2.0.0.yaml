@@ -1,0 +1,724 @@
+# CIS Microsoft Azure Compute Services Benchmark v2.0.0: ID, nivå och kopplingar.
+# Rubrikerna är egna svenska översättningar. CIS beskrivningar och anvisningar ingår inte (B-45).
+# level: profilnivå (1 eller 2). automated: kan kontrolleras automatiskt. ig: lägsta implementeringsgrupp i CIS Controls v8.
+# cisControls: skyddsåtgärder i CIS Controls v8. azurePolicy: ID för inbyggda Azure Policy-definitioner.
+
+schemaVersion: 1
+id: cis-azure-compute
+version: '2.0.0'
+name: CIS Microsoft Azure Compute Services Benchmark
+publisher: Center for Internet Security (CIS)
+language: sv
+sections:
+  - id: '2'
+    title: 'App Service'
+  - id: '2.1'
+    title: 'App Service-appar'
+  - id: '2.2'
+    title: 'Distributionsplatser för App Service'
+  - id: '2.3'
+    title: 'Funktionsappar'
+  - id: '2.4'
+    title: 'Distributionsplatser för funktionsappar'
+  - id: '3'
+    title: 'Azure Container Instances'
+  - id: '4'
+    title: 'Azure CycleCloud'
+  - id: '15'
+    title: 'Batch'
+  - id: '20'
+    title: 'Virtuella maskiner'
+recommendations:
+  - id: '2.1.1'
+    title: 'Java-versionen har support (om Java används)'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['496223c3-ad65-4ecd-878a-bae78737e9ed']
+  - id: '2.1.2'
+    title: 'Python-versionen har support (om Python används)'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['7008174a-fd10-4ef0-817e-fc820a951d73']
+  - id: '2.1.3'
+    title: 'PHP-versionen har support (om PHP används)'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['7261b898-8a84-4db8-9e04-18527132abb3']
+  - id: '2.1.4'
+    title: 'Publicering med grundläggande autentisering är inaktiverad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: ['871b205b-57cf-4e1e-a234-492616998bf7', 'aede300b-d67f-480a-ae26-4b3dfb1a1fdc']
+  - id: '2.1.5'
+    title: 'FTP är inaktiverat eller tillåter bara FTPS'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['4d24b6d4-5e53-4a4f-a7f4-618fa573ee4b']
+  - id: '2.1.6'
+    title: 'HTTP/2 används (om tillämpligt)'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['8c122334-9d20-4eb8-89ea-ac9a705b74ae']
+  - id: '2.1.7'
+    title: 'Bara HTTPS är tillåtet'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['a4af4a39-4135-47fb-b175-47fbdf85311d']
+  - id: '2.1.8'
+    title: 'Inkommande trafik kräver minst TLS 1.2'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['f0e6e85b-9b9f-4a4b-b67b-f730d42f1b0b']
+  - id: '2.1.9'
+    title: 'TLS-kryptering hela vägen (end-to-end) är aktiverad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['af1d7e88-c1c8-4ea8-be1f-87bff0df9101']
+  - id: '2.1.10'
+    title: 'Fjärrfelsökning är avstängd'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['12.3']
+    azurePolicy: ['cb510bfd-1cba-4d9f-a230-cb0976f4bb71']
+  - id: '2.1.11'
+    title: 'Klientcertifikat krävs för inkommande anrop (om tillämpligt)'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['12.6']
+    azurePolicy: ['19dd1db6-f442-49cf-a838-b0786b4401ef']
+  - id: '2.1.12'
+    title: 'Autentisering i App Service är aktiverad'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['95bccee9-a7f8-4bec-9ee9-62c3473701fc']
+  - id: '2.1.13'
+    title: 'Hanterade identiteter är konfigurerade'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: ['2b9ad585-36bc-4615-b300-fd4435808332']
+  - id: '2.1.14'
+    title: 'Publik nätverksåtkomst är inaktiverad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3', '4.4']
+    azurePolicy: ['1b5ef780-c53c-4a64-87f3-bb9c8c8094ba']
+  - id: '2.1.15'
+    title: 'App Service-planens SKU stöder privata slutpunkter'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['546fe8d2-368d-4029-a418-6af48a7f61e5']
+  - id: '2.1.16'
+    title: 'Privata slutpunkter används för åtkomst till App Service-appar'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['687aa49d-0982-40f8-bf6b-66d1da97a04b']
+  - id: '2.1.17'
+    title: 'Privata slutpunkter till App Service-appar använder privata DNS-zoner'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: []
+  - id: '2.1.18'
+    title: 'Appen är integrerad med ett virtuellt nätverk'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['72d04c29-f87d-4575-9731-419ff16a2757']
+  - id: '2.1.19'
+    title: 'Konfigurationstrafik går via integrationen med det virtuella nätverket'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['13.4']
+    azurePolicy: ['801543d1-1953-4a90-b8b0-8cf6d41473a5']
+  - id: '2.1.20'
+    title: 'All trafik går via det virtuella nätverket'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['13.4']
+    azurePolicy: ['a691eacb-474d-47e4-b287-b4813ca44222']
+  - id: '2.1.21'
+    title: 'CORS tillåter inte alla ursprung'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['16.1']
+    azurePolicy: ['5744710e-cc2f-4ee8-8809-3b11e89f4bc9']
+  - id: '2.2.1'
+    title: 'Java-versionen har support (om Java används)'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['46dad49f-8945-44d7-9bb1-2e1542f627d3']
+  - id: '2.2.2'
+    title: 'Python-versionen har support (om Python används)'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['9c014953-ef68-4a98-82af-fd0f6b2306c8']
+  - id: '2.2.3'
+    title: 'PHP-versionen har support (om PHP används)'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['f466b2a6-823d-470d-8ea5-b031e72d79ae']
+  - id: '2.2.4'
+    title: 'Publicering med grundläggande autentisering är inaktiverad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: ['ec71c0bc-6a45-4b1f-9587-80dc83e6898c', '847ef871-e2fe-4e6e-907e-4adbf71de5cf']
+  - id: '2.2.5'
+    title: 'FTP är inaktiverat eller tillåter bara FTPS'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['c285a320-8830-4665-9cc7-bbd05fc7c5c0']
+  - id: '2.2.6'
+    title: 'HTTP/2 används (om tillämpligt)'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['4dcfb8b5-05cd-4090-a931-2ec29057e1fc']
+  - id: '2.2.7'
+    title: 'Bara HTTPS är tillåtet'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['ae1b9a8c-dfce-4605-bd91-69213b4a26fc']
+  - id: '2.2.8'
+    title: 'Inkommande trafik kräver minst TLS 1.2'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['4ee5b817-627a-435a-8932-116193268172']
+  - id: '2.2.9'
+    title: 'TLS-kryptering hela vägen (end-to-end) är aktiverad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['123aed70-491a-4f07-a569-e1f3a8dd651e']
+  - id: '2.2.10'
+    title: 'Fjärrfelsökning är avstängd'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['12.3']
+    azurePolicy: ['a08ae1ab-8d1d-422b-a123-df82b307ba61']
+  - id: '2.2.11'
+    title: 'Klientcertifikat krävs för inkommande anrop (om tillämpligt)'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['5b0bd968-5cb5-4513-8987-27786c6f0df8']
+  - id: '2.2.12'
+    title: 'Hanterade identiteter är konfigurerade'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: ['4a15c15f-90d5-4a1f-8b63-2903944963fd']
+  - id: '2.2.13'
+    title: 'Publik nätverksåtkomst är inaktiverad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['701a595d-38fb-4a66-ae6d-fb3735217622']
+  - id: '2.2.14'
+    title: 'Distributionsplatsen är integrerad med ett virtuellt nätverk'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['24b7a1c6-44fe-40cc-a2e6-242d2ef70e98']
+  - id: '2.2.15'
+    title: 'Konfigurationstrafik går via integrationen med det virtuella nätverket'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['13.4']
+    azurePolicy: ['5747353b-1ca9-42c1-a4dd-b874b894f3d4']
+  - id: '2.2.16'
+    title: 'All trafik går via det virtuella nätverket'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['13.4']
+    azurePolicy: ['f5c0bfb3-acea-47b1-b477-b0edcdf6edc1']
+  - id: '2.2.17'
+    title: 'CORS tillåter inte alla ursprung'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['16.1']
+    azurePolicy: ['cae7c12e-764b-4c87-841a-fdc6675d196f']
+  - id: '2.3.1'
+    title: 'Java-versionen har support (om Java används)'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['9d0b6ea4-93e2-4578-bf2f-6bb17d22b4bc']
+  - id: '2.3.2'
+    title: 'Python-versionen har support (om Python används)'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['7238174a-fd10-4ef0-817e-fc820a951d73']
+  - id: '2.3.3'
+    title: 'Publicering med grundläggande autentisering är inaktiverad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: []
+  - id: '2.3.4'
+    title: 'FTP är inaktiverat eller tillåter bara FTPS'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['399b2637-a50f-4f95-96f8-3a145476eb15']
+  - id: '2.3.5'
+    title: 'HTTP/2 används (om tillämpligt)'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['e2c1c086-2d84-4019-bff3-c44ccd95113c']
+  - id: '2.3.6'
+    title: 'Bara HTTPS är tillåtet'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['6d555dd1-86f2-4f1c-8ed7-5abae7c6cbab']
+  - id: '2.3.7'
+    title: 'Inkommande trafik kräver minst TLS 1.2'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['f9d614c5-c173-4d56-95a7-b4437057d193']
+  - id: '2.3.8'
+    title: 'TLS-kryptering hela vägen (end-to-end) är aktiverad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['387140f1-6da9-4741-bcee-3b5edcdfd9ec']
+  - id: '2.3.9'
+    title: 'Fjärrfelsökning är avstängd'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['12.3']
+    azurePolicy: ['0e60b895-3786-45da-8377-9c6b4b6ac5f9']
+  - id: '2.3.10'
+    title: 'Klientcertifikat krävs för inkommande anrop (om tillämpligt)'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['ab6a902f-9493-453b-928d-62c30b11b5a6']
+  - id: '2.3.11'
+    title: 'Autentisering i App Service är aktiverad'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['c75248c1-ea1d-4a9c-8fc9-29a6aabd5da8']
+  - id: '2.3.12'
+    title: 'Hanterade identiteter är konfigurerade'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: ['0da106f2-4ca3-48e8-bc85-c638fe6aea8f']
+  - id: '2.3.13'
+    title: 'Publik nätverksåtkomst är inaktiverad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['969ac98b-88a8-449f-883c-2e9adb123127']
+  - id: '2.3.14'
+    title: 'Funktionsappen är integrerad med ett virtuellt nätverk'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: []
+  - id: '2.3.15'
+    title: 'Konfigurationstrafik går via integrationen med det virtuella nätverket'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['13.4']
+    azurePolicy: ['5e57f5ad-995a-485b-9f42-4748935ee5d9']
+  - id: '2.3.16'
+    title: 'All trafik går via det virtuella nätverket'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['13.4']
+    azurePolicy: ['32a913ec-5ed7-4b31-a5b0-198450d8fb13']
+  - id: '2.3.17'
+    title: 'CORS tillåter inte alla ursprung'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['16.1']
+    azurePolicy: ['0820b7b9-23aa-4725-a1ce-ae4558f718e5']
+  - id: '2.4.1'
+    title: 'Java-versionen har support (om Java används)'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['e1d1b522-02b0-4d18-a04f-5ab62d20445f']
+  - id: '2.4.2'
+    title: 'Python-versionen har support (om Python används)'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['829b40f3-d3db-4fd2-be46-76663d3aeeb2']
+  - id: '2.4.3'
+    title: 'Publicering med grundläggande autentisering är inaktiverad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: []
+  - id: '2.4.4'
+    title: 'FTP är inaktiverat eller tillåter bara FTPS'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['e1a09430-221d-4d4c-a337-1edb5a1fa9bb']
+  - id: '2.4.5'
+    title: 'HTTP/2 används (om tillämpligt)'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['fa98f1b1-1f56-4179-9faf-93ad82f3458f']
+  - id: '2.4.6'
+    title: 'Bara HTTPS är tillåtet'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['5e5dbe3f-2702-4ffc-8b1e-0cae008a5c71']
+  - id: '2.4.7'
+    title: 'Inkommande trafik kräver minst TLS 1.2'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['deb528de-8f89-4101-881c-595899253102']
+  - id: '2.4.8'
+    title: 'TLS-kryptering hela vägen (end-to-end) är aktiverad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['cbe0e5eb-fea9-491d-ab20-a62cf049c5ae']
+  - id: '2.4.9'
+    title: 'Fjärrfelsökning är avstängd'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['12.3']
+    azurePolicy: ['89691ef9-8c50-49a8-8950-9c7fba41699e']
+  - id: '2.4.10'
+    title: 'Klientcertifikat krävs för inkommande anrop (om tillämpligt)'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['153ab4ca-2d58-4b5d-9134-6d8c6bdd321c']
+  - id: '2.4.11'
+    title: 'Hanterade identiteter är konfigurerade'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: []
+  - id: '2.4.12'
+    title: 'Publik nätverksåtkomst är inaktiverad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['11c82d0c-db9f-4d7b-97c5-f3f9aa957da2']
+  - id: '2.4.13'
+    title: 'Distributionsplatsen är integrerad med ett virtuellt nätverk'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: []
+  - id: '2.4.14'
+    title: 'Konfigurationstrafik går via integrationen med det virtuella nätverket'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['13.4']
+    azurePolicy: ['f380edf5-de79-4862-bd57-ee407d8bd8b6']
+  - id: '2.4.15'
+    title: 'All trafik går via det virtuella nätverket'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['13.4']
+    azurePolicy: ['75c42c42-dfb3-453d-8fd5-9f978e1b1106']
+  - id: '2.4.16'
+    title: 'CORS tillåter inte alla ursprung'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['16.1']
+    azurePolicy: ['a1a22235-dd10-4062-bd55-7d62778f41b0']
+  - id: '2.5'
+    title: 'Hemligheter lagras i Azure Key Vault'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['3.1']
+    azurePolicy: []
+  - id: '2.6'
+    title: 'App Service Environment driftsätts med intern lastbalanserare'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['2d048aca-6479-4923-88f5-e2ac295d9af3']
+  - id: '2.7'
+    title: 'App Service Environment är version 3 eller senare'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: ['eb4d34ab-0929-491c-bbf3-61e13da19f9a']
+  - id: '2.8'
+    title: 'Intern kryptering är aktiverad i App Service Environment'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['fb74e86f-d351-4b8d-b034-93da7391c01f']
+  - id: '2.9'
+    title: 'TLS 1.0 och 1.1 är inaktiverade i App Service Environment'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['d6545c6b-dd9d-4265-91e6-0b451e2f1c50']
+  - id: '2.10'
+    title: 'Ordningen för TLS-chiffersviter är konfigurerad i App Service Environment'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['817dcf37-e83d-4999-a472-644eada2ea1e']
+  - id: '3.1'
+    title: 'Container Instances använder privata virtuella nätverk'
+    level: 1
+    automated: false
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: []
+  - id: '3.2'
+    title: 'Hanterad identitet används mot andra Azure-tjänster'
+    level: 1
+    automated: false
+    ig: 2
+    cisControls: ['6.7', '6.8']
+    azurePolicy: []
+  - id: '3.3'
+    title: 'Hanterade identiteter tilldelas roller enligt principen om minsta behörighet'
+    level: 1
+    automated: false
+    ig: 2
+    cisControls: ['5.5', '6.8']
+    azurePolicy: []
+  - id: '4.1'
+    title: 'SSL är konfigurerat för CycleCloud'
+    level: 1
+    automated: false
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: []
+  - id: '15.1'
+    title: 'Batch-konton krypterar data med kundhanterade nycklar'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['99e9ccd8-3db9-4592-b0d1-14b1715a4d8a']
+  - id: '15.2'
+    title: 'Diskkryptering är aktiverad för Batch-pooler'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['1760f9d4-7206-436e-a28f-d9f3a5c8a227']
+  - id: '15.3'
+    title: 'Lokala autentiseringsmetoder är inaktiverade för Batch-konton'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: ['4dbc2f5c-51cf-4e38-9179-c7028eed2274', '6f68b69f-05fe-49cd-b361-777ee9ca7e35']
+  - id: '15.4'
+    title: 'Privata slutpunkter har övervägts för Batch-konton'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['0ef5aac7-c064-427a-b87b-d47b3ddcaf73']
+  - id: '15.5'
+    title: 'Publik nätverksåtkomst är inaktiverad för Batch-konton'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['13.4']
+    azurePolicy: ['c520cefc-285f-40f3-86e2-2efc38ef1f64', '74c5a0ae-5e48-4738-b093-65e23a060488']
+  - id: '15.6'
+    title: 'Privata DNS-zoner är konfigurerade för privata slutpunkter till Batch-konton'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['4ec38ebc-381f-45ee-81a4-acbc4be878f8']
+  - id: '15.7'
+    title: 'Diagnostikloggar är aktiverade för Batch-konton'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5', '8.9']
+    azurePolicy: ['428256e6-1fac-4f48-a757-df34c2b3336d']
+  - id: '20.1'
+    title: 'Virtuella maskiner använder hanterade diskar'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['06a78e20-9358-41c9-923c-fb736d382a4d']
+  - id: '20.2'
+    title: 'OS- och datadiskar krypteras med kundhanterad nyckel (CMK)'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['ca88aadc-6e2b-416c-9de2-5a0f01d1693f', '3dc5edcd-002d-444c-b216-e123bbfa37c0']
+  - id: '20.3'
+    title: 'Oanslutna diskar krypteras med kundhanterad nyckel (CMK)'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['ca91455f-eace-4f96-be59-e6e2c35b4816']
+  - id: '20.4'
+    title: 'Diskar är inte publikt åtkomliga från alla nätverk'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['4.6']
+    azurePolicy: ['8405fdab-1faf-48aa-b702-999c9c172094']
+  - id: '20.5'
+    title: 'Autentiseringsläge för dataåtkomst är aktiverat för diskar'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['4.6']
+    azurePolicy: []
+  - id: '20.6'
+    title: 'Bara godkända tillägg är installerade'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['2.1']
+    azurePolicy: ['c0e996f8-39cf-4af9-9f45-83fbde810432']
+  - id: '20.7'
+    title: 'Slutpunktsskydd är installerat på alla virtuella maskiner'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['10.2']
+    azurePolicy: ['501541f7-f7e7-4cd6-868c-4190fdad3ac9']
+  - id: '20.8'
+    title: '[Äldre] VHD-filer är krypterade'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['702dd420-7fcc-42c5-afe8-4026edd20fe0']
+  - id: '20.9'
+    title: 'Bara identiteter med MFA har åtkomst till privilegierade virtuella maskiner'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['6.5']
+    azurePolicy: []
+  - id: '20.10'
+    title: 'Trusted Launch är aktiverat på virtuella maskiner'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['4.1']
+    azurePolicy: ['c95b54ad-0614-4633-ab29-104b01235cbf']
+  - id: '20.11'
+    title: 'Kryptering på värden (encryption at host) är aktiverad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10', '3.11']
+    azurePolicy: ['fc4d8e41-e223-45ea-9bf5-eada37891d87']

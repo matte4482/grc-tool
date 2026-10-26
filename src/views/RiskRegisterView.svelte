@@ -90,7 +90,7 @@
         </div>
       </div>
       <RiskMatrix {method} counts={heatmap(project, mode)} selected={cell} onselect={(k) => (cell = k)} />
-      <p class="meta">{cell ? 'Tabellen visar risker i vald ruta. Klicka igen för att visa alla.' : 'Klicka i en ruta för att filtrera tabellen.'}</p>
+      {#if cell}<p class="meta">Filtrerat på vald ruta</p>{/if}
     </section>
 
     <section class="card register-actions">
@@ -99,7 +99,6 @@
       {#if hasTemplates}
         <button type="button" onclick={() => (importing = true)}>Importera typrisker</button>
       {/if}
-      <p class="meta">Typrisker som inte gäller tar du bort i riskdetaljen. De kan importeras igen.</p>
     </section>
   </div>
 
@@ -155,7 +154,7 @@
               <td class="appr-{appr}">{APPROVAL[appr]}</td>
             </tr>
           {:else}
-            <tr><td colspan="10" class="meta">{project.risks.length ? 'Inga risker matchar filtret.' : 'Registret är tomt. Lägg till en risk eller importera typrisker.'}</td></tr>
+            <tr><td colspan="10" class="meta">{project.risks.length ? 'Inga risker matchar filtret.' : 'Inga risker ännu.'}</td></tr>
           {/each}
         </tbody>
       </table>

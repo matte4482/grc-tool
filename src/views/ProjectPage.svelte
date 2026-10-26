@@ -42,14 +42,13 @@
 
 {#if supportsFolderAccess() && store.target?.kind === 'download'}
   <p class="notice">
-    Projektet är inte kopplat till en mapp och sparas inte automatiskt. Välj Spara för att välja uppdragets mapp.
+    Inte kopplat till en mapp och sparas inte automatiskt. Välj Spara för att välja mapp.
   </p>
 {/if}
 
 {#if store.backupFailed}
   <p class="notice">
-    Reservkopian i webbläsaren kunde inte sparas, till exempel för att webbläsarens lagring är avstängd eller full. Spara
-    ofta.
+    Reservkopian i webbläsaren kunde inte sparas. Spara ofta.
   </p>
 {/if}
 

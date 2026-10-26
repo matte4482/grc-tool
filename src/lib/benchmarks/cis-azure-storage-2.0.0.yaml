@@ -1,0 +1,490 @@
+# CIS Microsoft Azure Storage Services Benchmark v2.0.0: ID, nivå och kopplingar.
+# Rubrikerna är egna svenska översättningar. CIS beskrivningar och anvisningar ingår inte (B-45).
+# level: profilnivå (1 eller 2). automated: kan kontrolleras automatiskt. ig: lägsta implementeringsgrupp i CIS Controls v8.
+# cisControls: skyddsåtgärder i CIS Controls v8. azurePolicy: ID för inbyggda Azure Policy-definitioner.
+
+schemaVersion: 1
+id: cis-azure-storage
+version: '2.0.0'
+name: CIS Microsoft Azure Storage Services Benchmark
+publisher: Center for Internet Security (CIS)
+language: sv
+sections:
+  - id: '3'
+    title: 'Azure Backup'
+  - id: '3.1'
+    title: 'Säkerhetskopieringsvalv (Backup vaults)'
+  - id: '3.2'
+    title: 'Recovery Services-valv'
+  - id: '4'
+    title: 'Azure Managed Lustre'
+  - id: '7'
+    title: 'Azure Files'
+  - id: '7.1'
+    title: 'Filresurser (Microsoft.FileShares)'
+  - id: '7.2'
+    title: 'Klassiska filresurser (Microsoft.Storage)'
+  - id: '9'
+    title: 'Azure NetApp Files'
+  - id: '10'
+    title: 'Azure Blob Storage'
+  - id: '11'
+    title: 'Azure Data Box'
+  - id: '14'
+    title: 'Azure Elastic SAN'
+  - id: '15'
+    title: 'Queue Storage'
+  - id: '16'
+    title: 'Lagringskonton'
+  - id: '16.1'
+    title: 'Hemligheter och nycklar'
+  - id: '16.2'
+    title: 'Nätverk'
+  - id: '17'
+    title: 'Storage Explorer'
+recommendations:
+  - id: '3.1.1'
+    title: 'Mjuk borttagning är aktiverad i säkerhetskopieringsvalv'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: ['9798d31d-6028-4dee-8643-46102185c016']
+  - id: '3.1.2'
+    title: 'Oföränderlighet är aktiverad i säkerhetskopieringsvalv'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: ['2514263b-bc0d-4b06-ac3e-f262c0979018']
+  - id: '3.1.3'
+    title: 'Säkerhetskopior i säkerhetskopieringsvalv krypteras med kundhanterade nycklar (CMK)'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['d6588149-9f06-462c-a076-56aece45b5ba']
+  - id: '3.1.4'
+    title: 'Infrastrukturkryptering är aktiverad i säkerhetskopieringsvalv'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['d6588149-9f06-462c-a076-56aece45b5ba']
+  - id: '3.1.5'
+    title: 'Återställning till annan region är aktiverad i säkerhetskopieringsvalv'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: []
+  - id: '3.1.6'
+    title: 'Återställning till annan prenumeration är inaktiverad i säkerhetskopieringsvalv'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['4d479a11-f2b5-4f0a-bb1e-d2332aa95cda']
+  - id: '3.2.1'
+    title: 'Mjuk borttagning är aktiverad i Recovery Services-valv'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: ['31b8092a-36b8-434b-9af7-5ec844364148']
+  - id: '3.2.2'
+    title: 'Oföränderlighet är aktiverad i Recovery Services-valv'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: ['d6f6f560-14b7-49a4-9fc8-d2c3a9807868']
+  - id: '3.2.3'
+    title: 'Säkerhetskopior i Recovery Services-valv krypteras med kundhanterade nycklar (CMK)'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['2e94d99a-8a36-4563-bc77-810d8893b671']
+  - id: '3.2.4'
+    title: 'Infrastrukturkryptering är aktiverad i Recovery Services-valv'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: []
+  - id: '3.2.5'
+    title: 'Publik nätverksåtkomst är inaktiverad för Recovery Services-valv'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['9ebbbba3-4d65-4da9-bb67-b22cfaaff090']
+  - id: '3.2.6'
+    title: 'Återställning till annan region är aktiverad i Recovery Services-valv'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: []
+  - id: '3.2.7'
+    title: 'Återställning till annan prenumeration är inaktiverad i Recovery Services-valv'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['f19b0c83-716f-4b81-85e3-2dbf057c35d6']
+  - id: '3.2.8'
+    title: 'Privata slutpunkter är konfigurerade för Recovery Services-valv'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['deeddb44-9f94-4903-9fa0-081d524406e3']
+  - id: '4.1'
+    title: 'Nyckelkrypteringsnyckeln är kundhanterad för Azure Managed Lustre'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: []
+  - id: '7.1.1'
+    title: 'Root squash är konfigurerat för NFS-filresurser (Microsoft.FileShares)'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: []
+  - id: '7.1.2'
+    title: 'Kryptering under överföring krävs för filresurser (Microsoft.FileShares)'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: []
+  - id: '7.1.3'
+    title: 'Publik åtkomst till filresurser är begränsad till utvalda virtuella nätverk (Microsoft.FileShares)'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['4.4']
+    azurePolicy: []
+  - id: '7.1.4'
+    title: 'Publik åtkomst till filresurser är inaktiverad (Microsoft.FileShares)'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: []
+  - id: '7.1.5'
+    title: 'Privata slutpunkter är konfigurerade för filresurser (Microsoft.FileShares)'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: []
+  - id: '7.2.1'
+    title: 'Mjuk borttagning är aktiverad för Azure-filresurser (klassiska)'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: []
+  - id: '7.2.2'
+    title: 'SMB-filresurser kräver kanalkryptering med minst AES-256-GCM (klassiska)'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: []
+  - id: '7.2.3'
+    title: 'SMB-filresurser kräver minst SMB 3.1.1 (klassiska)'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['12.6']
+    azurePolicy: []
+  - id: '7.2.4'
+    title: 'Root squash är konfigurerat för NFS-filresurser (klassiska)'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: []
+  - id: '9.1'
+    title: 'Azure NetApp Files-konton krypteras med kundhanterad nyckel'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: []
+  - id: '10.1'
+    title: 'SAS-token tillåter bara HTTPS'
+    level: 1
+    automated: false
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: []
+  - id: '10.2'
+    title: 'SAS-token går ut inom en timme'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['6.2']
+    azurePolicy: []
+  - id: '10.3'
+    title: 'Mjuk borttagning av blobbar är aktiverad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: []
+  - id: '10.4'
+    title: 'Lagrade åtkomstprinciper används när SAS-token skapas'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['6.2']
+    azurePolicy: []
+  - id: '10.5'
+    title: 'Versionshantering är aktiverad för Blob Storage'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: ['c36a325b-ae04-4863-ad4f-19c6678f8e08']
+  - id: '10.6'
+    title: 'Låsta oföränderlighetsprinciper används för containrar med affärskritisk data'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['3.7']
+    azurePolicy: []
+  - id: '11.1'
+    title: 'Dubbel kryptering används för Azure Data Box i miljöer med höga säkerhetskrav'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['c349d81b-9985-44ae-a8da-ff98d108ede8']
+  - id: '14.1'
+    title: 'Publik nätverksåtkomst är inaktiverad för Azure Elastic SAN'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: []
+  - id: '14.2'
+    title: 'Volymgrupper i Azure Elastic SAN krypteras med kundhanterade nycklar (CMK)'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['7698f4ed-80ce-4e13-b408-ee135fa400a5']
+  - id: '15.1'
+    title: 'SAS-token tillåter bara HTTPS'
+    level: 1
+    automated: false
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: []
+  - id: '15.2'
+    title: 'SAS-token går ut inom en timme'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['6.2']
+    azurePolicy: []
+  - id: '15.3'
+    title: 'Lagrade åtkomstprinciper används när SAS-token skapas'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['6.2']
+    azurePolicy: []
+  - id: '16.1.1'
+    title: 'Påminnelser om nyckelrotation är aktiverade för varje lagringskonto'
+    level: 1
+    automated: false
+    cisControls: []
+    azurePolicy: ['044985bb-afe1-42cd-8a36-9d5d42424537']
+  - id: '16.1.2'
+    title: 'SAS-token tillåter bara HTTPS'
+    level: 1
+    automated: false
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['bc1b984e-ddae-40cc-801a-050a030e4fbe']
+  - id: '16.1.3'
+    title: 'Åtkomstnycklar till lagringskonton förnyas regelbundet'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['4.6', '6.2']
+    azurePolicy: []
+  - id: '16.1.4'
+    title: 'En policy för utgång av SAS-token är konfigurerad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['6.2']
+    azurePolicy: ['bc1b984e-ddae-40cc-801a-050a030e4fbe']
+  - id: '16.1.5'
+    title: 'Policyn för utgång av SAS-token blockerar'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['6.2']
+    azurePolicy: []
+  - id: '16.1.6'
+    title: 'SAS-token går ut inom en timme'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['6.2']
+    azurePolicy: ['bc1b984e-ddae-40cc-801a-050a030e4fbe']
+  - id: '16.1.7'
+    title: 'Åtkomst med lagringskontonyckel är inaktiverad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3', '6.2']
+    azurePolicy: ['8c6a50c6-9ffd-4ae7-986f-5fa6111f9a54']
+  - id: '16.1.8'
+    title: 'Lagring av kritisk data krypteras med kundhanterade nycklar (CMK)'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['6fac406b-40ca-413b-bf8e-0bf964659c25']
+  - id: '16.2.1'
+    title: 'Privata slutpunkter används för åtkomst till lagringskonton'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['6edd7eda-6dd8-40f7-810d-67160c639cd9']
+  - id: '16.2.2'
+    title: 'Publik nätverksåtkomst är inaktiverad för lagringskonton'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['b2982f36-99f2-4db5-8eff-283140c09693']
+  - id: '16.2.3'
+    title: 'Standardregeln för nätverksåtkomst till lagringskonton är Deny'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['34c877ad-507e-4c82-993e-3452a6e0ad3c', '2a1a9cdf-e04d-429a-8416-3bfb72a1b26f']
+  - id: '16.4'
+    title: 'Säker överföring krävs'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['404c3081-a854-4457-ae30-26a93ef643f9']
+  - id: '16.5'
+    title: 'Infrastrukturkryptering är aktiverad för varje lagringskonto'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['4733ea7b-a883-42fe-8cac-97454c2a9e4a']
+  - id: '16.6'
+    title: 'Betrodda Azure-tjänster får åtkomst till lagringskontot'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['3.3', '13.5']
+    azurePolicy: ['c9d007d0-c057-4772-b18c-01e546713bcd']
+  - id: '16.7'
+    title: 'Mjuk borttagning är aktiverad för containrar och blobbar'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: []
+  - id: '16.8'
+    title: 'Lagringsloggning av läsning, skrivning och borttagning är aktiverad för Queue'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: []
+  - id: '16.9'
+    title: 'Lagringsloggning av läsning, skrivning och borttagning är aktiverad för Blob'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: []
+  - id: '16.10'
+    title: 'Lagringsloggning av läsning, skrivning och borttagning är aktiverad för Table'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: []
+  - id: '16.11'
+    title: 'Lagringskonton kräver minst TLS 1.2'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['fe83a0eb-a853-422d-aac2-1bffd182c5d0']
+  - id: '16.12'
+    title: 'Replikering mellan klienter är inaktiverad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['92a89a79-6c52-4a7e-a03f-61306fc49312']
+  - id: '16.13'
+    title: 'Anonym åtkomst till blobbar är inaktiverad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['4fa4b6c0-31ca-4c0d-b10d-24b96f62a751']
+  - id: '16.14'
+    title: 'Raderingslås från Azure Resource Manager finns på lagringskonton'
+    level: 1
+    automated: false
+    cisControls: ['3']
+    azurePolicy: []
+  - id: '16.15'
+    title: 'Skrivskyddslås från Azure Resource Manager har övervägts för lagringskonton'
+    level: 2
+    automated: false
+    cisControls: ['3']
+    azurePolicy: []
+  - id: '16.16'
+    title: 'Kritiska lagringskonton använder geo-redundant lagring'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: ['bf045164-79ba-4215-8f95-f8048dc1780b']
+  - id: '17.1'
+    title: 'SAS-token går ut inom en timme'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['6.2']
+    azurePolicy: []
+  - id: '17.2'
+    title: 'Lagrade åtkomstprinciper används när SAS-token skapas'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['6.2']
+    azurePolicy: []
+  - id: '17.3'
+    title: 'Storage Explorer är den senaste versionen'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: []

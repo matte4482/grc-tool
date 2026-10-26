@@ -101,9 +101,6 @@
     <StartPage />
   {/if}
 
-  {#if store.project}
-    <p class="info">Bedömningen sparas som en fil i kundens mapp. Inget lagras hos Method IT.</p>
-  {/if}
 </main>
 
 <DialogHost />

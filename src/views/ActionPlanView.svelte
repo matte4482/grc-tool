@@ -69,10 +69,7 @@
 
 {#if proposed.length}
   <section class="card">
-    <div class="card-head">
-      <h2>Förslag</h2>
-      <span class="meta">Brister utan åtgärd. Förslagen sparas inte förrän de blir åtgärder.</span>
-    </div>
+    <h2>Förslag</h2>
     <ul class="suggestions">
       {#each shownSuggestions as s (s.key)}
         <li>
@@ -130,7 +127,7 @@
   {:else if project.actions.length}
     <p class="meta">Inga åtgärder matchar filtret.</p>
   {:else}
-    <p class="meta">Inga åtgärder än. Skapa dem från förslagen ovan eller med "+ Ny åtgärd".</p>
+    <p class="meta">Inga åtgärder ännu.</p>
   {/if}
 </section>
 

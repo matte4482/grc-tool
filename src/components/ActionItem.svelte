@@ -102,7 +102,7 @@
                 <button type="button" class="link muted" aria-label="Ta bort {r} från {id}" onclick={() => store.update((d) => unlink(d, id, 'risk', r))}>×</button>
               </li>
             {:else}
-              {#if !action.controls.length}<li class="meta">Ingen kontroll eller risk. Lägg till från ett förslag.</li>{/if}
+              {#if !action.controls.length}<li class="meta">Ingen kontroll eller risk.</li>{/if}
             {/each}
           </ul>
           <p class="meta">{sourceText(action)} · skapad {shortDate(action.createdAt)}{action.completedAt ? ` · klar ${shortDate(action.completedAt)}` : ''}</p>

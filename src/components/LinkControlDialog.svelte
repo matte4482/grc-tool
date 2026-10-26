@@ -48,7 +48,6 @@
       <select bind:value={type}>{#each Object.entries(TYPE_LABELS) as [v, l] (v)}<option value={v}>{l}</option>{/each}</select>
     </label>
   </div>
-  <p class="meta">Föreslagna kontroller från typrisken kopplas med sin föreslagna effekt och typ.</p>
   <ul class="pick-list">
     {#each controls as c (c.id)}
       {@const s = suggested.get(c.id)}

@@ -21,9 +21,9 @@ export interface ReadinessItem {
 export type Verdict = 'ready' | 'close' | 'not_ready'
 
 export const VERDICT_LABELS: Record<Verdict, string> = {
-  ready: 'Redo för certifieringsrevision',
-  close: 'Nära, men något återstår',
-  not_ready: 'Inte redo för revision',
+  ready: 'Redo',
+  close: 'Nära',
+  not_ready: 'Inte redo',
 }
 
 export interface Readiness {
@@ -79,7 +79,7 @@ export function readiness(project: Project, framework: Framework): Readiness {
     item('evidence', 'Evidens för uppfyllda', withEvidence, claimed),
     ...(soaSections.length ? [item('soa', 'Bortval i SoA motiverade', justified, excluded)] : []),
     item('risks', 'Risker behandlade och godkända', handled, project.risks.length, true),
-    item('actions', 'Brister med planerad åtgärd (ansvarig och deadline)', planned, open.length + unplanned),
+    item('actions', 'Brister med planerad åtgärd', planned, open.length + unplanned),
   ]
   const counted = items.filter((i) => i.applies)
   const pct = Math.round(counted.reduce((n, i) => n + i.pct, 0) / counted.length)

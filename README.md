@@ -82,6 +82,10 @@ grc-tool/
     │   │   ├── iso27001.test.ts      ✅
     │   │   ├── index.ts              ✅ register över tillgängliga och kommande ramverk
     │   │   └── index.test.ts         ✅
+    │   ├── benchmarks/               ✅ CIS Azure-benchmarks: ID, nivå och kopplingar (B-45), inte inkopplade än
+    │   │   ├── schema.ts             ✅ zod-schema för benchmarks
+    │   │   ├── cis-azure-*.yaml      ✅ Foundations 6.0.0, Compute, Database och Storage 2.0.0
+    │   │   └── benchmarks.test.ts    ✅
     │   ├── project/                  ✅ projektfilen (.grc.json)
     │   │   ├── schema.ts             ✅ zod-schema för projektfilen
     │   │   ├── project.ts            ✅ skapa, läsa in, skriva ut, kontrollera mot ramverk
@@ -209,7 +213,7 @@ Funktionerna nedan är det verktyget erbjuder i dagsläget. (skärm 1–5 och 7)
 
 - **Nytt arbete** (huvudkortet till vänster)
   - **Kund:** fritext.
-  - **Ramverk:** ett per arbete. Kort visas för ISO 27001:2022, NIS2, CIS Controls v8 och DORA, med omfattning och en mening om ramverket. Bara ramverk som finns i `lib/frameworks/` går att välja, övriga visas som "Kommer".
+  - **Ramverk:** ett per arbete. Kort visas för ISO 27001:2022, NIS2, CIS Controls v8 och DORA med omfattning. Bara ramverk som finns i `lib/frameworks/` går att välja, övriga visas som "Kommer".
   - **Startpunkt för riskregistret:**
     - *Med typrisker:* typriskerna i `lib/risk/` läggs in i projektfilen direkt (i dag 15 risker).
     - *Tomt register.*

@@ -71,7 +71,7 @@ Nya beslut läggs till sist, med nästa lediga nummer. Ett beslut som ändras sk
 - **Klart i fas 6:** översikten är dashboard med "redo för revision" (B-37), åtgärder, riskprofil och lägesbild på en sida.
 - **Klart i fas 7:** starta nästa bedömning, jämförelse med en tidigare fil och progressrapport (B-38).
 - **Klart i fas 8:** rapporterna (komplett, lägesbild, gapanalys, SoA, riskbehandlingsplan med riskmetoden, progress) som PDF och Word, export till Excel (B-39), uppdragsuppgifter (B-40), instruktion i verktyget och version 0.8.0 (B-41).
-- **Utseende (15 okt):** Method-logotypen, större text, ny layout på översikten och rymligare textfält (B-42). Menyknapp, statusfärger, Klar i riskmetoden och val av konsekvenstyp (B-43).
+- **Utseende (15 okt):** Method-logotypen, större text, ny layout på översikten och rymligare textfält (B-42). Menyknapp, statusfärger, Klar i riskmetoden och val av konsekvenstyp (B-43). Avskalade texter i alla vyer (B-44).
 - **Kodkvalitet:** gemensamma hjälpfunktioner, kommentar överst i varje fil och DATAFLOW.md (B-41). 197 enhetstester, svelte-check utan fel, alla flöden provade i Chromium.
 - **Att verifiera:** fas 1–8 i riktiga webbläsare, se TODO.md.
 - **Nästa steg:** prova i Chrome och Edge på Mac och Windows, kundtest (M4), O-06. Därefter fler ramverk och CloudSecComp.
@@ -691,7 +691,7 @@ Beslutat 14 oktober 2026.
 
 **Status:** Beslutat
 
-Beslutat 15 oktober 2026 på Mateusz begäran, inför testningen.
+Beslutat 15 oktober 2026.
 
 - **Logotyp:** `src/lib/ui/logo.jpg` (Method, vit text på svart) visas i sidhuvudet och i rapporternas sidhuvud. Den importeras och bäddas in i HTML-filen som `data:`-adress, vilket CSP redan tillåter (`img-src data:`). Sidhuvudet är svart, så att logotypens bakgrund smälter in. Bilden beskärs med `object-fit` till texten. *För:* ingen ny fil bredvid verktyget. *Emot:* filen blir 16 kB större.
 - **Text:** grundstorleken är 16 px i stället för 15, och alla mindre storlekar är 1 px större. Länkknappar (`button.link`) är större och har lite luft.
@@ -706,15 +706,53 @@ Beslutat 15 oktober 2026 på Mateusz begäran, inför testningen.
 
 **Status:** Beslutat
 
-Beslutat 15 oktober 2026 på Mateusz begäran.
+Beslutat 15 oktober 2026.
 
 - **Menyknapp i stället för rullista.** "Lägg till i …" och "+ Lägg till konsekvenstyp" använder samma komponent (`MenuButton.svelte`). Den öppnar en lista som stängs vid val, med Esc eller vid klick utanför. *För:* ser likadan ut som verktygets andra knappar, visar hela rubriken och ansvarig, och kan återanvändas. *Emot:* en egen komponent i stället för webbläsarens rullista.
-- **Konsekvenstyper att välja bland:** Människa och Hälsa, Miljö, Förtroende och Varumärke, Lagar och Regler (Compliance), eller en egen typ. (Ekonomi och Tillgångar samt Verksamhet och Drift togs bort 15 okt 2026 på Mateusz begäran; standardmetoden täcker dem redan med "Verksamhet och ekonomi".) Listan finns i `CONSEQUENCE_CATEGORIES` i `risk/rules.ts`. Standardmetodens två typer är oförändrade.
+- **Konsekvenstyper att välja bland:** Människa och Hälsa, Miljö, Förtroende och Varumärke, Lagar och Regler (Compliance), eller en egen typ. (Ekonomi och Tillgångar samt Verksamhet och Drift togs bort 15 okt 2026; standardmetoden täcker dem redan med "Verksamhet och ekonomi".) Listan finns i `CONSEQUENCE_CATEGORIES` i `risk/rules.ts`. Standardmetodens två typer är oförändrade.
 - **Klar vid acceptans och fastställande.** Ändringarna sparas fortfarande direkt. Klar kräver vem som fastställt metoden, sätter dagens datum om det saknas och visar uppgifterna som text tills konsulten trycker Ändra.
 - **Statusfärger för åtgärder:** Ej påbörjad grå, Pågår blå (ny färg `--blue`), Klar grön, Avbruten röd. Samma färger i statusknapparna.
 - **Ta bort uppdelningen** i teknisk och organisatorisk del (`clearParts`), med en fråga om delarna har värden.
 - **Rullistor** har samma stil som textfälten.
 - **Kortet "Så räknas restrisken" är borttaget** från riskmetoden, eftersom användarna redan kan regeln. Regeln står kvar i B-27 och i rapporternas bilaga.
+
+
+## B-44 · Avskalade texter i gränssnittet
+
+**Status:** Beslutat
+
+Beslutat 18 oktober 2026.
+
+- **Förklarande texter är borttagna.** Användarna är konsulter som kan gapanalys, och instruktionen finns i sidfoten. Borttaget: startsidans ingress, ramverkens beskrivningar (`description` i `frameworks/index.ts`), raden "Inget lagras hos Method IT", förklaringen av redo för revision, hjälptexter om sparande och namn på översikten, samt hjälptexter i åtgärdsplanen, riskvyerna, uppföljningen, rapporterna och evidensen.
+- **Kvar finns det som påverkar arbetet:** antal, status, tomma listor, varningar och fel, samt notiser om webbläsaren inte kan spara i en mapp.
+- **Kortare etiketter:** omdömet för redo för revision är Redo, Nära eller Inte redo. Rapporternas beskrivningar är några ord.
+- *För:* lugnare vyer och snabbare att läsa. *Emot:* en ny användare behöver öppna instruktionen. Det är godtagbart eftersom verktyget används av ett fåtal konsulter.
+
+
+## B-45 · CIS Azure-benchmarks som data, utan CIS-texter
+
+**Status:** Beslutat
+
+Beslutat 20 oktober 2026.
+
+- **Fyra filer** i `src/lib/benchmarks/`, en per benchmark och version: Azure Foundations 6.0.0 (127 rekommendationer), Compute 2.0.0 (99), Database 2.0.0 (49) och Storage 2.0.0 (64). En fil per benchmark eftersom de får nya versioner var för sig.
+- **Innehåll per rekommendation:** CIS-ID, egen svensk rubrik, nivå (1 eller 2), automatiserad eller manuell, lägsta implementeringsgrupp, skyddsåtgärder i CIS Controls v8 och ID för inbyggda Azure Policy-definitioner. Avsnitten har egna svenska rubriker.
+- **Inga CIS-texter.** Beskrivning, motivering, granskning och åtgärd ingår inte. De fria PDF:erna har licensen CC BY-NC-SA 4.0 (bara icke-kommersiell användning). Ett test kontrollerar att filerna bara innehåller de tillåtna fälten.
+- **Plats för egna texter:** schemat har det valfria fältet `remediation` för en egen kort åtgärdstext. Det fylls senare. Rekommendationerna kopplas inte till ISO 27001 (B-46).
+- **Används inte i appen än.** Filerna valideras med zod i testerna (`schema.ts`). De kopplas in när importen från Prowler och Defender for Cloud byggs (O-07).
+- **Hur filerna togs fram:** ur PDF:erna med ett skript som ligger utanför repot (`Claude outputs/`), eftersom det kräver PDF:erna. Siffrorna kontrollerades mot bilagorna i PDF:erna. *För:* snabbt och spårbart. *Emot:* en ny version kräver att skriptet körs igen och att rubrikerna översätts.
+
+
+## B-46 · Ett ramverk per projekt, ingen korsmappning
+
+**Status:** Beslutat
+
+Beslutat 20 oktober 2026.
+
+- **Varje ramverk är ett eget arbete.** En gapanalys mot ISO 27001 och en mot CIS Controls är två projekt med var sin projektfil, även för samma kund. Det följer hur verktyget redan fungerar: ett ramverk per arbete.
+- **Ingen korsmappning i verktyget.** Kontroller i ett ramverk kopplas inte till kontroller i ett annat, och CIS-rekommendationer kopplas inte till Annex A. Konsulten jämför projekten själv om det behövs.
+- *För:* enklare datamodell och inga mappningar att underhålla när ramverken får nya versioner. Varje bedömning står för sig och kan granskas för sig. *Emot:* en kontroll som finns i båda ramverken bedöms två gånger.
+- Ersätter förslaget om korsmappning i rapporten "Funktioner, ramverk och CloudSecComp" (20 okt 2026).
 
 
 ---
@@ -866,3 +904,20 @@ Kontrollen mot målet i övrigt:
 - **Gamla versioner?** Förslag: de ligger kvar. Projektfilerna är bakåtkompatibla inom samma MAJOR-version (B-24), så en äldre fil kan alltid öppnas i en nyare version.
 
 **Beslut behövs om:** plats, kanal och om gamla versioner ska ligga kvar.
+
+### O-07 · Import från granskningsverktyg (Lynis, OpenSCAP, CIS-CAT Lite)
+
+*Efter M4.* Tre verktyg kan ge underlag för den tekniska delen av kontrollerna (`parts.technical`, B-18) utöver molngranskningen. Uppgifterna nedan om verktygen ska kontrolleras innan något byggs.
+
+| Verktyg | Vad det granskar | Resultat |
+|---|---|---|
+| **Lynis** (CISOfy, öppen källkod) | Härdning av Linux, macOS och Unix | Textfil med nyckel och värde (`lynis-report.dat`): varningar, förslag och ett härdningsindex |
+| **OpenSCAP** (`oscap`) | Främst Linux, mot profiler i SCAP Security Guide, t.ex. CIS och PCI DSS | XML (XCCDF- eller ARF-resultat) per regel. En del regler har referenser till ISO 27001:2013 |
+| **CIS-CAT Lite** (CIS, gratis) | Ett urval av CIS Benchmarks, t.ex. Windows och macOS | Rapport i HTML. Maskinläsbara format finns troligen bara i CIS-CAT Pro |
+
+- **Samma väg som molnfynden:** resultaten översätts till filformatet `grc-fynd` (B-33). Då behöver verktyget bara en inläsning, och fynden påverkar aldrig den övergripande statusen.
+- **Mappning:** fynden kopplas till kontrollerna i det ramverk projektet gäller, inte mellan ramverk (B-46). För CIS-baserade granskningar räcker CIS-ID:t i verktygets resultat. För andra ramverk behövs en mappningstabell per verktyg.
+- **Var översättningen görs:** filerna är lokala, så översättningen kan göras i verktyget utan nätverk (B-20) eller av ett litet separat skript. Det bestäms när den första importen byggs.
+- **CIS-CAT Lite:** om bara HTML finns blir importen skör. Pröva först om Pro-licens eller manuell evidens räcker.
+
+**Beslut behövs om:** vilket verktyg som byggs först (förslag: OpenSCAP, eftersom det ger XML per regel), och var översättningen görs.

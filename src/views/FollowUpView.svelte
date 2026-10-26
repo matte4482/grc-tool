@@ -75,11 +75,6 @@
 {#if !c}
   <section class="card">
     <h2>Jämför med en tidigare bedömning</h2>
-    <p>
-      Välj projektfilen från förra bedömningen av samma kund. Verktyget visar vad som har förbättrats, försämrats och tillkommit, och
-      progressrapporten kan skrivas ut.
-    </p>
-    {#if store.project?.previousId}<p class="meta">Den här bedömningen är en uppföljning. Välj filen den startades från.</p>{/if}
     {#if result && !result.ok}<p class="warn-up">{result.message}</p>{/if}
     <button type="button" class="primary" onclick={() => input?.click()}>Välj tidigare projektfil</button>
   </section>
@@ -151,10 +146,7 @@
 
 <section class="card">
   <h2>Starta nästa bedömning</h2>
-  <p>
-    Vid nästa uppföljning hos kunden: skapa en ny projektfil som utgår från den här. Allt följer med och behåller sina ID:n, så att
-    bedömningarna kan jämföras. Den nya filen får dagens datum i namnet.
-  </p>
+  <p class="meta">Ny projektfil baserad på den här.</p>
   <button type="button" disabled={ui.busy} onclick={startNext}>Starta nästa bedömning</button>
 </section>
 

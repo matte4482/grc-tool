@@ -28,7 +28,7 @@
 {#if showSummary && project.engagement.summary}<p>{project.engagement.summary}</p>{/if}
 <div class="kpis">
   <div class="kpi"><b>{percent(total.fulfilled, total.applicable)} %</b>uppfyllda av {total.applicable} tillämpliga</div>
-  <div class="kpi"><b>{ready.pct} %</b>{VERDICT_LABELS[ready.verdict]}</div>
+  <div class="kpi"><b>{ready.pct} %</b>redo för revision · {VERDICT_LABELS[ready.verdict].toLowerCase()}</div>
   <div class="kpi"><b>{risks.aboveThreshold}</b>risker över acceptansnivån</div>
   <div class="kpi"><b>{actions.open}</b>öppna åtgärder, {actions.overdue} försenade</div>
 </div>

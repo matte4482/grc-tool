@@ -237,16 +237,12 @@
 </script>
 
 <div class="intro">
-  <div class="eyebrow">Startsida</div>
-  <h1>Starta ett nytt arbete eller fortsätt där du slutade</h1>
-  <p>Bedömningen sparas som en fil i kundens SharePoint-mapp. Inget lagras hos Method IT.</p>
+  <h1>Gapanalys</h1>
 </div>
 
 {#if !canUseFolders}
   <p class="notice">
-    Den här webbläsaren kan inte spara direkt till en mapp. Projektfilen laddas ned i stället, och varje ändring sparas
-    som reservkopia i webbläsaren tills du öppnar den nedladdade filen igen. Använd Chrome eller Edge för att spara
-    direkt i kundens mapp.
+    Webbläsaren kan inte spara i en mapp, så projektfilen laddas ned. Använd Chrome eller Edge för att spara direkt.
   </p>
 {/if}
 
@@ -255,10 +251,6 @@
 {#if store.backups.length}
   <section class="card backups" aria-labelledby="backups-h">
     <h2 id="backups-h">Osparade ändringar i webbläsaren</h2>
-    <p class="meta">
-      Ändringar som inte nådde projektfilen, till exempel för att fliken stängdes eller en nedladdning inte sparades.
-      Återställ dem och spara, eller ta bort dem.
-    </p>
     <ul class="list">
       {#each store.backups as backup (backup.projectId)}
         <li>
@@ -286,7 +278,7 @@
       <input id="client" class="big-input" placeholder="Kundens namn" bind:value={client} autocomplete="off" />
 
       <fieldset>
-        <legend class="field-label">Ramverk <span>— ett ramverk per arbete</span></legend>
+        <legend class="field-label">Ramverk</legend>
         <div class="fw-grid">
           {#each FRAMEWORKS as entry (keyOf(entry))}
             <label class="fw-card" class:selected={frameworkKey === keyOf(entry)} class:upcoming={!entry.framework}>
@@ -296,7 +288,6 @@
                 {#if entry.framework}<span class="radio" aria-hidden="true"></span>{:else}<span class="badge">Kommer</span>{/if}
               </span>
               <span class="fw-scope">{scope(entry)}</span>
-              <span class="fw-desc">{entry.description}</span>
             </label>
           {/each}
         </div>
@@ -308,19 +299,19 @@
           <label class="option" class:selected={startpoint === 'templates'} class:upcoming={!templates}>
             <input type="radio" name="startpoint" value="templates" bind:group={startpoint} disabled={!templates} />
             <span class="radio" aria-hidden="true"></span>
-            <span><strong>Med typrisker</strong><span>{templates ? `${templates.risks.length} vanliga risker förifyllda` : 'Finns inte för ramverket'}</span></span>
+            <span><strong>Med typrisker</strong><span>{templates ? `${templates.risks.length} risker` : 'Finns inte för ramverket'}</span></span>
           </label>
           <label class="option" class:selected={startpoint === 'empty'}>
             <input type="radio" name="startpoint" value="empty" bind:group={startpoint} />
             <span class="radio" aria-hidden="true"></span>
-            <span><strong>Tomt register</strong><span>Börja från noll</span></span>
+            <span><strong>Tomt register</strong><span>Inga risker</span></span>
           </label>
           <label class="option" class:selected={startpoint === 'copy'}>
             <input type="radio" name="startpoint" value="copy" bind:group={startpoint} onclick={() => !copySource && copyInput?.click()} />
             <span class="radio" aria-hidden="true"></span>
             <span>
               <strong>Kopiera från kund</strong>
-              <span>{copySource ? `${copySource.client.name} · ${copySource.risks.length} risker` : 'Återanvänd riskmetod och risker'}</span>
+              <span>{copySource ? `${copySource.client.name} · ${copySource.risks.length} risker` : 'Riskmetod och risker'}</span>
             </span>
           </label>
         </div>
@@ -329,13 +320,12 @@
       <input class="hidden" type="file" accept=".json" bind:this={copyInput} onchange={chooseCopy} aria-label="Projektfil att kopiera från" />
       {#if startpoint === 'copy'}
         <p class="meta">
-          Riskmetoden och riskerna kopieras, men inga bedömningar, ägare eller godkännanden.
+          Utan bedömningar, ägare och godkännanden.
           <button type="button" class="link" onclick={() => copyInput?.click()}>{copySource ? 'Välj en annan fil' : 'Välj projektfil'}</button>
         </p>
       {/if}
 
       <div class="form-foot">
-        <span class="meta">{canUseFolders ? 'Du väljer var filen sparas i nästa steg.' : 'Projektfilen laddas ned när arbetet skapas.'}</span>
         <button class="cta" type="submit" disabled={ui.busy}>{canUseFolders ? 'Skapa arbete och välj sparplats' : 'Skapa arbete'} →</button>
       </div>
     </form>
@@ -361,11 +351,11 @@
             <path d="M12 15V4M7 9l5-5 5 5M5 20h14" />
           </svg>
         </span>
-        <strong>{canUseFolders ? 'Dra in uppdragets mapp eller projektfil här' : 'Dra in en projektfil här'}</strong>
+        <strong>{canUseFolders ? 'Dra in mapp eller projektfil' : 'Dra in projektfil'}</strong>
         <span class="meta">
           eller
           {#if canUseFolders}
-            <button type="button" class="link" onclick={openFolder} disabled={ui.busy}>välj mapp</button> från kundens SharePoint-mapp
+            <button type="button" class="link" onclick={openFolder} disabled={ui.busy}>välj mapp</button>
           {:else}
             <button type="button" class="link" onclick={() => fileInput?.click()} disabled={ui.busy}>välj fil</button>
           {/if}
@@ -374,7 +364,7 @@
       </div>
       <input class="hidden" type="file" accept=".json" bind:this={fileInput} onchange={openSelected} aria-label="Välj projektfil" />
       {#if choice}
-        <p class="meta choose">Mappen innehåller flera projektfiler. Välj en:</p>
+        <p class="meta choose">Välj projektfil:</p>
         <ul class="files">
           {#each choice.files as name (name)}
             <li><button onclick={() => openChosen(name)} disabled={ui.busy}>{name}</button></li>
@@ -418,7 +408,7 @@
           {/each}
         </ul>
       {:else}
-        <p class="meta">Inga arbeten ännu. Projekt du skapar eller öppnar visas här, så att du kan fortsätta med ett klick.</p>
+        <p class="meta">Inga arbeten ännu.</p>
       {/if}
     </section>
   </div>

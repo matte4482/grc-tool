@@ -23,7 +23,7 @@ describe('ramverksregistret', () => {
     expect(new Set(keys).size).toBe(keys.length)
   })
 
-  it('alla ramverk har en beskrivning för startsidan', () => {
-    expect(FRAMEWORKS.every((e) => e.description.length > 0)).toBe(true)
+  it('kommande ramverk har en omfattning för startsidan', () => {
+    expect(FRAMEWORKS.every((e) => e.framework || (e.summary?.length ?? 0) > 0)).toBe(true)
   })
 })

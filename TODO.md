@@ -6,7 +6,7 @@ Småfix och konkreta punkter som ska åtgärdas. Claude läser den här filen in
 - Ange fil och rad när det går, och i vilken fas punkten senast måste vara åtgärdad.
 - Större beslut hör hemma i ARCHITECTURE.md, inte här.
 
-*Senast uppdaterad: 15 oktober 2026*
+*Senast uppdaterad: 19 oktober 2026*
 
 ## Fas 1 (filsparande), klar 5 okt 2026
 
@@ -72,6 +72,15 @@ Logiken är testad, men följande är inte provat i riktiga webbläsare. Bocka a
 - [ ] **O-06: rutin för att dela ut en ny version.** Förslag finns i ARCHITECTURE. Skriv rutinen i README när den är bestämd. Före M4.
 - [x] **Logotyp som bild** i sidhuvudet och rapporterna (`src/lib/ui/logo.jpg`, B-42). *(15 okt 2026)*
 - [ ] **Kundtest (M4):** en hel gapanalys hos en befintlig kund. Mät tiden mot hur det görs i dag.
+
+## Efter M4
+
+- [ ] **Import från granskningsverktyg: Lynis, OpenSCAP och CIS-CAT Lite** (O-07). Översätt resultaten till `grc-fynd` (B-33) och koppla fynden till kontrollerna i projektets ramverk (B-46). Kontrollera först verktygens utdataformat.
+
+- [x] **CIS Azure-benchmarks som YAML** i `src/lib/benchmarks/`: 339 rekommendationer med ID, svensk rubrik, nivå och kopplingar (B-45). *(20 okt 2026)*
+- [ ] **Granska de svenska rubrikerna** i `src/lib/benchmarks/*.yaml`. De är maskinnära översättningar och kan behöva justeras.
+- [ ] **Skriv egna åtgärdstexter (`remediation`)** med Microsoft Learn och Azure Policy som källa, inte CIS-texterna. Börja med Foundations, Level 1, automatiserade.
+- [ ] **Stäm av med CIS** att egna kontroller med hänvisning till ID:n är tillåtna i betalda uppdrag.
 
 ## Småfix, när som helst
 

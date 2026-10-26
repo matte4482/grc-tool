@@ -26,7 +26,7 @@
   </ul>
 {/if}
 {#if suggestion}
-  <p class="meta">{suggestion.reason} Ingen åtgärd ännu.</p>
+  <p class="meta">{suggestion.reason}</p>
   <button type="button" class="link" onclick={create}>Skapa åtgärd</button>
 {:else if !linked.length}
   <p class="meta">Ingen åtgärd behövs.</p>
