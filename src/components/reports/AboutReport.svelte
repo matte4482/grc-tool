@@ -6,13 +6,16 @@
 
   const project = $derived(store.project!)
   const e = $derived(project.engagement)
+  const framework = $derived(store.framework)
+  const target = $derived(project.profile && framework?.profiles ? framework.profiles[project.profile - 1] : undefined)
 </script>
 
 <h2>Om bedömningen</h2>
 {#if e.summary}<h3>Sammanfattning</h3><p>{e.summary}</p>{/if}
 <table>
   <tbody>
-    <tr><th style="width:24%">Ramverk</th><td>{store.framework?.name}</td></tr>
+    <tr><th style="width:24%">Ramverk</th><td>{framework?.name}</td></tr>
+    {#if target}<tr><th>Målnivå</th><td>{target}</td></tr>{/if}
     <tr><th>Period</th><td>{shortDate(project.createdAt.slice(0, 10))} – {shortDate(project.updatedAt.slice(0, 10))}</td></tr>
     {#if e.scope}<tr><th>Omfattning</th><td>{e.scope}</td></tr>{/if}
     {#if e.participants}<tr><th>Deltagare</th><td>{e.participants}</td></tr>{/if}
@@ -20,5 +23,8 @@
 </table>
 <p class="muted">
   Varje krav och kontroll har bedömts som Uppfylld, Delvis uppfylld, Ej uppfylld eller Ej bedömd, utifrån intervjuer och granskad
-  evidens. Uppfyllnadsgrad = uppfyllda av tillämpliga. Kontroller som valts bort i SoA räknas inte.
+  evidens. Uppfyllnadsgrad = uppfyllda av tillämpliga. {framework?.sections.some((s) => s.soa)
+    ? 'Kontroller som valts bort i SoA räknas inte.'
+    : `Kontroller som är ej tillämpliga${target ? ' eller över målnivån' : ''} räknas inte.`}
 </p>
+{#if framework?.source}<p class="muted">{framework.source}</p>{/if}

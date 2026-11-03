@@ -44,7 +44,7 @@
       const ok = await dialog.ask({
         title: 'Starta nästa bedömning?',
         message:
-          'En ny projektfil skapas med allt från den här bedömningen: status, kommentarer, SoA, risker, åtgärder och evidens. Godkännanden av restrisk tas bort och görs om. Den här filen ändras inte.',
+          'En ny projektfil skapas med allt från den här bedömningen: status, kommentarer, tillämplighet, risker, åtgärder och evidens. Godkännanden av restrisk tas bort och görs om. Den här filen ändras inte.',
         confirm: 'Skapa ny bedömning',
       })
       if (!ok) return
@@ -75,11 +75,6 @@
 {#if !c}
   <section class="card">
     <h2>Jämför med en tidigare bedömning</h2>
-    <p>
-      Välj projektfilen från förra bedömningen av samma kund. Verktyget visar vad som har förbättrats, försämrats och tillkommit, och
-      progressrapporten kan skrivas ut.
-    </p>
-    {#if store.project?.previousId}<p class="meta">Den här bedömningen är en uppföljning. Välj filen den startades från.</p>{/if}
     {#if result && !result.ok}<p class="warn-up">{result.message}</p>{/if}
     <button type="button" class="primary" onclick={() => input?.click()}>Välj tidigare projektfil</button>
   </section>
@@ -115,8 +110,9 @@
       </tbody>
     </table>
     <p class="meta">
-      Risker: {c.risks.added.length} nya, {c.risks.changed.length} med ändrat värde, {c.risks.removed.length} borttagna. Åtgärder: {c.actions.completed.length}
-      avslutade, {c.actions.added.length} nya, {c.actions.overdue.length} försenade. SoA: {c.soa.included.length} invalda, {c.soa.excluded.length} bortvalda. Ny
+      {#if store.framework?.riskManagement}Risker: {c.risks.added.length} nya, {c.risks.changed.length} med ändrat värde, {c.risks.removed.length} borttagna.{/if}
+      Åtgärder: {c.actions.completed.length} avslutade, {c.actions.added.length} nya, {c.actions.overdue.length} försenade.
+      {store.framework?.sections.some((s) => s.soa) ? 'SoA' : 'Tillämplighet'}: {c.soa.included.length} invalda, {c.soa.excluded.length} bortvalda. Ny
       evidens: {c.evidenceAdded} filer.
     </p>
   </section>
@@ -151,10 +147,7 @@
 
 <section class="card">
   <h2>Starta nästa bedömning</h2>
-  <p>
-    Vid nästa uppföljning hos kunden: skapa en ny projektfil som utgår från den här. Allt följer med och behåller sina ID:n, så att
-    bedömningarna kan jämföras. Den nya filen får dagens datum i namnet.
-  </p>
+  <p class="meta">Ny projektfil baserad på den här.</p>
   <button type="button" disabled={ui.busy} onclick={startNext}>Starta nästa bedömning</button>
 </section>
 

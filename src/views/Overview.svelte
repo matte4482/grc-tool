@@ -4,7 +4,7 @@
   import RiskMatrix from '../components/RiskMatrix.svelte'
   import StatusBar from '../components/StatusBar.svelte'
   import { actionSummary, suggestions } from '../lib/actions'
-  import { VERDICT_LABELS, readiness, type ReadinessItem } from '../lib/dashboard'
+  import { VERDICT_LABELS, profileProgress, readiness, type ReadinessItem } from '../lib/dashboard'
   import { heatmap, methodOf } from '../lib/risk/rules'
   import { consultantName, setConsultantName } from '../lib/storage/settings'
   import { localDate } from '../lib/ui/format'
@@ -23,7 +23,9 @@
   const framework = $derived(store.framework!)
   const total = $derived(assessmentProgress(project, framework))
   const sections = $derived(sectionProgress(project, framework))
-  const themes = $derived(framework.sections.filter((s) => s.soa).flatMap((s) => groupProgress(project, s)))
+  // Teman i SoA-avsnitten, eller grupperna när ramverket bara har ett avsnitt (t.ex. CIS).
+  const themes = $derived(framework.sections.filter((s) => s.soa || framework.sections.length === 1).flatMap((s) => groupProgress(project, s)))
+  const levels = $derived(profileProgress(project, framework))
   const soa = $derived(soaSummary(project, framework))
   const risks = $derived(riskSummary(project))
   const todo = $derived(framework.sections.map((s) => ({ section: s, ...attention(project, s) })))
@@ -56,7 +58,7 @@
     { label: 'Delvis uppfylld', value: total.partial, cls: 'partial' },
     { label: 'Ej uppfylld', value: total.notFulfilled, cls: 'no' },
     { label: 'Ej bedömd', value: total.applicable - total.assessed, cls: 'none' },
-    { label: 'Ej tillämplig', value: total.total - total.applicable, cls: 'excluded' },
+    { label: framework.profiles ? 'Ej tillämplig eller över målnivån' : 'Ej tillämplig', value: total.total - total.applicable, cls: 'excluded' },
   ])
 
   // Kontroll av alla bifogade filer (B-31). Kräver mappåtkomst.
@@ -80,6 +82,12 @@
     })
   }
 
+  function setProfile(value: string) {
+    store.update((d) => {
+      d.profile = value ? Number(value) : undefined
+    })
+  }
+
   function rename(value: string) {
     store.update((d) => {
       d.client.name = value
@@ -94,6 +102,7 @@
 
 <div class="overview">
   <div class="ov-col">
+    {#if framework.readiness}
     <section class="card readiness verdict-{ready.verdict}">
       <div class="field-label">Redo för revision</div>
       <div class="big-pct">{ready.pct} %</div>
@@ -107,8 +116,22 @@
           </li>
         {/each}
       </ul>
-      <p class="meta">Medelvärdet av delarna som gäller. Redo kräver minst 90 % och att alla grundkrav är uppfyllda (B-37).</p>
     </section>
+    {:else if levels.length}
+      <section class="card">
+        <div class="field-label">Uppfyllnad per nivå</div>
+        <ul class="progress-list profile-list">
+          {#each levels as l (l.level)}
+            <li>
+              <div class="group-link static" class:target={l.target}>
+                <span>{l.label}{l.target ? ' · målnivå' : ''}</span><span class="meta">{l.pct} % · {l.fulfilled} av {l.applicable}</span>
+              </div>
+              <span class="mini-bar wide"><span style:width="{l.pct}%"></span></span>
+            </li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
     <section class="card">
       <div class="card-head">
         <h2>Åtgärder</h2>
@@ -134,6 +157,7 @@
         {#each distribution as d (d.label)}<li><span class="dot {d.cls}"></span>{d.label} <strong>{d.value}</strong></li>{/each}
       </ul>
     </section>
+    {#if framework.riskManagement}
     <section class="card">
       <div class="card-head">
         <h2>Riskprofil</h2>
@@ -152,6 +176,7 @@
         <li><span>Väntar på godkännande</span><span>{risks.awaitingApproval}</span></li>
       </ul>
     </section>
+    {/if}
   </div>
   <div class="ov-col">
     <section class="card">
@@ -167,7 +192,7 @@
         {/each}
       </ul>
       {#if themes.length}
-        <h3 class="sub">Per tema</h3>
+        <h3 class="sub">{framework.sections.some((s) => s.soa) ? 'Per tema' : 'Per område'}</h3>
         <ul class="progress-list">
           {#each themes as t (t.id)}
             <li>
@@ -193,7 +218,7 @@
       {#if evidence.length && store.target?.dir}
         <p class="meta">
           {evidence.length} bifogade filer.
-          <button type="button" class="link" disabled={checking} onclick={checkAll}>{checking ? 'Kontrollerar …' : 'Kontrollera att de finns kvar'}</button>
+          <button type="button" class="link" disabled={checking} onclick={checkAll}>{checking ? 'Kontrollerar …' : 'Kontrollera'}</button>
         </p>
         {#if checked && checked.length === 0}<p class="meta">Alla filer finns kvar och är oförändrade.</p>{/if}
         {#if checked?.length}
@@ -217,18 +242,21 @@
       <p class="meta">{framework.name} · {store.target?.label ?? ''}</p>
       <label class="field-label" for="consultant-name">Ditt namn</label>
       <input id="consultant-name" bind:value={name} onchange={() => setConsultantName(name)} autocomplete="name" />
-      <p class="meta">Sparas i webbläsaren och skrivs in när du ändrar något, bifogar en fil och i rapporterna.</p>
-      <p class="meta">
-        Ändringar sparas automatiskt var tionde minut{store.target?.autosave ? '' : ' (inte vid nedladdning)'}. Stäng inte fliken med osparade ändringar.
-      </p>
+      {#if framework.profiles}
+        <label class="field-label" for="profile">Målnivå</label>
+        <select id="profile" value={project.profile ? String(project.profile) : ''} onchange={(e) => setProfile(e.currentTarget.value)}>
+          <option value="">Alla nivåer</option>
+          {#each framework.profiles as p, i (p)}<option value={String(i + 1)}>{p}</option>{/each}
+        </select>
+      {/if}
     </div>
     <div>
       <label class="field-label" for="eng-scope">Omfattning</label>
-      <textarea id="eng-scope" placeholder="Verksamhet, platser och system som bedömningen gäller" value={project.engagement.scope} oninput={(e) => engagement('scope', e.currentTarget.value)}></textarea>
+      <textarea id="eng-scope" placeholder="Verksamhet, platser, system" value={project.engagement.scope} oninput={(e) => engagement('scope', e.currentTarget.value)}></textarea>
       <label class="field-label" for="eng-participants">Deltagare och intervjuade</label>
       <textarea id="eng-participants" value={project.engagement.participants} oninput={(e) => engagement('participants', e.currentTarget.value)}></textarea>
     </div>
   </div>
   <label class="field-label" for="eng-summary">Sammanfattning och slutsats</label>
-  <textarea id="eng-summary" class="summary-field" placeholder="Visas först i rapporterna" value={project.engagement.summary} oninput={(e) => engagement('summary', e.currentTarget.value)}></textarea>
+  <textarea id="eng-summary" class="summary-field" value={project.engagement.summary} oninput={(e) => engagement('summary', e.currentTarget.value)}></textarea>
 </section>

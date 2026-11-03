@@ -193,7 +193,7 @@ describe('kontroll mot ramverket', () => {
   it('grundkrav kan inte väljas bort', () => {
     const p = load()
     p.controls['6.1.2'].applicable = false
-    expect(checkAgainstFramework(p, iso)).toEqual(['6.1.2 kan inte väljas bort, den ingår inte i SoA.'])
+    expect(checkAgainstFramework(p, iso)).toEqual(['6.1.2 kan inte väljas bort.'])
   })
 
   it('kontroll kopplad till risk är låst som tillämplig', () => {

@@ -52,10 +52,7 @@
   }
 </script>
 
-<p class="meta lead">
-  Riskmetoden är underlag för krav 6.1.2 och 8.2 och skrivs ut som bilaga i rapporten. Klicka i en ruta för att ändra
-  texten.{isDefault ? ' Projektet använder standardmetoden tills något ändras.' : ''}
-</p>
+{#if isDefault}<p class="meta lead">Standardmetoden används.</p>{/if}
 
 <section class="card">
   <div class="card-head">
@@ -151,7 +148,7 @@
       <label class="field-label" for="threshold">Acceptansnivå</label>
       <div class="inline-field">
         <input id="threshold" type="number" min="1" max="25" value={method.acceptanceThreshold} onchange={(e) => edit((m) => (m.acceptanceThreshold = num(e.currentTarget.value, 1, 25)))} />
-        <span class="meta">Risker med värde till och med {method.acceptanceThreshold} är acceptabla. Högre kräver behandlingsbeslut och ägare.</span>
+        <span class="meta">Acceptabelt till och med {method.acceptanceThreshold}</span>
       </div>
       <label class="field-label" for="interval">Ny bedömning</label>
       <div class="inline-field">
@@ -174,7 +171,7 @@
       </div>
     {:else}
       <dl class="approved">
-        <dt>Acceptansnivå</dt><dd>Riskvärde {method.acceptanceThreshold}. Högre kräver behandlingsbeslut och ägare.</dd>
+        <dt>Acceptansnivå</dt><dd>Riskvärde {method.acceptanceThreshold}</dd>
         <dt>Ny bedömning</dt><dd>Var {method.reviewIntervalMonths}:e månad och vid väsentlig förändring.</dd>
         <dt>Fastställd av</dt><dd>{method.approvedBy}{method.approvedAt ? `, ${shortDate(method.approvedAt)}` : ''}</dd>
       </dl>

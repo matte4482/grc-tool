@@ -2,7 +2,7 @@
 // Ändringsfunktionerna ändrar ett utkast och anropas via store.update.
 
 import { consultantName } from './storage/settings'
-import { allControls, type Framework, type Section } from './frameworks/schema'
+import { allControls, type Control, type Framework, type Section } from './frameworks/schema'
 import { nextId } from './project/project'
 import { ActionSchema, type Action, type ActionStatus, type Priority, type Project, type Risk } from './project/schema'
 import { answerFor, isDeficient } from './assessment'
@@ -34,6 +34,8 @@ export interface Suggestion {
   priority: Priority
   controls: string[]
   risks: string[]
+  /** Ramverkets åtgärdstext, blir åtgärdens beskrivning (B-47). */
+  description?: string
 }
 
 /** Kontroller och risker som redan har en åtgärd, oavsett status. */
@@ -83,16 +85,17 @@ function riskSuggestion(ctx: Context, r: Risk): Suggestion | undefined {
   }
 }
 
-function controlSuggestion(ctx: Context, controlId: string, title: string): Suggestion {
-  const notFulfilled = answerFor(ctx.project, controlId).status === 'not_fulfilled'
+function controlSuggestion(ctx: Context, control: Control): Suggestion {
+  const notFulfilled = answerFor(ctx.project, control.id).status === 'not_fulfilled'
   return {
-    key: `control:${controlId}`,
-    source: { type: 'control', id: controlId },
-    title: `Åtgärda ${controlId} ${title}`,
+    key: `control:${control.id}`,
+    source: { type: 'control', id: control.id },
+    title: `Åtgärda ${control.id} ${control.title}`,
     reason: notFulfilled ? 'Ej uppfylld.' : 'Delvis uppfylld.',
     priority: notFulfilled ? 'high' : 'medium',
-    controls: [controlId],
+    controls: [control.id],
     risks: [],
+    description: control.remediation,
   }
 }
 
@@ -106,7 +109,7 @@ export function suggestions(project: Project, framework: Framework): Suggestion[
   const result = project.risks.map((r) => riskSuggestion(ctx, r)).filter((x) => x !== undefined)
   const inRisk = new Set(result.flatMap((x) => x.controls))
   for (const { control } of allControls(framework))
-    if (!inRisk.has(control.id) && deficient(ctx, control.id)) result.push(controlSuggestion(ctx, control.id, control.title))
+    if (!inRisk.has(control.id) && deficient(ctx, control.id)) result.push(controlSuggestion(ctx, control))
   return result.sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority])
 }
 
@@ -122,7 +125,7 @@ export function suggestionFor(project: Project, framework: Framework, kind: 'con
     const s = r.controls.some((l) => l.control === id) ? riskSuggestion(ctx, r) : undefined
     if (s?.controls.includes(id)) return s
   }
-  return controlSuggestion(ctx, id, allControls(framework).find((x) => x.control.id === id)!.control.title)
+  return controlSuggestion(ctx, allControls(framework).find((x) => x.control.id === id)!.control)
 }
 
 // Ändringar
@@ -141,7 +144,7 @@ function logOnRisks(draft: Project, riskIds: string[], now: string, text: string
 export function acceptSuggestion(draft: Project, s: Suggestion, now: string): string {
   const id = nextId(draft, 'action')
   draft.actions.push(
-    ActionSchema.parse({ id, title: s.title, source: s.source, controls: s.controls, risks: s.risks, priority: s.priority, createdAt: now.slice(0, 10) }),
+    ActionSchema.parse({ id, title: s.title, description: s.description ?? '', source: s.source, controls: s.controls, risks: s.risks, priority: s.priority, createdAt: now.slice(0, 10) }),
   )
   logOnRisks(draft, s.risks, now, `Åtgärd ${id} skapad`)
   return id

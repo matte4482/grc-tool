@@ -1,0 +1,642 @@
+# CIS Microsoft Azure Compute Services 2.0.0: rekommendationer med nivå (Level 1–2), automatiserad eller manuell och kopplingar.
+# ID, nivå, CIS Controls och Azure Policy-ID kommer från CIS-benchmarken. Rubriker och åtgärder är egna texter (B-45, B-47).
+
+schemaVersion: 1
+id: 'cis-azure-compute'
+version: '2.0.0'
+name: 'CIS Microsoft Azure Compute Services 2.0.0'
+language: 'sv'
+profiles: ['Level 1', 'Level 2']
+riskManagement: false
+readiness: false
+guidanceLabel: 'Kontrollera'
+source: 'ID, nivåer och kopplingar följer CIS Microsoft Azure Compute Services Benchmark v2.0.0 från Center for Internet Security. Rubriker och åtgärder är egna texter.'
+sections:
+  - id: 'recommendations'
+    title: 'Rekommendationer'
+    soa: false
+    optional: true
+    unit: 'rekommendationer'
+    groupLabel: 'Områden'
+    groups:
+      - id: '2'
+        title: 'App Service'
+        controls:
+          - id: '2.5'
+            title: 'Hemligheter lagras i Azure Key Vault'
+            profile: 2
+            automated: false
+            remediation: 'Flytta hemligheter från appinställningar till Key Vault och referera till dem med Key Vault-referenser och hanterad identitet.'
+            refs: ['CIS Controls v8: 3.1']
+          - id: '2.6'
+            title: 'App Service Environment driftsätts med intern lastbalanserare'
+            profile: 2
+            automated: true
+            remediation: 'Driftsätt App Service Environment med intern lastbalanserare (ILB) och exponera publika appar via Application Gateway med WAF.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 2d048aca-6479-4923-88f5-e2ac295d9af3']
+          - id: '2.7'
+            title: 'App Service Environment är version 3 eller senare'
+            profile: 1
+            automated: true
+            remediation: 'Migrera äldre App Service Environment (v1 och v2, som inte längre har support) till v3.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: eb4d34ab-0929-491c-bbf3-61e13da19f9a']
+          - id: '2.8'
+            title: 'Intern kryptering är aktiverad i App Service Environment'
+            profile: 2
+            automated: true
+            remediation: 'Aktivera intern kryptering (InternalEncryption) i App Service Environment-konfigurationen.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: fb74e86f-d351-4b8d-b034-93da7391c01f']
+          - id: '2.9'
+            title: 'TLS 1.0 och 1.1 är inaktiverade i App Service Environment'
+            profile: 1
+            automated: true
+            remediation: 'Sätt DisableTls1.0 i App Service Environment-konfigurationen så att bara TLS 1.2 eller senare tillåts.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: d6545c6b-dd9d-4265-91e6-0b451e2f1c50']
+          - id: '2.10'
+            title: 'Ordningen för TLS-chiffersviter är konfigurerad i App Service Environment'
+            profile: 1
+            automated: true
+            remediation: 'Ange FrontEndSSLCipherSuiteOrder med starka chiffersviter i App Service Environment-konfigurationen.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: 817dcf37-e83d-4999-a472-644eada2ea1e']
+      - id: '2.1'
+        title: 'App Service-appar'
+        controls:
+          - id: '2.1.1'
+            title: 'Java-versionen har support (om Java används)'
+            profile: 1
+            automated: false
+            remediation: 'Under Konfiguration › Allmänna inställningar: välj en Java-version som har support och planera uppgradering innan supporten upphör.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: 496223c3-ad65-4ecd-878a-bae78737e9ed']
+          - id: '2.1.2'
+            title: 'Python-versionen har support (om Python används)'
+            profile: 1
+            automated: false
+            remediation: 'Under Konfiguration › Allmänna inställningar: välj en Python-version som har support.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: 7008174a-fd10-4ef0-817e-fc820a951d73']
+          - id: '2.1.3'
+            title: 'PHP-versionen har support (om PHP används)'
+            profile: 1
+            automated: false
+            remediation: 'Under Konfiguration › Allmänna inställningar: välj en PHP-version som har support.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: 7261b898-8a84-4db8-9e04-18527132abb3']
+          - id: '2.1.4'
+            title: 'Publicering med grundläggande autentisering är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: stäng av SCM och FTP Basic Auth Publishing Credentials. Publicera via Entra ID, t.ex. GitHub Actions med OIDC.'
+            refs: ['CIS Controls v8: 5.6', 'Azure Policy: 871b205b-57cf-4e1e-a234-492616998bf7', 'Azure Policy: aede300b-d67f-480a-ae26-4b3dfb1a1fdc']
+          - id: '2.1.5'
+            title: 'FTP är inaktiverat eller tillåter bara FTPS'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt FTP-tillstånd till Inaktiverat, eller Endast FTPS om FTP behövs.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: 4d24b6d4-5e53-4a4f-a7f4-618fa573ee4b']
+          - id: '2.1.6'
+            title: 'HTTP/2 används (om tillämpligt)'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt HTTP-versionen till 2.0.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: 8c122334-9d20-4eb8-89ea-ac9a705b74ae']
+          - id: '2.1.7'
+            title: 'Bara HTTPS är tillåtet'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: aktivera Endast HTTPS (az webapp update --https-only true).'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: a4af4a39-4135-47fb-b175-47fbdf85311d']
+          - id: '2.1.8'
+            title: 'Inkommande trafik kräver minst TLS 1.2'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt lägsta inkommande TLS-version till 1.2 eller 1.3.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: f0e6e85b-9b9f-4a4b-b67b-f730d42f1b0b']
+          - id: '2.1.9'
+            title: 'TLS-kryptering hela vägen (end-to-end) är aktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: aktivera End-to-end TLS encryption så att trafiken krypteras även inne i plattformen.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: af1d7e88-c1c8-4ea8-be1f-87bff0df9101']
+          - id: '2.1.10'
+            title: 'Fjärrfelsökning är avstängd'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: stäng av fjärrfelsökning. Slå bara på tillfälligt vid behov.'
+            refs: ['CIS Controls v8: 12.3', 'Azure Policy: cb510bfd-1cba-4d9f-a230-cb0976f4bb71']
+          - id: '2.1.11'
+            title: 'Klientcertifikat krävs för inkommande anrop (om tillämpligt)'
+            profile: 2
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt klientcertifikatläge till Obligatoriskt för appar som ska kräva ömsesidig TLS.'
+            refs: ['CIS Controls v8: 12.6', 'Azure Policy: 19dd1db6-f442-49cf-a838-b0786b4401ef']
+          - id: '2.1.12'
+            title: 'Autentisering i App Service är aktiverad'
+            profile: 2
+            automated: true
+            remediation: 'Under Autentisering: lägg till Microsoft som identitetsleverantör och kräv inloggning för oautentiserade anrop.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 95bccee9-a7f8-4bec-9ee9-62c3473701fc']
+          - id: '2.1.13'
+            title: 'Hanterade identiteter är konfigurerade'
+            profile: 1
+            automated: true
+            remediation: 'Under Identitet: aktivera systemtilldelad eller användartilldelad hanterad identitet och använd den mot andra Azure-tjänster i stället för nycklar.'
+            refs: ['CIS Controls v8: 5.6', 'Azure Policy: 2b9ad585-36bc-4615-b300-fd4435808332']
+          - id: '2.1.14'
+            title: 'Publik nätverksåtkomst är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk › Åtkomst för inkommande trafik: stäng av publik åtkomst och använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 3.3, 4.4', 'Azure Policy: 1b5ef780-c53c-4a64-87f3-bb9c8c8094ba']
+          - id: '2.1.15'
+            title: 'App Service-planens SKU stöder privata slutpunkter'
+            profile: 2
+            automated: true
+            remediation: 'Använd en App Service-plan på nivån Basic eller högre (helst Premium v3) som stöder privata slutpunkter.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 546fe8d2-368d-4029-a418-6af48a7f61e5']
+          - id: '2.1.16'
+            title: 'Privata slutpunkter används för åtkomst till App Service-appar'
+            profile: 2
+            automated: true
+            remediation: 'Under Nätverk: lägg till en privat slutpunkt för appen.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 687aa49d-0982-40f8-bf6b-66d1da97a04b']
+          - id: '2.1.17'
+            title: 'Privata slutpunkter till App Service-appar använder privata DNS-zoner'
+            profile: 2
+            automated: false
+            remediation: 'Koppla den privata slutpunkten till den privata DNS-zonen privatelink.azurewebsites.net.'
+            refs: ['CIS Controls v8: 12.2']
+          - id: '2.1.18'
+            title: 'Appen är integrerad med ett virtuellt nätverk'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk: aktivera VNet-integrering mot ett dedikerat subnät.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 72d04c29-f87d-4575-9731-419ff16a2757']
+          - id: '2.1.19'
+            title: 'Konfigurationstrafik går via integrationen med det virtuella nätverket'
+            profile: 2
+            automated: true
+            remediation: 'Under Nätverk › VNet-integrering: aktivera dirigering av konfigurationstrafik (t.ex. hämtning av containeravbildning och innehållsdelning) via det virtuella nätverket.'
+            refs: ['CIS Controls v8: 13.4', 'Azure Policy: 801543d1-1953-4a90-b8b0-8cf6d41473a5']
+          - id: '2.1.20'
+            title: 'All trafik går via det virtuella nätverket'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk › VNet-integrering: aktivera Route All (vnetRouteAllEnabled) så att all utgående trafik går via det virtuella nätverket.'
+            refs: ['CIS Controls v8: 13.4', 'Azure Policy: a691eacb-474d-47e4-b287-b4813ca44222']
+          - id: '2.1.21'
+            title: 'CORS tillåter inte alla ursprung'
+            profile: 2
+            automated: true
+            remediation: 'Under API › CORS: ta bort * och ange bara de ursprung som behöver anropa appen.'
+            refs: ['CIS Controls v8: 16.1', 'Azure Policy: 5744710e-cc2f-4ee8-8809-3b11e89f4bc9']
+      - id: '2.2'
+        title: 'Distributionsplatser för App Service'
+        controls:
+          - id: '2.2.1'
+            title: 'Java-versionen har support (om Java används)'
+            profile: 1
+            automated: false
+            remediation: 'Under Konfiguration › Allmänna inställningar: välj en Java-version som har support och planera uppgradering innan supporten upphör.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: 46dad49f-8945-44d7-9bb1-2e1542f627d3']
+          - id: '2.2.2'
+            title: 'Python-versionen har support (om Python används)'
+            profile: 1
+            automated: false
+            remediation: 'Under Konfiguration › Allmänna inställningar: välj en Python-version som har support.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: 9c014953-ef68-4a98-82af-fd0f6b2306c8']
+          - id: '2.2.3'
+            title: 'PHP-versionen har support (om PHP används)'
+            profile: 1
+            automated: false
+            remediation: 'Under Konfiguration › Allmänna inställningar: välj en PHP-version som har support.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: f466b2a6-823d-470d-8ea5-b031e72d79ae']
+          - id: '2.2.4'
+            title: 'Publicering med grundläggande autentisering är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: stäng av SCM och FTP Basic Auth Publishing Credentials. Publicera via Entra ID, t.ex. GitHub Actions med OIDC.'
+            refs: ['CIS Controls v8: 5.6', 'Azure Policy: ec71c0bc-6a45-4b1f-9587-80dc83e6898c', 'Azure Policy: 847ef871-e2fe-4e6e-907e-4adbf71de5cf']
+          - id: '2.2.5'
+            title: 'FTP är inaktiverat eller tillåter bara FTPS'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt FTP-tillstånd till Inaktiverat, eller Endast FTPS om FTP behövs.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: c285a320-8830-4665-9cc7-bbd05fc7c5c0']
+          - id: '2.2.6'
+            title: 'HTTP/2 används (om tillämpligt)'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt HTTP-versionen till 2.0.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: 4dcfb8b5-05cd-4090-a931-2ec29057e1fc']
+          - id: '2.2.7'
+            title: 'Bara HTTPS är tillåtet'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: aktivera Endast HTTPS (az webapp update --https-only true).'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: ae1b9a8c-dfce-4605-bd91-69213b4a26fc']
+          - id: '2.2.8'
+            title: 'Inkommande trafik kräver minst TLS 1.2'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt lägsta inkommande TLS-version till 1.2 eller 1.3.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: 4ee5b817-627a-435a-8932-116193268172']
+          - id: '2.2.9'
+            title: 'TLS-kryptering hela vägen (end-to-end) är aktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: aktivera End-to-end TLS encryption så att trafiken krypteras även inne i plattformen.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: 123aed70-491a-4f07-a569-e1f3a8dd651e']
+          - id: '2.2.10'
+            title: 'Fjärrfelsökning är avstängd'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: stäng av fjärrfelsökning. Slå bara på tillfälligt vid behov.'
+            refs: ['CIS Controls v8: 12.3', 'Azure Policy: a08ae1ab-8d1d-422b-a123-df82b307ba61']
+          - id: '2.2.11'
+            title: 'Klientcertifikat krävs för inkommande anrop (om tillämpligt)'
+            profile: 2
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt klientcertifikatläge till Obligatoriskt för appar som ska kräva ömsesidig TLS.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 5b0bd968-5cb5-4513-8987-27786c6f0df8']
+          - id: '2.2.12'
+            title: 'Hanterade identiteter är konfigurerade'
+            profile: 1
+            automated: true
+            remediation: 'Under Identitet: aktivera systemtilldelad eller användartilldelad hanterad identitet och använd den mot andra Azure-tjänster i stället för nycklar.'
+            refs: ['CIS Controls v8: 5.6', 'Azure Policy: 4a15c15f-90d5-4a1f-8b63-2903944963fd']
+          - id: '2.2.13'
+            title: 'Publik nätverksåtkomst är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk › Åtkomst för inkommande trafik: stäng av publik åtkomst och använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 701a595d-38fb-4a66-ae6d-fb3735217622']
+          - id: '2.2.14'
+            title: 'Distributionsplatsen är integrerad med ett virtuellt nätverk'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk på distributionsplatsen: aktivera VNet-integrering mot samma nätverk som produktionsplatsen.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 24b7a1c6-44fe-40cc-a2e6-242d2ef70e98']
+          - id: '2.2.15'
+            title: 'Konfigurationstrafik går via integrationen med det virtuella nätverket'
+            profile: 2
+            automated: true
+            remediation: 'Under Nätverk › VNet-integrering: aktivera dirigering av konfigurationstrafik (t.ex. hämtning av containeravbildning och innehållsdelning) via det virtuella nätverket.'
+            refs: ['CIS Controls v8: 13.4', 'Azure Policy: 5747353b-1ca9-42c1-a4dd-b874b894f3d4']
+          - id: '2.2.16'
+            title: 'All trafik går via det virtuella nätverket'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk › VNet-integrering: aktivera Route All (vnetRouteAllEnabled) så att all utgående trafik går via det virtuella nätverket.'
+            refs: ['CIS Controls v8: 13.4', 'Azure Policy: f5c0bfb3-acea-47b1-b477-b0edcdf6edc1']
+          - id: '2.2.17'
+            title: 'CORS tillåter inte alla ursprung'
+            profile: 2
+            automated: true
+            remediation: 'Under API › CORS: ta bort * och ange bara de ursprung som behöver anropa appen.'
+            refs: ['CIS Controls v8: 16.1', 'Azure Policy: cae7c12e-764b-4c87-841a-fdc6675d196f']
+      - id: '2.3'
+        title: 'Funktionsappar'
+        controls:
+          - id: '2.3.1'
+            title: 'Java-versionen har support (om Java används)'
+            profile: 1
+            automated: false
+            remediation: 'Under Konfiguration › Allmänna inställningar: välj en Java-version som har support och planera uppgradering innan supporten upphör.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: 9d0b6ea4-93e2-4578-bf2f-6bb17d22b4bc']
+          - id: '2.3.2'
+            title: 'Python-versionen har support (om Python används)'
+            profile: 1
+            automated: false
+            remediation: 'Under Konfiguration › Allmänna inställningar: välj en Python-version som har support.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: 7238174a-fd10-4ef0-817e-fc820a951d73']
+          - id: '2.3.3'
+            title: 'Publicering med grundläggande autentisering är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: stäng av SCM och FTP Basic Auth Publishing Credentials. Publicera via Entra ID, t.ex. GitHub Actions med OIDC.'
+            refs: ['CIS Controls v8: 5.6']
+          - id: '2.3.4'
+            title: 'FTP är inaktiverat eller tillåter bara FTPS'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt FTP-tillstånd till Inaktiverat, eller Endast FTPS om FTP behövs.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: 399b2637-a50f-4f95-96f8-3a145476eb15']
+          - id: '2.3.5'
+            title: 'HTTP/2 används (om tillämpligt)'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt HTTP-versionen till 2.0.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: e2c1c086-2d84-4019-bff3-c44ccd95113c']
+          - id: '2.3.6'
+            title: 'Bara HTTPS är tillåtet'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: aktivera Endast HTTPS (az webapp update --https-only true).'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: 6d555dd1-86f2-4f1c-8ed7-5abae7c6cbab']
+          - id: '2.3.7'
+            title: 'Inkommande trafik kräver minst TLS 1.2'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt lägsta inkommande TLS-version till 1.2 eller 1.3.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: f9d614c5-c173-4d56-95a7-b4437057d193']
+          - id: '2.3.8'
+            title: 'TLS-kryptering hela vägen (end-to-end) är aktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: aktivera End-to-end TLS encryption så att trafiken krypteras även inne i plattformen.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: 387140f1-6da9-4741-bcee-3b5edcdfd9ec']
+          - id: '2.3.9'
+            title: 'Fjärrfelsökning är avstängd'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: stäng av fjärrfelsökning. Slå bara på tillfälligt vid behov.'
+            refs: ['CIS Controls v8: 12.3', 'Azure Policy: 0e60b895-3786-45da-8377-9c6b4b6ac5f9']
+          - id: '2.3.10'
+            title: 'Klientcertifikat krävs för inkommande anrop (om tillämpligt)'
+            profile: 2
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt klientcertifikatläge till Obligatoriskt för appar som ska kräva ömsesidig TLS.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: ab6a902f-9493-453b-928d-62c30b11b5a6']
+          - id: '2.3.11'
+            title: 'Autentisering i App Service är aktiverad'
+            profile: 2
+            automated: true
+            remediation: 'Under Autentisering: lägg till Microsoft som identitetsleverantör och kräv inloggning för oautentiserade anrop.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: c75248c1-ea1d-4a9c-8fc9-29a6aabd5da8']
+          - id: '2.3.12'
+            title: 'Hanterade identiteter är konfigurerade'
+            profile: 1
+            automated: true
+            remediation: 'Under Identitet: aktivera systemtilldelad eller användartilldelad hanterad identitet och använd den mot andra Azure-tjänster i stället för nycklar.'
+            refs: ['CIS Controls v8: 5.6', 'Azure Policy: 0da106f2-4ca3-48e8-bc85-c638fe6aea8f']
+          - id: '2.3.13'
+            title: 'Publik nätverksåtkomst är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk › Åtkomst för inkommande trafik: stäng av publik åtkomst och använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 969ac98b-88a8-449f-883c-2e9adb123127']
+          - id: '2.3.14'
+            title: 'Funktionsappen är integrerad med ett virtuellt nätverk'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk: aktivera VNet-integrering mot ett dedikerat subnät (kräver Premium- eller Flex Consumption-plan).'
+            refs: ['CIS Controls v8: 12.2']
+          - id: '2.3.15'
+            title: 'Konfigurationstrafik går via integrationen med det virtuella nätverket'
+            profile: 2
+            automated: true
+            remediation: 'Under Nätverk › VNet-integrering: aktivera dirigering av konfigurationstrafik (t.ex. hämtning av containeravbildning och innehållsdelning) via det virtuella nätverket.'
+            refs: ['CIS Controls v8: 13.4', 'Azure Policy: 5e57f5ad-995a-485b-9f42-4748935ee5d9']
+          - id: '2.3.16'
+            title: 'All trafik går via det virtuella nätverket'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk › VNet-integrering: aktivera Route All (vnetRouteAllEnabled) så att all utgående trafik går via det virtuella nätverket.'
+            refs: ['CIS Controls v8: 13.4', 'Azure Policy: 32a913ec-5ed7-4b31-a5b0-198450d8fb13']
+          - id: '2.3.17'
+            title: 'CORS tillåter inte alla ursprung'
+            profile: 2
+            automated: true
+            remediation: 'Under API › CORS: ta bort * och ange bara de ursprung som behöver anropa appen.'
+            refs: ['CIS Controls v8: 16.1', 'Azure Policy: 0820b7b9-23aa-4725-a1ce-ae4558f718e5']
+      - id: '2.4'
+        title: 'Distributionsplatser för funktionsappar'
+        controls:
+          - id: '2.4.1'
+            title: 'Java-versionen har support (om Java används)'
+            profile: 1
+            automated: false
+            remediation: 'Under Konfiguration › Allmänna inställningar: välj en Java-version som har support och planera uppgradering innan supporten upphör.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: e1d1b522-02b0-4d18-a04f-5ab62d20445f']
+          - id: '2.4.2'
+            title: 'Python-versionen har support (om Python används)'
+            profile: 1
+            automated: false
+            remediation: 'Under Konfiguration › Allmänna inställningar: välj en Python-version som har support.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: 829b40f3-d3db-4fd2-be46-76663d3aeeb2']
+          - id: '2.4.3'
+            title: 'Publicering med grundläggande autentisering är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: stäng av SCM och FTP Basic Auth Publishing Credentials. Publicera via Entra ID, t.ex. GitHub Actions med OIDC.'
+            refs: ['CIS Controls v8: 5.6']
+          - id: '2.4.4'
+            title: 'FTP är inaktiverat eller tillåter bara FTPS'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt FTP-tillstånd till Inaktiverat, eller Endast FTPS om FTP behövs.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: e1a09430-221d-4d4c-a337-1edb5a1fa9bb']
+          - id: '2.4.5'
+            title: 'HTTP/2 används (om tillämpligt)'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt HTTP-versionen till 2.0.'
+            refs: ['CIS Controls v8: 2.2', 'Azure Policy: fa98f1b1-1f56-4179-9faf-93ad82f3458f']
+          - id: '2.4.6'
+            title: 'Bara HTTPS är tillåtet'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: aktivera Endast HTTPS (az webapp update --https-only true).'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: 5e5dbe3f-2702-4ffc-8b1e-0cae008a5c71']
+          - id: '2.4.7'
+            title: 'Inkommande trafik kräver minst TLS 1.2'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt lägsta inkommande TLS-version till 1.2 eller 1.3.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: deb528de-8f89-4101-881c-595899253102']
+          - id: '2.4.8'
+            title: 'TLS-kryptering hela vägen (end-to-end) är aktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: aktivera End-to-end TLS encryption så att trafiken krypteras även inne i plattformen.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: cbe0e5eb-fea9-491d-ab20-a62cf049c5ae']
+          - id: '2.4.9'
+            title: 'Fjärrfelsökning är avstängd'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: stäng av fjärrfelsökning. Slå bara på tillfälligt vid behov.'
+            refs: ['CIS Controls v8: 12.3', 'Azure Policy: 89691ef9-8c50-49a8-8950-9c7fba41699e']
+          - id: '2.4.10'
+            title: 'Klientcertifikat krävs för inkommande anrop (om tillämpligt)'
+            profile: 2
+            automated: true
+            remediation: 'Under Konfiguration › Allmänna inställningar: sätt klientcertifikatläge till Obligatoriskt för appar som ska kräva ömsesidig TLS.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 153ab4ca-2d58-4b5d-9134-6d8c6bdd321c']
+          - id: '2.4.11'
+            title: 'Hanterade identiteter är konfigurerade'
+            profile: 1
+            automated: true
+            remediation: 'Under Identitet: aktivera systemtilldelad eller användartilldelad hanterad identitet och använd den mot andra Azure-tjänster i stället för nycklar.'
+            refs: ['CIS Controls v8: 5.6']
+          - id: '2.4.12'
+            title: 'Publik nätverksåtkomst är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk › Åtkomst för inkommande trafik: stäng av publik åtkomst och använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 11c82d0c-db9f-4d7b-97c5-f3f9aa957da2']
+          - id: '2.4.13'
+            title: 'Distributionsplatsen är integrerad med ett virtuellt nätverk'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk på distributionsplatsen: aktivera VNet-integrering mot samma nätverk som produktionsplatsen.'
+            refs: ['CIS Controls v8: 12.2']
+          - id: '2.4.14'
+            title: 'Konfigurationstrafik går via integrationen med det virtuella nätverket'
+            profile: 2
+            automated: true
+            remediation: 'Under Nätverk › VNet-integrering: aktivera dirigering av konfigurationstrafik (t.ex. hämtning av containeravbildning och innehållsdelning) via det virtuella nätverket.'
+            refs: ['CIS Controls v8: 13.4', 'Azure Policy: f380edf5-de79-4862-bd57-ee407d8bd8b6']
+          - id: '2.4.15'
+            title: 'All trafik går via det virtuella nätverket'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk › VNet-integrering: aktivera Route All (vnetRouteAllEnabled) så att all utgående trafik går via det virtuella nätverket.'
+            refs: ['CIS Controls v8: 13.4', 'Azure Policy: 75c42c42-dfb3-453d-8fd5-9f978e1b1106']
+          - id: '2.4.16'
+            title: 'CORS tillåter inte alla ursprung'
+            profile: 2
+            automated: true
+            remediation: 'Under API › CORS: ta bort * och ange bara de ursprung som behöver anropa appen.'
+            refs: ['CIS Controls v8: 16.1', 'Azure Policy: a1a22235-dd10-4062-bd55-7d62778f41b0']
+      - id: '3'
+        title: 'Azure Container Instances'
+        controls:
+          - id: '3.1'
+            title: 'Container Instances använder privata virtuella nätverk'
+            profile: 1
+            automated: false
+            remediation: 'Driftsätt containergrupper i ett virtuellt nätverk i stället för med publik IP-adress.'
+            refs: ['CIS Controls v8: 12.2']
+          - id: '3.2'
+            title: 'Hanterad identitet används mot andra Azure-tjänster'
+            profile: 1
+            automated: false
+            remediation: 'Aktivera hanterad identitet på containergruppen och använd den mot t.ex. Key Vault och lagring i stället för nycklar.'
+            refs: ['CIS Controls v8: 6.7, 6.8']
+          - id: '3.3'
+            title: 'Hanterade identiteter tilldelas roller enligt principen om minsta behörighet'
+            profile: 1
+            automated: false
+            remediation: 'Ge den hanterade identiteten bara de roller och den omfattning som behövs, t.ex. Key Vault Secrets User på ett enskilt valv.'
+            refs: ['CIS Controls v8: 5.5, 6.8']
+      - id: '4'
+        title: 'Azure CycleCloud'
+        controls:
+          - id: '4.1'
+            title: 'SSL är konfigurerat för CycleCloud'
+            profile: 1
+            automated: false
+            remediation: 'Konfigurera HTTPS med ett giltigt certifikat för CycleCloud-webbgränssnittet och stäng HTTP.'
+            refs: ['CIS Controls v8: 3.10']
+      - id: '15'
+        title: 'Batch'
+        controls:
+          - id: '15.1'
+            title: 'Batch-konton krypterar data med kundhanterade nycklar'
+            profile: 2
+            automated: false
+            remediation: 'Under Kryptering på Batch-kontot: välj kundhanterade nycklar från Key Vault.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: 99e9ccd8-3db9-4592-b0d1-14b1715a4d8a']
+          - id: '15.2'
+            title: 'Diskkryptering är aktiverad för Batch-pooler'
+            profile: 1
+            automated: true
+            remediation: 'Ange diskkryptering (OsDisk och TemporaryDisk) när poolen skapas. Befintliga pooler måste skapas om.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: 1760f9d4-7206-436e-a28f-d9f3a5c8a227']
+          - id: '15.3'
+            title: 'Lokala autentiseringsmetoder är inaktiverade för Batch-konton'
+            profile: 1
+            automated: true
+            remediation: 'Stäng av autentisering med delad nyckel (allowedAuthenticationModes) och använd Entra ID.'
+            refs: ['CIS Controls v8: 5.6', 'Azure Policy: 4dbc2f5c-51cf-4e38-9179-c7028eed2274', 'Azure Policy: 6f68b69f-05fe-49cd-b361-777ee9ca7e35']
+          - id: '15.4'
+            title: 'Privata slutpunkter har övervägts för Batch-konton'
+            profile: 2
+            automated: true
+            remediation: 'Bedöm behovet och skapa privata slutpunkter för Batch-kontot när det ska nås från interna nätverk.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 0ef5aac7-c064-427a-b87b-d47b3ddcaf73']
+          - id: '15.5'
+            title: 'Publik nätverksåtkomst är inaktiverad för Batch-konton'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk: stäng av publik nätverksåtkomst och använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 13.4', 'Azure Policy: c520cefc-285f-40f3-86e2-2efc38ef1f64', 'Azure Policy: 74c5a0ae-5e48-4738-b093-65e23a060488']
+          - id: '15.6'
+            title: 'Privata DNS-zoner är konfigurerade för privata slutpunkter till Batch-konton'
+            profile: 2
+            automated: false
+            remediation: 'Koppla de privata slutpunkterna till den privata DNS-zonen privatelink.batch.azure.com.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 4ec38ebc-381f-45ee-81a4-acbc4be878f8']
+          - id: '15.7'
+            title: 'Diagnostikloggar är aktiverade för Batch-konton'
+            profile: 1
+            automated: true
+            remediation: 'Lägg till en diagnostikinställning på Batch-kontot som skickar ServiceLogs till Log Analytics.'
+            refs: ['CIS Controls v8: 8.5, 8.9', 'Azure Policy: 428256e6-1fac-4f48-a757-df34c2b3336d']
+      - id: '20'
+        title: 'Virtuella maskiner'
+        controls:
+          - id: '20.1'
+            title: 'Virtuella maskiner använder hanterade diskar'
+            profile: 1
+            automated: true
+            remediation: 'Konvertera ohanterade diskar till hanterade diskar (az vm convert).'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: 06a78e20-9358-41c9-923c-fb736d382a4d']
+          - id: '20.2'
+            title: 'OS- och datadiskar krypteras med kundhanterad nyckel (CMK)'
+            profile: 2
+            automated: true
+            remediation: 'Skapa en diskkrypteringsuppsättning med nyckel i Key Vault och koppla diskarna till den.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: ca88aadc-6e2b-416c-9de2-5a0f01d1693f', 'Azure Policy: 3dc5edcd-002d-444c-b216-e123bbfa37c0']
+          - id: '20.3'
+            title: 'Oanslutna diskar krypteras med kundhanterad nyckel (CMK)'
+            profile: 2
+            automated: true
+            remediation: 'Koppla oanslutna diskar till en diskkrypteringsuppsättning med kundhanterad nyckel, eller ta bort diskar som inte behövs.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: ca91455f-eace-4f96-be59-e6e2c35b4816']
+          - id: '20.4'
+            title: 'Diskar är inte publikt åtkomliga från alla nätverk'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk på disken: välj Inaktivera publik och privat åtkomst, eller privat åtkomst via diskåtkomstresurs.'
+            refs: ['CIS Controls v8: 4.6', 'Azure Policy: 8405fdab-1faf-48aa-b702-999c9c172094']
+          - id: '20.5'
+            title: 'Autentiseringsläge för dataåtkomst är aktiverat för diskar'
+            profile: 1
+            automated: true
+            remediation: 'Aktivera Entra ID-autentisering för export och import av diskdata (dataAccessAuthMode = AzureActiveDirectory).'
+            refs: ['CIS Controls v8: 4.6']
+          - id: '20.6'
+            title: 'Bara godkända tillägg är installerade'
+            profile: 1
+            automated: false
+            remediation: 'Gå igenom tilläggen på varje virtuell maskin och ta bort de som inte är godkända. Styr tillåtna tillägg med Azure Policy.'
+            refs: ['CIS Controls v8: 2.1', 'Azure Policy: c0e996f8-39cf-4af9-9f45-83fbde810432']
+          - id: '20.7'
+            title: 'Slutpunktsskydd är installerat på alla virtuella maskiner'
+            profile: 2
+            automated: false
+            remediation: 'Aktivera Defender for Servers med integrationen mot Defender for Endpoint, eller installera annat godkänt slutpunktsskydd.'
+            refs: ['CIS Controls v8: 10.2', 'Azure Policy: 501541f7-f7e7-4cd6-868c-4190fdad3ac9']
+          - id: '20.8'
+            title: '[Äldre] VHD-filer är krypterade'
+            profile: 2
+            automated: false
+            remediation: 'Kryptera ohanterade VHD-filer eller, hellre, konvertera till hanterade diskar som krypteras automatiskt.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: 702dd420-7fcc-42c5-afe8-4026edd20fe0']
+          - id: '20.9'
+            title: 'Bara identiteter med MFA har åtkomst till privilegierade virtuella maskiner'
+            profile: 2
+            automated: false
+            remediation: 'Kräv MFA med villkorsstyrd åtkomst för alla som har roller som ger inloggning eller administration på virtuella maskiner.'
+            refs: ['CIS Controls v8: 6.5']
+          - id: '20.10'
+            title: 'Trusted Launch är aktiverat på virtuella maskiner'
+            profile: 1
+            automated: true
+            remediation: 'Aktivera Trusted Launch med säker start och vTPM. Nya maskiner får det som standard; äldre Gen2-maskiner kan uppgraderas.'
+            refs: ['CIS Controls v8: 4.1', 'Azure Policy: c95b54ad-0614-4633-ab29-104b01235cbf']
+          - id: '20.11'
+            title: 'Kryptering på värden (encryption at host) är aktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Registrera funktionen EncryptionAtHost och aktivera den på maskinen när den är avstängd (az vm update --set securityProfile.encryptionAtHost=true).'
+            refs: ['CIS Controls v8: 3.10, 3.11', 'Azure Policy: fc4d8e41-e223-45ea-9bf5-eada37891d87']

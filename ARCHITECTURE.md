@@ -71,7 +71,8 @@ Nya beslut läggs till sist, med nästa lediga nummer. Ett beslut som ändras sk
 - **Klart i fas 6:** översikten är dashboard med "redo för revision" (B-37), åtgärder, riskprofil och lägesbild på en sida.
 - **Klart i fas 7:** starta nästa bedömning, jämförelse med en tidigare fil och progressrapport (B-38).
 - **Klart i fas 8:** rapporterna (komplett, lägesbild, gapanalys, SoA, riskbehandlingsplan med riskmetoden, progress) som PDF och Word, export till Excel (B-39), uppdragsuppgifter (B-40), instruktion i verktyget och version 0.8.0 (B-41).
-- **Utseende (15 okt):** Method-logotypen, större text, ny layout på översikten och rymligare textfält (B-42). Menyknapp, statusfärger, Klar i riskmetoden och val av konsekvenstyp (B-43).
+- **Utseende (15 okt):** Method-logotypen, större text, ny layout på översikten och rymligare textfält (B-42). Menyknapp, statusfärger, Klar i riskmetoden och val av konsekvenstyp (B-43). Avskalade texter i alla vyer (B-44).
+- **CIS (20–28 okt):** CIS Controls v8.1 och fyra CIS Azure-benchmarks som ramverk med målnivå, egna åtgärdstexter och åtgärdsplan (B-45–B-47).
 - **Kodkvalitet:** gemensamma hjälpfunktioner, kommentar överst i varje fil och DATAFLOW.md (B-41). 197 enhetstester, svelte-check utan fel, alla flöden provade i Chromium.
 - **Att verifiera:** fas 1–8 i riktiga webbläsare, se TODO.md.
 - **Nästa steg:** prova i Chrome och Edge på Mac och Windows, kundtest (M4), O-06. Därefter fler ramverk och CloudSecComp.
@@ -137,7 +138,7 @@ Ramverk → avsnitt (sections) → grupper (groups) → kontroller (controls)
 - **`schemaVersion: 1`** finns i varje fil, så att formatet kan utvecklas och gamla filer ändå kännas igen.
 - **`soa: true`** på ett avsnitt betyder att dess kontroller ingår i Statement of Applicability. I ISO 27001 gäller det bara Annex A.
 - **`unit`** styr UI-texter som "26 krav" och "93 kontroller".
-- **Nya fält är alltid valfria.** Exempel är kopplingar mellan ramverk och uppgifter för automatiska kontroller. Befintliga filer ska aldrig sluta validera.
+- **Nya fält är alltid valfria.** Exempel är nivåer, åtgärdstexter och referenser för CIS-ramverken (B-47). Befintliga filer ska aldrig sluta validera.
 - **ID:n kontrolleras.** Schemat ser till att alla kontroll-ID:n i ett ramverk är unika.
 
 ## B-06 · Kontroll-ID:n är alltid fullständiga textsträngar
@@ -357,7 +358,7 @@ Verifierat 25 september 2026 i Chromium med filen öppnad direkt från disk: pro
 
 **Status:** Beslutat
 
-- **Register.** `src/lib/frameworks/index.ts` listar alla ramverk. Tillgängliga ramverk valideras med zod när modulen laddas, så ett fel i en YAML-fil stoppar både testerna och appen direkt. Kommande ramverk (NIS2, CIS Controls v8, DORA) står i samma lista utan innehåll och visas som "Kommer" på startsidan.
+- **Register.** `src/lib/frameworks/index.ts` listar alla ramverk. Tillgängliga ramverk valideras med zod när modulen laddas, så ett fel i en YAML-fil stoppar både testerna och appen direkt. Kommande ramverk (NIS2, DORA) står i samma lista utan innehåll och visas som "Kommer" på startsidan.
 - **Svenska felmeddelanden.** `parseProject()` använder zods svenska språkpaket. Egna meddelanden i schemat, till exempel om motivering för godkännande, går före. Testerna kontrollerar sökvägen till felet och inte zods ordalydelse, eftersom den kan ändras mellan versioner.
 
 ## B-22 · Konsulten väljer uppdragets mapp
@@ -691,7 +692,7 @@ Beslutat 14 oktober 2026.
 
 **Status:** Beslutat
 
-Beslutat 15 oktober 2026 på Mateusz begäran, inför testningen.
+Beslutat 15 oktober 2026.
 
 - **Logotyp:** `src/lib/ui/logo.jpg` (Method, vit text på svart) visas i sidhuvudet och i rapporternas sidhuvud. Den importeras och bäddas in i HTML-filen som `data:`-adress, vilket CSP redan tillåter (`img-src data:`). Sidhuvudet är svart, så att logotypens bakgrund smälter in. Bilden beskärs med `object-fit` till texten. *För:* ingen ny fil bredvid verktyget. *Emot:* filen blir 16 kB större.
 - **Text:** grundstorleken är 16 px i stället för 15, och alla mindre storlekar är 1 px större. Länkknappar (`button.link`) är större och har lite luft.
@@ -706,15 +707,71 @@ Beslutat 15 oktober 2026 på Mateusz begäran, inför testningen.
 
 **Status:** Beslutat
 
-Beslutat 15 oktober 2026 på Mateusz begäran.
+Beslutat 15 oktober 2026.
 
 - **Menyknapp i stället för rullista.** "Lägg till i …" och "+ Lägg till konsekvenstyp" använder samma komponent (`MenuButton.svelte`). Den öppnar en lista som stängs vid val, med Esc eller vid klick utanför. *För:* ser likadan ut som verktygets andra knappar, visar hela rubriken och ansvarig, och kan återanvändas. *Emot:* en egen komponent i stället för webbläsarens rullista.
-- **Konsekvenstyper att välja bland:** Människa och Hälsa, Miljö, Förtroende och Varumärke, Lagar och Regler (Compliance), eller en egen typ. (Ekonomi och Tillgångar samt Verksamhet och Drift togs bort 15 okt 2026 på Mateusz begäran; standardmetoden täcker dem redan med "Verksamhet och ekonomi".) Listan finns i `CONSEQUENCE_CATEGORIES` i `risk/rules.ts`. Standardmetodens två typer är oförändrade.
+- **Konsekvenstyper att välja bland:** Människa och Hälsa, Miljö, Förtroende och Varumärke, Lagar och Regler (Compliance), eller en egen typ. (Ekonomi och Tillgångar samt Verksamhet och Drift togs bort 15 okt 2026; standardmetoden täcker dem redan med "Verksamhet och ekonomi".) Listan finns i `CONSEQUENCE_CATEGORIES` i `risk/rules.ts`. Standardmetodens två typer är oförändrade.
 - **Klar vid acceptans och fastställande.** Ändringarna sparas fortfarande direkt. Klar kräver vem som fastställt metoden, sätter dagens datum om det saknas och visar uppgifterna som text tills konsulten trycker Ändra.
 - **Statusfärger för åtgärder:** Ej påbörjad grå, Pågår blå (ny färg `--blue`), Klar grön, Avbruten röd. Samma färger i statusknapparna.
 - **Ta bort uppdelningen** i teknisk och organisatorisk del (`clearParts`), med en fråga om delarna har värden.
 - **Rullistor** har samma stil som textfälten.
 - **Kortet "Så räknas restrisken" är borttaget** från riskmetoden, eftersom användarna redan kan regeln. Regeln står kvar i B-27 och i rapporternas bilaga.
+
+
+## B-44 · Avskalade texter i gränssnittet
+
+**Status:** Beslutat
+
+Beslutat 18 oktober 2026.
+
+- **Förklarande texter är borttagna.** Användarna är konsulter som kan gapanalys, och instruktionen finns i sidfoten. Borttaget: startsidans ingress, ramverkens beskrivningar (`description` i `frameworks/index.ts`), raden "Inget lagras hos Method IT", förklaringen av redo för revision, hjälptexter om sparande och namn på översikten, samt hjälptexter i åtgärdsplanen, riskvyerna, uppföljningen, rapporterna och evidensen.
+- **Kvar finns det som påverkar arbetet:** antal, status, tomma listor, varningar och fel, samt notiser om webbläsaren inte kan spara i en mapp.
+- **Kortare etiketter:** omdömet för redo för revision är Redo, Nära eller Inte redo. Rapporternas beskrivningar är några ord.
+- *För:* lugnare vyer och snabbare att läsa. *Emot:* en ny användare behöver öppna instruktionen. Det är godtagbart eftersom verktyget används av ett fåtal konsulter.
+
+
+## B-45 · CIS Azure-benchmarks som ramverk, utan CIS-texter
+
+**Status:** Beslutat
+
+Beslutat 20 oktober 2026, ändrat 28 oktober 2026 (filerna blev ramverk, se B-47).
+
+- **Fyra ramverk** i `src/lib/frameworks/`, ett per benchmark och version: Azure Foundations 6.0.0 (127 rekommendationer), Compute 2.0.0 (99), Database 2.0.0 (49) och Storage 2.0.0 (64). Ett ramverk per benchmark eftersom de får nya versioner var för sig.
+- **Per rekommendation:** CIS-ID som kontroll-ID, egen svensk rubrik, nivå (Level 1 eller 2), automatiserad eller manuell, egen kort åtgärdstext och referenser till CIS Controls v8 och inbyggda Azure Policy-definitioner.
+- **Inga CIS-texter.** Beskrivning, motivering, granskning och CIS åtgärdstext ingår inte. De fria PDF:erna har licensen CC BY-NC-SA 4.0 (bara icke-kommersiell användning). Ett test kontrollerar att filerna bara innehåller tillåtna fält. Rubriker och åtgärder är egna texter med Microsoft Learn som grund.
+- **Hur filerna togs fram:** ID, nivå och kopplingar lästes ur PDF:erna med ett skript som ligger utanför repot (i Claude docs), eftersom det kräver PDF:erna. Antalen kontrollerades mot PDF:ernas bilagor. *För:* snabbt och spårbart. *Emot:* en ny version kräver att skriptet körs igen och att nya rubriker och åtgärder skrivs.
+- **PDF:erna hör inte hemma i repot.** De ska inte committas.
+
+
+## B-46 · Ett ramverk per projekt, ingen korsmappning
+
+**Status:** Beslutat
+
+Beslutat 20 oktober 2026.
+
+- **Varje ramverk är ett eget arbete.** En gapanalys mot ISO 27001 och en mot CIS Controls är två projekt med var sin projektfil, även för samma kund. Det följer hur verktyget redan fungerar: ett ramverk per arbete.
+- **Ingen korsmappning i verktyget.** Kontroller i ett ramverk kopplas inte till kontroller i ett annat, och CIS-rekommendationer kopplas inte till Annex A. Konsulten jämför projekten själv om det behövs.
+- *För:* enklare datamodell och inga mappningar att underhålla när ramverken får nya versioner. Varje bedömning står för sig och kan granskas för sig. *Emot:* en kontroll som finns i båda ramverken bedöms två gånger.
+- Ersätter förslaget om korsmappning i rapporten "Funktioner, ramverk och CloudSecComp" (20 okt 2026).
+
+
+## B-47 · Analys mot CIS Controls och CIS Benchmarks
+
+**Status:** Beslutat
+
+Beslutat 28 oktober 2026.
+
+- **CIS Controls v8.1** som ramverk (`cis-controls-8.1.yaml`): 18 kontroller och 153 skyddsåtgärder med implementeringsgrupp (56 i IG1, 74 till i IG2, 23 till i IG3). ID och IG följer CIS. Rubriker, kontrollfrågor ("Kontrollera") och åtgärder är egna texter. IG kontrollerades mot benchmark-PDF:ernas tabeller.
+- **Nya valfria fält i ramverksschemat**, så att ISO-filen är oförändrad:
+  - per ramverk: `profiles` (nivåer som bygger på varandra), `riskManagement` och `readiness` (båda standard true), `guidanceLabel` och `source`
+  - per avsnitt: `optional` (kontroller kan markeras ej tillämpliga direkt i listan) och `groupLabel`
+  - per kontroll: `profile`, `remediation`, `automated` och `refs`
+- **Målnivå i projektfilen** (`profile`, valfritt). Väljs när arbetet skapas och kan ändras på översikten. Kontroller över målnivån räknas inte som tillämpliga, på samma sätt som bortval i SoA. All logik går via `scope.ts` (`exclusion`), så uppfyllnad, förslag, rapporter och jämförelser räknar likadant.
+- **Ej tillämplig direkt i listan** för avsnitt med `optional`. Motiveringen sparas i samma fält som SoA-motiveringen. Projektfilens format är bakåtkompatibelt.
+- **Utan riskhantering** (`riskManagement: false`) döljs Riskmetod och Riskregister, startpunkten för risker, riskprofilen och riskexporten. Planen skrivs ut som *Åtgärdsplan* (ny rapport `ActionPlanReport`).
+- **Utan "redo för revision"** (`readiness: false`) visar översikten och lägesbilden *Uppfyllnad per nivå* (`dashboard.profileProgress`). Varje nivå räknar sina och lägre nivåers kontroller oavsett målnivå.
+- **Åtgärdstexten följer med.** Ett förslag från en kontroll med `remediation` får texten som beskrivning, och den blir åtgärdens beskrivning. Gapanalysen och Excel-exporten får nivå och åtgärdstext.
+- *För:* CIS-analyser använder samma vyer, rapporter och projektfil som ISO, och fler ramverk med nivåer kan läggas till som data. *Emot:* fler valfria fält i schemat, och egna åtgärdstexter måste underhållas när CIS eller Azure ändras.
 
 
 ---
@@ -866,3 +923,22 @@ Kontrollen mot målet i övrigt:
 - **Gamla versioner?** Förslag: de ligger kvar. Projektfilerna är bakåtkompatibla inom samma MAJOR-version (B-24), så en äldre fil kan alltid öppnas i en nyare version.
 
 **Beslut behövs om:** plats, kanal och om gamla versioner ska ligga kvar.
+
+### O-07 · Import från granskningsverktyg (Prowler, Defender for Cloud, Lynis, OpenSCAP, CIS-CAT Lite)
+
+*Efter M4.* Flera verktyg kan ge underlag för den tekniska delen av kontrollerna (`parts.technical`, B-18). För CIS Azure-ramverken (B-45) kan fynden kopplas direkt via CIS-ID:t. Uppgifterna nedan om verktygen ska kontrolleras innan något byggs.
+
+| Verktyg | Vad det granskar | Resultat |
+|---|---|---|
+| **Prowler** (öppen källkod, Apache 2.0) | Azure och Microsoft 365 mot bl.a. CIS Azure | CSV och JSON-OCSF med CIS-ID per kontroll |
+| **Defender for Cloud** | Azure, mot MCSB och (med Defender CSPM) CIS Azure, ISO 27001 och NIS2 | Rapport för regelefterlevnad som kan laddas ned |
+| **Lynis** (CISOfy, öppen källkod) | Härdning av Linux, macOS och Unix | Textfil med nyckel och värde (`lynis-report.dat`): varningar, förslag och ett härdningsindex |
+| **OpenSCAP** (`oscap`) | Främst Linux, mot profiler i SCAP Security Guide, t.ex. CIS och PCI DSS | XML (XCCDF- eller ARF-resultat) per regel. En del regler har referenser till ISO 27001:2013 |
+| **CIS-CAT Lite** (CIS, gratis) | Ett urval av CIS Benchmarks, t.ex. Windows och macOS | Rapport i HTML. Maskinläsbara format finns troligen bara i CIS-CAT Pro |
+
+- **Samma väg som molnfynden:** resultaten översätts till filformatet `grc-fynd` (B-33). Då behöver verktyget bara en inläsning, och fynden påverkar aldrig den övergripande statusen.
+- **Mappning:** fynden kopplas till kontrollerna i det ramverk projektet gäller, inte mellan ramverk (B-46). För CIS-baserade granskningar räcker CIS-ID:t i verktygets resultat. För andra ramverk behövs en mappningstabell per verktyg.
+- **Var översättningen görs:** filerna är lokala, så översättningen kan göras i verktyget utan nätverk (B-20) eller av ett litet separat skript. Det bestäms när den första importen byggs.
+- **CIS-CAT Lite:** om bara HTML finns blir importen skör. Pröva först om Pro-licens eller manuell evidens räcker.
+
+**Beslut behövs om:** vilket verktyg som byggs först (förslag: Prowler, eftersom det är gratis, täcker Azure och redan använder CIS-ID:n som ramverken i B-45), och var översättningen görs.

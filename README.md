@@ -80,8 +80,12 @@ grc-tool/
     │   │   ├── schema.ts             ✅ zod-schema för alla ramverk
     │   │   ├── iso27001-2022.yaml    ✅ 26 grundkrav + 93 Annex A-kontroller
     │   │   ├── iso27001.test.ts      ✅
+    │   │   ├── cis-controls-8.1.yaml ✅ 153 skyddsåtgärder med IG1–IG3 (B-47)
+    │   │   ├── cis-azure-*.yaml      ✅ CIS Azure Foundations 6.0.0, Compute, Database och Storage 2.0.0 (B-45)
+    │   │   ├── cis.test.ts           ✅
     │   │   ├── index.ts              ✅ register över tillgängliga och kommande ramverk
     │   │   └── index.test.ts         ✅
+    │   ├── scope.ts                  ✅ vilka kontroller som bedöms: SoA, ej tillämpliga, målnivå (B-47)
     │   ├── project/                  ✅ projektfilen (.grc.json)
     │   │   ├── schema.ts             ✅ zod-schema för projektfilen
     │   │   ├── project.ts            ✅ skapa, läsa in, skriva ut, kontrollera mot ramverk
@@ -209,8 +213,9 @@ Funktionerna nedan är det verktyget erbjuder i dagsläget. (skärm 1–5 och 7)
 
 - **Nytt arbete** (huvudkortet till vänster)
   - **Kund:** fritext.
-  - **Ramverk:** ett per arbete. Kort visas för ISO 27001:2022, NIS2, CIS Controls v8 och DORA, med omfattning och en mening om ramverket. Bara ramverk som finns i `lib/frameworks/` går att välja, övriga visas som "Kommer".
-  - **Startpunkt för riskregistret:**
+  - **Ramverk:** ett per arbete (ARCHITECTURE B-46). Att välja: ISO 27001:2022, CIS Controls v8.1 och fyra CIS Azure-benchmarks (Foundations 6.0.0, Compute, Database och Storage 2.0.0). NIS2 och DORA visas som "Kommer".
+  - **Målnivå** (CIS): IG1–IG3 för CIS Controls, Level 1–2 för benchmarks. Kontroller över målnivån räknas inte. Kan ändras på översikten (B-47).
+  - **Startpunkt för riskregistret** (bara ISO 27001):
     - *Med typrisker:* typriskerna i `lib/risk/` läggs in i projektfilen direkt (i dag 15 risker).
     - *Tomt register.*
     - *Kopiera från kund:* återanvänder riskmetod och struktur från ett tidigare uppdrag med samma ramverk, men inte bedömningarna.
@@ -245,6 +250,7 @@ Funktionerna nedan är det verktyget erbjuder i dagsläget. (skärm 1–5 och 7)
 - **Åtgärder:** öppna, försenade, klara och brister utan åtgärd.
 - **Riskprofil:** matrisen före behandling och med faktisk restrisk, och risknyckeltalen.
 - **Behöver uppmärksamhet:** ej bedömda, saknar ansvarig och saknar evidens per avsnitt, och SoA-bortval utan motivering. Bifogade filer kan kontrolleras.
+- **CIS-ramverk (B-47):** *Uppfyllnad per nivå* (t.ex. IG1, IG2, IG3) ersätter Redo för revision, och riskprofilen visas inte. Målnivån väljs under Projekt.
 - **Projekt:** kundnamn, ditt namn (sparas i webbläsaren), omfattning, deltagare och sammanfattning till rapporterna (ARCHITECTURE B-40).
 - **Skriv ut lägesbild:** dashboarden på en sida.
 
@@ -329,9 +335,9 @@ Riskregistret är underlag för krav 6.1.1, 6.1.3 och 8.2.
 - **Navigering** till föregående och nästa risk.
 - **Ta bort risken:** efter en bekräftelse. ID:t återanvänds inte, och kontroller som bara var kopplade till risken låses upp i SoA.
 
-### 4.7 Grundkrav och Annex A
+### 4.7 Grundkrav, Annex A och CIS-kontroller
 
-Grundkrav och Annex A använder samma vy, med en växlare mellan dem.
+Grundkrav, Annex A, CIS-skyddsåtgärder och CIS-rekommendationer använder samma vy.
 
 - **Sidomeny:**
   - uppfyllnadsgrad
@@ -353,6 +359,11 @@ Grundkrav och Annex A använder samma vy, med en växlare mellan dem.
   - **Teknisk och organisatorisk del (valfritt):** statusen kan delas upp i två delar som underlag. Den övergripande statusen sätts alltid av konsulten (ARCHITECTURE B-18). "Ta bort uppdelningen" tar bort delarna igen.
   - **Sidfot:** "Senast uppdaterad … av …".
 - **Åtgärder:** kopplade åtgärder visas vid kontrollen. En brist utan åtgärd har knappen "Skapa åtgärd" (ARCHITECTURE B-34).
+- **CIS-ramverk (B-47):**
+  - Raden visar nivå (t.ex. IG1 eller Level 1) och om kontrollen är automatisk eller manuell.
+  - Öppnad kontroll visar *Kontrollera* (vad som granskas), *Så åtgärdas det* (egen kort åtgärdstext) och *Referenser* (CIS Controls och Azure Policy-ID).
+  - **Markera som ej tillämplig** direkt i listan, med motivering. "Ta med i bedömningen" ångrar.
+  - Kontroller över målnivån visas som "Utanför nivå" och räknas inte.
 - **Bortvalda kontroller** i Annex A visas utgråade och kan inte bedömas.
 - **Grundkrav kan aldrig väljas bort.**
 - **Saknar evidens:** en tillämplig kontroll som är Uppfylld eller Delvis uppfylld utan bifogad fil och utan text i *Evidens på annan plats*.
@@ -376,7 +387,8 @@ Grundkrav och Annex A använder samma vy, med en växlare mellan dem.
 - **Inget tas bort.** En åtgärd som inte behövs sätts till Avbruten, så att historiken finns kvar till uppföljningen.
 - **Varningar:** försenad, saknar ansvarig eller deadline, "underlaget är åtgärdat, stäng?" och "klar men bristen finns kvar". Status ändras aldrig automatiskt.
 - **Filter och sortering:** sök, status, ansvarig och bara försenade. Sorteras på prioritet, deadline och ID.
-- **Riskbehandlingsplan** (krav 6.1.3 e–f) kan skrivas ut direkt från fliken.
+- **Riskbehandlingsplan** (krav 6.1.3 e–f) kan skrivas ut direkt från fliken. För CIS-ramverk är det en åtgärdsplan.
+- **Åtgärdstext (B-47):** en åtgärd som skapas från en CIS-kontroll får kontrollens *Så åtgärdas det* som beskrivning.
 - **Länkar** till kontrollen eller risken, och från dem tillbaka till åtgärdsplanen.
 
 ### 4.10 Rapporter
@@ -387,9 +399,10 @@ Rapporterna förhandsvisas i fliken Rapporter och har samma sidhuvud: Method-log
 |---|---|
 | Komplett rapport | Om bedömningen, lägesbild, progress (om en jämförelse finns), gapanalys, SoA och riskbehandlingsplan med riskmetoden som bilaga |
 | Lägesbild | Dashboarden på en sida |
-| Gapanalys | Om bedömningen, brister med åtgärder, och alla krav och kontroller med status, observation, evidens och ansvarig |
+| Gapanalys | Om bedömningen, brister med åtgärder, och alla krav och kontroller med status, observation, evidens och ansvarig. CIS-ramverk får även nivå och åtgärdstext |
 | SoA | Tillämplighet, motivering och genomförande per kontroll (krav 6.1.3 d) |
 | Riskbehandlingsplan | Risker med behandling, restrisk, åtgärder och godkännande, med riskmetoden som bilaga |
+| Åtgärdsplan (CIS) | Alla åtgärder med beskrivning, kopplade kontroller, ansvarig, deadline, prioritet och status. Ersätter riskbehandlingsplanen och SoA för CIS-ramverk |
 | Progressrapport | Ändringar sedan förra bedömningen (4.12) |
 
 - **PDF:** "Skriv ut eller spara som PDF" använder webbläsarens utskrift. Bara rapporten skrivs ut.
@@ -515,9 +528,10 @@ Ett framtida granskningsprogram, till exempel CloudSecComp mot Azure, skriver si
 
 ## 6. Lägga till ett nytt ramverk
 
-1. **Skapa filen** `src/lib/frameworks/<id>-<version>.yaml` enligt schemat i `schema.ts`. Använd `iso27001-2022.yaml` som mall.
+1. **Skapa filen** `src/lib/frameworks/<id>-<version>.yaml` enligt schemat i `schema.ts`. Använd `iso27001-2022.yaml` som mall, eller `cis-controls-8.1.yaml` för ett ramverk med nivåer.
    - Alla ID:n ska vara fullständiga textsträngar.
-   - Sätt `soa: true` bara på avsnitt som ska ingå i en SoA.
+   - Sätt `soa: true` bara på avsnitt som ska ingå i en SoA, och `optional: true` på avsnitt där kontroller kan markeras ej tillämpliga direkt.
+   - Valfritt (B-47): `profiles` (nivåer) med `profile` per kontroll, `remediation`, `automated` och `refs` per kontroll, samt `riskManagement: false` och `readiness: false` för ramverk utan riskdel och utan "redo för revision".
 2. **Registrera ramverket** i `src/lib/frameworks/index.ts`: importera YAML-filen, lägg den i `available` och ta bort posten ur `upcoming` om den fanns där.
 3. **Skriv ett test** `<id>.test.ts` som låser antalet kontroller per grupp, på samma sätt som `iso27001.test.ts`.
 4. **Kör kontrollerna:** `npm test` och `npm run check`.

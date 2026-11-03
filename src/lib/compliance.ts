@@ -3,6 +3,7 @@
 
 import type { Framework, Group, Section } from './frameworks/schema'
 import type { Project } from './project/schema'
+import { exclusion } from './scope'
 
 export interface SectionSummary {
   id: string
@@ -42,23 +43,23 @@ export function assessmentProgress(project: Project, framework: Framework): Prog
 /** Progress per avsnitt, t.ex. för grundkrav och Annex A var för sig. */
 export function sectionProgress(project: Project, framework: Framework): (SectionSummary & Progress)[] {
   return framework.sections.map((section) => {
-    const progress = tally(project, section.soa, section.groups.flatMap((g) => g.controls))
+    const progress = tally(project, section, section.groups.flatMap((g) => g.controls))
     return { id: section.id, title: section.title, unit: section.unit, count: progress.total, ...progress }
   })
 }
 
 /** Progress per grupp i ett avsnitt, t.ex. per tema A.5–A.8 eller kapitel 4–10. */
 export function groupProgress(project: Project, section: Section): (Pick<Group, 'id' | 'title'> & Progress)[] {
-  return section.groups.map((g) => ({ id: g.id, title: g.title, ...tally(project, section.soa, g.controls) }))
+  return section.groups.map((g) => ({ id: g.id, title: g.title, ...tally(project, section, g.controls) }))
 }
 
-/** Räknar status för en mängd kontroller. Bortval räknas bara i SoA-avsnitt. */
-function tally(project: Project, soa: boolean, controls: { id: string }[]): Progress {
+/** Räknar status för en mängd kontroller. Bortvalda och kontroller utanför målnivån är inte tillämpliga. */
+function tally(project: Project, section: Section, controls: { id: string }[]): Progress {
   const progress: Progress = { ...EMPTY }
   for (const control of controls) {
     progress.total += 1
     const answer = project.controls[control.id]
-    if (soa && answer?.applicable === false) continue
+    if (exclusion(project, section, control.id)) continue
     progress.applicable += 1
     if (answer && answer.status !== 'not_assessed') progress.assessed += 1
     if (answer?.status === 'fulfilled') progress.fulfilled += 1

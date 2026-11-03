@@ -29,8 +29,12 @@
 
   const tabs = $derived([
     { id: 'overview', label: 'Översikt', count: `${percent(total.fulfilled, total.applicable)} %` },
-    { id: 'method', label: 'Riskmetod', count: '' },
-    { id: 'risks', label: 'Riskregister', count: String(project.risks.length) },
+    ...(framework.riskManagement
+      ? [
+          { id: 'method', label: 'Riskmetod', count: '' },
+          { id: 'risks', label: 'Riskregister', count: String(project.risks.length) },
+        ]
+      : []),
     ...framework.sections.map((s) => ({ id: s.id, label: s.title, count: String(s.groups.reduce((n, g) => n + g.controls.length, 0)) })),
     ...(hasSoa ? [{ id: 'soa', label: 'SoA', count: soa.missing ? `${soa.missing} saknar motivering` : String(soa.applicable) }] : []),
     { id: 'actions', label: 'Åtgärdsplan', count: actions.overdue ? `${actions.overdue} försenade` : String(actions.open) },
@@ -42,14 +46,13 @@
 
 {#if supportsFolderAccess() && store.target?.kind === 'download'}
   <p class="notice">
-    Projektet är inte kopplat till en mapp och sparas inte automatiskt. Välj Spara för att välja uppdragets mapp.
+    Inte kopplat till en mapp och sparas inte automatiskt. Välj Spara för att välja mapp.
   </p>
 {/if}
 
 {#if store.backupFailed}
   <p class="notice">
-    Reservkopian i webbläsaren kunde inte sparas, till exempel för att webbläsarens lagring är avstängd eller full. Spara
-    ofta.
+    Reservkopian i webbläsaren kunde inte sparas. Spara ofta.
   </p>
 {/if}
 

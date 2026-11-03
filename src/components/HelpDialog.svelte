@@ -1,5 +1,5 @@
 <script lang="ts">
-  // Instruktion för konsulter: arbetsgång, sparande och arbete i samma fil.
+  // Instruktion för konsulter: arbetsgång, CIS-ramverk, sparande och arbete i samma fil.
 
   import Modal from './Modal.svelte'
 
@@ -15,8 +15,8 @@
         SharePoint-mapp som är synkad till datorn via OneDrive. Projektfilen sparas i den mappen.
       </li>
       <li>
-        <strong>Fastställ riskmetoden och bedöm riskerna.</strong> Gå igenom skalorna och acceptansnivån med kunden under Riskmetod. Ta
-        bort de typrisker som inte gäller kunden och bedöm resten under Riskregister.
+        <strong>Fastställ riskmetoden och bedöm riskerna</strong> (ISO 27001). Gå igenom skalorna och acceptansnivån med kunden under
+        Riskmetod. Ta bort de typrisker som inte gäller kunden och bedöm resten under Riskregister.
       </li>
       <li>
         <strong>Bedöm kraven och kontrollerna.</strong> Sätt status för varje krav och kontroll, skriv vad du har sett, ange ansvarig och
@@ -36,6 +36,19 @@
         som har ändrats sedan förra gången.
       </li>
     </ol>
+
+    <h3>CIS Controls och CIS Benchmarks</h3>
+    <ul>
+      <li>
+        <strong>Välj målnivå</strong> när arbetet skapas: IG1–IG3 för CIS Controls, Level 1–2 för benchmarks. Kontroller över målnivån
+        räknas inte, men nivån kan ändras under Projekt på översikten.
+      </li>
+      <li><strong>Markera det som inte används som ej tillämpligt</strong>, till exempel en Azure-tjänst kunden inte har.</li>
+      <li>
+        <strong>Varje kontroll har en kort åtgärd.</strong> Den blir beskrivningen när du skapar en åtgärd från en brist. Det finns ingen
+        riskdel; åtgärdsplanen skrivs ut som åtgärdsplan.
+      </li>
+    </ul>
 
     <h3>Sparande</h3>
     <ul>

@@ -1,0 +1,441 @@
+# CIS Microsoft Azure Storage Services 2.0.0: rekommendationer med nivå (Level 1–2), automatiserad eller manuell och kopplingar.
+# ID, nivå, CIS Controls och Azure Policy-ID kommer från CIS-benchmarken. Rubriker och åtgärder är egna texter (B-45, B-47).
+
+schemaVersion: 1
+id: 'cis-azure-storage'
+version: '2.0.0'
+name: 'CIS Microsoft Azure Storage Services 2.0.0'
+language: 'sv'
+profiles: ['Level 1', 'Level 2']
+riskManagement: false
+readiness: false
+guidanceLabel: 'Kontrollera'
+source: 'ID, nivåer och kopplingar följer CIS Microsoft Azure Storage Services Benchmark v2.0.0 från Center for Internet Security. Rubriker och åtgärder är egna texter.'
+sections:
+  - id: 'recommendations'
+    title: 'Rekommendationer'
+    soa: false
+    optional: true
+    unit: 'rekommendationer'
+    groupLabel: 'Områden'
+    groups:
+      - id: '3.1'
+        title: 'Säkerhetskopieringsvalv (Backup vaults)'
+        controls:
+          - id: '3.1.1'
+            title: 'Mjuk borttagning är aktiverad i säkerhetskopieringsvalv'
+            profile: 1
+            automated: true
+            remediation: 'Under Egenskaper › Säkerhetsinställningar: aktivera mjuk borttagning, gärna i läget Alltid på.'
+            refs: ['CIS Controls v8: 11.1', 'Azure Policy: 9798d31d-6028-4dee-8643-46102185c016']
+          - id: '3.1.2'
+            title: 'Oföränderlighet är aktiverad i säkerhetskopieringsvalv'
+            profile: 1
+            automated: true
+            remediation: 'Under Egenskaper: aktivera oföränderliga valv och lås inställningen när den är verifierad.'
+            refs: ['CIS Controls v8: 11.1', 'Azure Policy: 2514263b-bc0d-4b06-ac3e-f262c0979018']
+          - id: '3.1.3'
+            title: 'Säkerhetskopior i säkerhetskopieringsvalv krypteras med kundhanterade nycklar (CMK)'
+            profile: 2
+            automated: true
+            remediation: 'Under Egenskaper › Krypteringsinställningar: välj kundhanterad nyckel från Key Vault och en hanterad identitet.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: d6588149-9f06-462c-a076-56aece45b5ba']
+          - id: '3.1.4'
+            title: 'Infrastrukturkryptering är aktiverad i säkerhetskopieringsvalv'
+            profile: 2
+            automated: true
+            remediation: 'Aktivera infrastrukturkryptering när valvet skapas. Det går inte att ändra i efterhand.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: d6588149-9f06-462c-a076-56aece45b5ba']
+          - id: '3.1.5'
+            title: 'Återställning till annan region är aktiverad i säkerhetskopieringsvalv'
+            profile: 2
+            automated: true
+            remediation: 'Under Egenskaper: aktivera Cross Region Restore (kräver geo-redundant lagring).'
+            refs: ['CIS Controls v8: 11.1']
+          - id: '3.1.6'
+            title: 'Återställning till annan prenumeration är inaktiverad i säkerhetskopieringsvalv'
+            profile: 1
+            automated: true
+            remediation: 'Under Egenskaper: sätt Cross Subscription Restore till Inaktiverad eller Permanent inaktiverad.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 4d479a11-f2b5-4f0a-bb1e-d2332aa95cda']
+      - id: '3.2'
+        title: 'Recovery Services-valv'
+        controls:
+          - id: '3.2.1'
+            title: 'Mjuk borttagning är aktiverad i Recovery Services-valv'
+            profile: 1
+            automated: true
+            remediation: 'Under Egenskaper › Säkerhetsinställningar: aktivera mjuk borttagning, gärna i läget Alltid på.'
+            refs: ['CIS Controls v8: 11.1', 'Azure Policy: 31b8092a-36b8-434b-9af7-5ec844364148']
+          - id: '3.2.2'
+            title: 'Oföränderlighet är aktiverad i Recovery Services-valv'
+            profile: 1
+            automated: true
+            remediation: 'Under Egenskaper: aktivera oföränderliga valv och lås inställningen när den är verifierad.'
+            refs: ['CIS Controls v8: 11.1', 'Azure Policy: d6f6f560-14b7-49a4-9fc8-d2c3a9807868']
+          - id: '3.2.3'
+            title: 'Säkerhetskopior i Recovery Services-valv krypteras med kundhanterade nycklar (CMK)'
+            profile: 2
+            automated: true
+            remediation: 'Under Egenskaper › Krypteringsinställningar: välj kundhanterad nyckel från Key Vault och en hanterad identitet.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: 2e94d99a-8a36-4563-bc77-810d8893b671']
+          - id: '3.2.4'
+            title: 'Infrastrukturkryptering är aktiverad i Recovery Services-valv'
+            profile: 2
+            automated: true
+            remediation: 'Aktivera infrastrukturkryptering i valvets krypteringsinställningar innan några objekt skyddas.'
+            refs: ['CIS Controls v8: 3.11']
+          - id: '3.2.5'
+            title: 'Publik nätverksåtkomst är inaktiverad för Recovery Services-valv'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk: neka publik åtkomst och använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 9ebbbba3-4d65-4da9-bb67-b22cfaaff090']
+          - id: '3.2.6'
+            title: 'Återställning till annan region är aktiverad i Recovery Services-valv'
+            profile: 2
+            automated: true
+            remediation: 'Under Egenskaper › Säkerhetskopieringskonfiguration: aktivera Cross Region Restore (kräver GRS).'
+            refs: ['CIS Controls v8: 11.1']
+          - id: '3.2.7'
+            title: 'Återställning till annan prenumeration är inaktiverad i Recovery Services-valv'
+            profile: 1
+            automated: true
+            remediation: 'Under Egenskaper: sätt Cross Subscription Restore till Inaktiverad eller Permanent inaktiverad.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: f19b0c83-716f-4b81-85e3-2dbf057c35d6']
+          - id: '3.2.8'
+            title: 'Privata slutpunkter är konfigurerade för Recovery Services-valv'
+            profile: 2
+            automated: true
+            remediation: 'Skapa privata slutpunkter för valvet med privat DNS-zon för Azure Backup.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: deeddb44-9f94-4903-9fa0-081d524406e3']
+      - id: '4'
+        title: 'Azure Managed Lustre'
+        controls:
+          - id: '4.1'
+            title: 'Nyckelkrypteringsnyckeln är kundhanterad för Azure Managed Lustre'
+            profile: 2
+            automated: true
+            remediation: 'Välj kundhanterad nyckel från Key Vault när filsystemet skapas.'
+            refs: ['CIS Controls v8: 3.11']
+      - id: '7.1'
+        title: 'Filresurser (Microsoft.FileShares)'
+        controls:
+          - id: '7.1.1'
+            title: 'Root squash är konfigurerat för NFS-filresurser (Microsoft.FileShares)'
+            profile: 1
+            automated: true
+            remediation: 'Sätt root squash till Root Squash eller All Squash på NFS-filresursen.'
+            refs: ['CIS Controls v8: 3.3']
+          - id: '7.1.2'
+            title: 'Kryptering under överföring krävs för filresurser (Microsoft.FileShares)'
+            profile: 1
+            automated: true
+            remediation: 'Aktivera krav på kryptering under överföring för filresursen.'
+            refs: ['CIS Controls v8: 3.10']
+          - id: '7.1.3'
+            title: 'Publik åtkomst till filresurser är begränsad till utvalda virtuella nätverk (Microsoft.FileShares)'
+            profile: 1
+            automated: true
+            remediation: 'Begränsa publik slutpunktsåtkomst till valda virtuella nätverk.'
+            refs: ['CIS Controls v8: 4.4']
+          - id: '7.1.4'
+            title: 'Publik åtkomst till filresurser är inaktiverad (Microsoft.FileShares)'
+            profile: 2
+            automated: true
+            remediation: 'Stäng av publik slutpunktsåtkomst och använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 3.3']
+          - id: '7.1.5'
+            title: 'Privata slutpunkter är konfigurerade för filresurser (Microsoft.FileShares)'
+            profile: 2
+            automated: true
+            remediation: 'Skapa privata slutpunkter för filresurserna med privat DNS-zon.'
+            refs: ['CIS Controls v8: 12.2']
+      - id: '7.2'
+        title: 'Klassiska filresurser (Microsoft.Storage)'
+        controls:
+          - id: '7.2.1'
+            title: 'Mjuk borttagning är aktiverad för Azure-filresurser (klassiska)'
+            profile: 1
+            automated: true
+            remediation: 'Under Dataskydd på lagringskontot: aktivera mjuk borttagning för filresurser.'
+            refs: ['CIS Controls v8: 11.1']
+          - id: '7.2.2'
+            title: 'SMB-filresurser kräver kanalkryptering med minst AES-256-GCM (klassiska)'
+            profile: 1
+            automated: true
+            remediation: 'Under Filresursinställningar: välj bara AES-256-GCM som kanalkryptering för SMB.'
+            refs: ['CIS Controls v8: 3.10']
+          - id: '7.2.3'
+            title: 'SMB-filresurser kräver minst SMB 3.1.1 (klassiska)'
+            profile: 1
+            automated: true
+            remediation: 'Under Filresursinställningar: välj säkerhetsprofilen Maximum security eller endast SMB 3.1.1.'
+            refs: ['CIS Controls v8: 12.6']
+          - id: '7.2.4'
+            title: 'Root squash är konfigurerat för NFS-filresurser (klassiska)'
+            profile: 1
+            automated: true
+            remediation: 'Sätt root squash till Root Squash eller All Squash på NFS-filresursen.'
+            refs: ['CIS Controls v8: 3.3']
+      - id: '9'
+        title: 'Azure NetApp Files'
+        controls:
+          - id: '9.1'
+            title: 'Azure NetApp Files-konton krypteras med kundhanterad nyckel'
+            profile: 2
+            automated: true
+            remediation: 'Under Kryptering på NetApp-kontot: välj kundhanterad nyckel från Key Vault.'
+            refs: ['CIS Controls v8: 3.11']
+      - id: '10'
+        title: 'Azure Blob Storage'
+        controls:
+          - id: '10.1'
+            title: 'SAS-token tillåter bara HTTPS'
+            profile: 1
+            automated: false
+            remediation: 'Välj Endast HTTPS som tillåtet protokoll när SAS-token skapas (--https-only), och använd helst användardelegerade SAS-token via Entra ID.'
+            refs: ['CIS Controls v8: 3.10']
+          - id: '10.2'
+            title: 'SAS-token går ut inom en timme'
+            profile: 2
+            automated: false
+            remediation: 'Sätt utgångstid till högst en timme för ad hoc-SAS-token och styr det med en utgångsprincip för SAS på lagringskontot.'
+            refs: ['CIS Controls v8: 6.2']
+          - id: '10.3'
+            title: 'Mjuk borttagning av blobbar är aktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Dataskydd på lagringskontot: aktivera mjuk borttagning för blobbar.'
+            refs: ['CIS Controls v8: 11.1']
+          - id: '10.4'
+            title: 'Lagrade åtkomstprinciper används när SAS-token skapas'
+            profile: 1
+            automated: false
+            remediation: 'Skapa en lagrad åtkomstprincip på containern, kön eller tabellen och koppla SAS-token till den, så att de kan återkallas.'
+            refs: ['CIS Controls v8: 6.2']
+          - id: '10.5'
+            title: 'Versionshantering är aktiverad för Blob Storage'
+            profile: 2
+            automated: true
+            remediation: 'Under Dataskydd: aktivera versionshantering för blobbar.'
+            refs: ['CIS Controls v8: 11.1', 'Azure Policy: c36a325b-ae04-4863-ad4f-19c6678f8e08']
+          - id: '10.6'
+            title: 'Låsta oföränderlighetsprinciper används för containrar med affärskritisk data'
+            profile: 2
+            automated: true
+            remediation: 'Skapa en tidsbaserad oföränderlighetsprincip på containern och lås den när lagringstiden är fastställd.'
+            refs: ['CIS Controls v8: 3.7']
+      - id: '11'
+        title: 'Azure Data Box'
+        controls:
+          - id: '11.1'
+            title: 'Dubbel kryptering används för Azure Data Box i miljöer med höga säkerhetskrav'
+            profile: 2
+            automated: false
+            remediation: 'Välj dubbel kryptering (programvarukryptering utöver hårdvarukryptering) när Data Box-beställningen görs.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: c349d81b-9985-44ae-a8da-ff98d108ede8']
+      - id: '14'
+        title: 'Azure Elastic SAN'
+        controls:
+          - id: '14.1'
+            title: 'Publik nätverksåtkomst är inaktiverad för Azure Elastic SAN'
+            profile: 2
+            automated: true
+            remediation: 'Under Nätverk på Elastic SAN: stäng av publik nätverksåtkomst och använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 3.3']
+          - id: '14.2'
+            title: 'Volymgrupper i Azure Elastic SAN krypteras med kundhanterade nycklar (CMK)'
+            profile: 2
+            automated: true
+            remediation: 'Välj kundhanterad nyckel från Key Vault i volymgruppens krypteringsinställningar.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: 7698f4ed-80ce-4e13-b408-ee135fa400a5']
+      - id: '15'
+        title: 'Queue Storage'
+        controls:
+          - id: '15.1'
+            title: 'SAS-token tillåter bara HTTPS'
+            profile: 1
+            automated: false
+            remediation: 'Välj Endast HTTPS som tillåtet protokoll när SAS-token skapas (--https-only), och använd helst användardelegerade SAS-token via Entra ID.'
+            refs: ['CIS Controls v8: 3.10']
+          - id: '15.2'
+            title: 'SAS-token går ut inom en timme'
+            profile: 2
+            automated: false
+            remediation: 'Sätt utgångstid till högst en timme för ad hoc-SAS-token och styr det med en utgångsprincip för SAS på lagringskontot.'
+            refs: ['CIS Controls v8: 6.2']
+          - id: '15.3'
+            title: 'Lagrade åtkomstprinciper används när SAS-token skapas'
+            profile: 1
+            automated: false
+            remediation: 'Skapa en lagrad åtkomstprincip på containern, kön eller tabellen och koppla SAS-token till den, så att de kan återkallas.'
+            refs: ['CIS Controls v8: 6.2']
+      - id: '16'
+        title: 'Lagringskonton'
+        controls:
+          - id: '16.1.1'
+            title: 'Påminnelser om nyckelrotation är aktiverade för varje lagringskonto'
+            profile: 1
+            automated: false
+            remediation: 'Under Åtkomstnycklar: välj Ställ in rotationspåminnelse och ange ett intervall, t.ex. 90 dagar.'
+            refs: ['Azure Policy: 044985bb-afe1-42cd-8a36-9d5d42424537']
+          - id: '16.1.2'
+            title: 'SAS-token tillåter bara HTTPS'
+            profile: 1
+            automated: false
+            remediation: 'Välj Endast HTTPS som tillåtet protokoll när SAS-token skapas (--https-only), och använd helst användardelegerade SAS-token via Entra ID.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: bc1b984e-ddae-40cc-801a-050a030e4fbe']
+          - id: '16.1.3'
+            title: 'Åtkomstnycklar till lagringskonton förnyas regelbundet'
+            profile: 1
+            automated: false
+            remediation: 'Rotera åtkomstnycklarna minst var 90:e dag, en nyckel i taget, och uppdatera de tjänster som använder dem.'
+            refs: ['CIS Controls v8: 4.6, 6.2']
+          - id: '16.1.4'
+            title: 'En policy för utgång av SAS-token är konfigurerad'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration: aktivera SAS-utgångsprincip och ange högsta giltighetstid.'
+            refs: ['CIS Controls v8: 6.2', 'Azure Policy: bc1b984e-ddae-40cc-801a-050a030e4fbe']
+          - id: '16.1.5'
+            title: 'Policyn för utgång av SAS-token blockerar'
+            profile: 2
+            automated: true
+            remediation: 'Sätt åtgärden i SAS-utgångsprincipen till Block så att token med för lång giltighet nekas.'
+            refs: ['CIS Controls v8: 6.2']
+          - id: '16.1.6'
+            title: 'SAS-token går ut inom en timme'
+            profile: 2
+            automated: false
+            remediation: 'Sätt utgångstid till högst en timme för ad hoc-SAS-token och styr det med en utgångsprincip för SAS på lagringskontot.'
+            refs: ['CIS Controls v8: 6.2', 'Azure Policy: bc1b984e-ddae-40cc-801a-050a030e4fbe']
+          - id: '16.1.7'
+            title: 'Åtkomst med lagringskontonyckel är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration: sätt "Tillåt åtkomst med lagringskontonyckel" till Inaktiverad efter att alla klienter gått över till Entra ID.'
+            refs: ['CIS Controls v8: 3.3, 6.2', 'Azure Policy: 8c6a50c6-9ffd-4ae7-986f-5fa6111f9a54']
+          - id: '16.1.8'
+            title: 'Lagring av kritisk data krypteras med kundhanterade nycklar (CMK)'
+            profile: 2
+            automated: false
+            remediation: 'Under Kryptering på lagringskontot: välj kundhanterade nycklar från Key Vault.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: 6fac406b-40ca-413b-bf8e-0bf964659c25']
+          - id: '16.2.1'
+            title: 'Privata slutpunkter används för åtkomst till lagringskonton'
+            profile: 2
+            automated: true
+            remediation: 'Skapa privata slutpunkter för de tjänster som används (blob, file, queue, table) med privata DNS-zoner.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 6edd7eda-6dd8-40f7-810d-67160c639cd9']
+          - id: '16.2.2'
+            title: 'Publik nätverksåtkomst är inaktiverad för lagringskonton'
+            profile: 2
+            automated: true
+            remediation: 'Under Nätverk: sätt publik nätverksåtkomst till Inaktiverad och använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: b2982f36-99f2-4db5-8eff-283140c09693']
+          - id: '16.2.3'
+            title: 'Standardregeln för nätverksåtkomst till lagringskonton är Deny'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk: välj "Aktiverad från valda virtuella nätverk och IP-adresser" så att standardåtgärden blir Deny.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 34c877ad-507e-4c82-993e-3452a6e0ad3c', 'Azure Policy: 2a1a9cdf-e04d-429a-8416-3bfb72a1b26f']
+          - id: '16.4'
+            title: 'Säker överföring krävs'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration: aktivera "Säker överföring krävs" (az storage account update --https-only true).'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: 404c3081-a854-4457-ae30-26a93ef643f9']
+          - id: '16.5'
+            title: 'Infrastrukturkryptering är aktiverad för varje lagringskonto'
+            profile: 2
+            automated: true
+            remediation: 'Aktivera infrastrukturkryptering när lagringskontot skapas. Befintliga konton måste skapas om och data flyttas.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: 4733ea7b-a883-42fe-8cac-97454c2a9e4a']
+          - id: '16.6'
+            title: 'Betrodda Azure-tjänster får åtkomst till lagringskontot'
+            profile: 2
+            automated: true
+            remediation: 'Under Nätverk › Undantag: markera "Tillåt Azure-tjänster i listan över betrodda tjänster att komma åt lagringskontot".'
+            refs: ['CIS Controls v8: 3.3, 13.5', 'Azure Policy: c9d007d0-c057-4772-b18c-01e546713bcd']
+          - id: '16.7'
+            title: 'Mjuk borttagning är aktiverad för containrar och blobbar'
+            profile: 1
+            automated: true
+            remediation: 'Under Dataskydd: aktivera mjuk borttagning för både blobbar och containrar.'
+            refs: ['CIS Controls v8: 11.1']
+          - id: '16.8'
+            title: 'Lagringsloggning av läsning, skrivning och borttagning är aktiverad för Queue'
+            profile: 2
+            automated: true
+            remediation: 'Lägg till en diagnostikinställning för kötjänsten med StorageRead, StorageWrite och StorageDelete till Log Analytics.'
+            refs: ['CIS Controls v8: 8.5']
+          - id: '16.9'
+            title: 'Lagringsloggning av läsning, skrivning och borttagning är aktiverad för Blob'
+            profile: 2
+            automated: true
+            remediation: 'Lägg till en diagnostikinställning för blobtjänsten med StorageRead, StorageWrite och StorageDelete till Log Analytics.'
+            refs: ['CIS Controls v8: 8.5']
+          - id: '16.10'
+            title: 'Lagringsloggning av läsning, skrivning och borttagning är aktiverad för Table'
+            profile: 2
+            automated: true
+            remediation: 'Lägg till en diagnostikinställning för tabelltjänsten med StorageRead, StorageWrite och StorageDelete till Log Analytics.'
+            refs: ['CIS Controls v8: 8.5']
+          - id: '16.11'
+            title: 'Lagringskonton kräver minst TLS 1.2'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration: sätt lägsta TLS-version till 1.2 (az storage account update --min-tls-version TLS1_2).'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: fe83a0eb-a853-422d-aac2-1bffd182c5d0']
+          - id: '16.12'
+            title: 'Replikering mellan klienter är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Objektreplikering: stäng av "Tillåt replikering mellan klienter".'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 92a89a79-6c52-4a7e-a03f-61306fc49312']
+          - id: '16.13'
+            title: 'Anonym åtkomst till blobbar är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration: sätt "Tillåt anonym åtkomst till blobbar" till Inaktiverad.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 4fa4b6c0-31ca-4c0d-b10d-24b96f62a751']
+          - id: '16.14'
+            title: 'Raderingslås från Azure Resource Manager finns på lagringskonton'
+            profile: 1
+            automated: false
+            remediation: 'Lägg till ett lås av typen CanNotDelete på lagringskontot under Lås.'
+            refs: ['CIS Controls v8: 3']
+          - id: '16.15'
+            title: 'Skrivskyddslås från Azure Resource Manager har övervägts för lagringskonton'
+            profile: 2
+            automated: false
+            remediation: 'Bedöm om lagringskontot ska ha ett ReadOnly-lås. Tänk på att det kan hindra funktioner som listning av nycklar.'
+            refs: ['CIS Controls v8: 3']
+          - id: '16.16'
+            title: 'Kritiska lagringskonton använder geo-redundant lagring'
+            profile: 2
+            automated: true
+            remediation: 'Byt redundans till GRS, RA-GRS, GZRS eller RA-GZRS för lagringskonton med kritisk data.'
+            refs: ['CIS Controls v8: 11.1', 'Azure Policy: bf045164-79ba-4215-8f95-f8048dc1780b']
+      - id: '17'
+        title: 'Storage Explorer'
+        controls:
+          - id: '17.1'
+            title: 'SAS-token går ut inom en timme'
+            profile: 2
+            automated: false
+            remediation: 'Sätt utgångstid till högst en timme för ad hoc-SAS-token och styr det med en utgångsprincip för SAS på lagringskontot.'
+            refs: ['CIS Controls v8: 6.2']
+          - id: '17.2'
+            title: 'Lagrade åtkomstprinciper används när SAS-token skapas'
+            profile: 1
+            automated: false
+            remediation: 'Skapa en lagrad åtkomstprincip på containern, kön eller tabellen och koppla SAS-token till den, så att de kan återkallas.'
+            refs: ['CIS Controls v8: 6.2']
+          - id: '17.3'
+            title: 'Storage Explorer är den senaste versionen'
+            profile: 1
+            automated: false
+            remediation: 'Uppdatera Azure Storage Explorer till senaste versionen och aktivera automatiska uppdateringar.'
+            refs: ['CIS Controls v8: 2.2']

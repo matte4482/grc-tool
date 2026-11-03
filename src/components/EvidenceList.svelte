@@ -138,10 +138,10 @@
           e.currentTarget.value = ''
         }}
       />
-      <span class="meta">eller släpp filer här. Kopieras till mappen {ownerFolder(owner)}.</span>
+      <span class="meta">eller släpp filer här · {ownerFolder(owner)}</span>
     </div>
   {:else}
-    <p class="meta">Filer kan bara bifogas när projektet är öppnat från en mapp i Chrome eller Edge. Ange annars var evidensen finns.</p>
+    <p class="meta">Bifogning kräver Chrome eller Edge och en öppnad mapp.</p>
   {/if}
 
   {#if runner.messages.length}<Notice tone="warn" lines={runner.messages} />{/if}

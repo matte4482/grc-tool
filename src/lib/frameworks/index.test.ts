@@ -9,7 +9,7 @@ describe('ramverksregistret', () => {
 
   it('kommande ramverk finns i listan men kan inte väljas', () => {
     const upcoming = FRAMEWORKS.filter((e) => !e.framework).map((e) => e.name)
-    expect(upcoming).toEqual(['NIS2', 'CIS Controls v8', 'DORA'])
+    expect(upcoming).toEqual(['NIS2', 'DORA'])
     expect(getFramework('nis2', '2022')).toBeUndefined()
   })
 
@@ -23,7 +23,7 @@ describe('ramverksregistret', () => {
     expect(new Set(keys).size).toBe(keys.length)
   })
 
-  it('alla ramverk har en beskrivning för startsidan', () => {
-    expect(FRAMEWORKS.every((e) => e.description.length > 0)).toBe(true)
+  it('kommande ramverk har en omfattning för startsidan', () => {
+    expect(FRAMEWORKS.every((e) => e.framework || (e.summary?.length ?? 0) > 0)).toBe(true)
   })
 })

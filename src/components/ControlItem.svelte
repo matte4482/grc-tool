@@ -1,8 +1,9 @@
 <script lang="ts">
-  // En rad i Grundkrav eller Annex A, med bedömningen när den är öppnad.
+  // En kontroll i en lista, med bedömningen när den är öppnad. Visar nivå, åtgärdstext och referenser om ramverket har dem (B-47).
 
-  import { answerFor, clearParts, setPart, setStatus, setText, type AnswerText } from '../lib/assessment'
-  import type { Control } from '../lib/frameworks/schema'
+  import { answerFor, clearParts, setApplicable, setPart, setStatus, setText, type AnswerText } from '../lib/assessment'
+  import type { Control, Section } from '../lib/frameworks/schema'
+  import { EXCLUSION_LABELS, canExclude, type Exclusion } from '../lib/scope'
   import type { Status } from '../lib/project/schema'
   import { store } from '../lib/project/store.svelte'
   import { actionsFor } from '../lib/actions'
@@ -17,10 +18,18 @@
 
   let {
     control,
+    section,
     excluded,
     risks,
     open = $bindable(false),
-  }: { control: Control; excluded: boolean; risks: { id: string; title: string }[]; open?: boolean } = $props()
+  }: { control: Control; section: Section; excluded: Exclusion | undefined; risks: { id: string; title: string }[]; open?: boolean } = $props()
+
+  const framework = $derived(store.framework!)
+  const level = $derived(control.profile ? framework.profiles?.[control.profile - 1] : undefined)
+  const target = $derived(store.project!.profile ? framework.profiles?.[store.project!.profile - 1] : undefined)
+  /** Ej tillämplig direkt i listan, i avsnitt med optional (inte SoA, som har en egen flik). */
+  const inlineExclude = $derived(canExclude(section) && !section.soa)
+  const applicable = (value: boolean) => store.update((d) => void setApplicable(d, section, control.id, value, now()))
 
   const answer = $derived(answerFor(store.project!, control.id))
   const linkedCount = $derived(actionsFor(store.project!, 'control', control.id).length)
@@ -52,11 +61,13 @@
   )
 </script>
 
-<li class="control" class:open class:excluded id="ctrl-{control.id}">
+<li class="control" class:open class:excluded={!!excluded} id="ctrl-{control.id}">
   <button type="button" class="control-row" aria-expanded={open} onclick={() => (open = !open)}>
     <span class="control-id">{control.id}</span>
     <span class="control-title">{control.title}</span>
     <span class="control-meta">
+      {#if level}<span class="tag">{level}</span>{/if}
+      {#if control.automated !== undefined}<span class="tag muted">{control.automated ? 'Automatisk' : 'Manuell'}</span>{/if}
       {#if answer.evidence.length}<span class="risk-count">{answer.evidence.length} {answer.evidence.length === 1 ? 'fil' : 'filer'}</span>{/if}
       {#if risks.length}<span class="risk-count" title={risks.map((r) => `${r.id} ${r.title}`).join('\n')}>{risks.length} {risks.length === 1 ? 'risk' : 'risker'}</span>{/if}
       {#if answer.owner}<span class="owner">{answer.owner}</span>{/if}
@@ -66,8 +77,17 @@
 
   {#if open}
     <div class="control-body">
-      {#if excluded}
-        <p class="meta">Kontrollen är bortvald i SoA och bedöms inte. Ändra under fliken SoA.</p>
+      {#if excluded === 'profile'}
+        <p class="meta">{EXCLUSION_LABELS.profile}{target ? ` (${target})` : ''}.</p>
+      {:else if excluded === 'not_applicable'}
+        <div class="na-row">
+          <p class="meta">{EXCLUSION_LABELS.not_applicable}.</p>
+          <button type="button" class="link muted" onclick={() => applicable(true)}>Ta med i bedömningen</button>
+        </div>
+        <label class="field-label" for={fieldId('na')}>Motivering</label>
+        <textarea id={fieldId('na')} rows="2" value={answer.soaJustification} oninput={(e) => text('soaJustification', e.currentTarget.value)}></textarea>
+      {:else if excluded}
+        <p class="meta">{EXCLUSION_LABELS[excluded]}.</p>
       {:else}
         <StatusPicker label="Status för {control.id}" value={answer.status} onchange={status} />
 
@@ -96,7 +116,6 @@
                 <StatusPicker label="Teknisk del för {control.id}" compact allowNone value={answer.parts?.technical} onchange={(s) => part('technical', s)} />
                 <span class="field-label">Organisatorisk del</span>
                 <StatusPicker label="Organisatorisk del för {control.id}" compact allowNone value={answer.parts?.organizational} onchange={(s) => part('organizational', s)} />
-                <p class="meta">Underlag. Den övergripande statusen sätts alltid ovan.</p>
                 <button type="button" class="link muted" onclick={removeParts}>Ta bort uppdelningen</button>
               </div>
             {:else}
@@ -106,8 +125,16 @@
 
           <aside class="control-aside">
             {#if control.guidance}
-              <div class="field-label">Bevisbörda</div>
+              <div class="field-label">{framework.guidanceLabel}</div>
               <p class="guidance">{control.guidance}</p>
+            {/if}
+            {#if control.remediation}
+              <div class="field-label">Så åtgärdas det</div>
+              <p class="guidance">{control.remediation}</p>
+            {/if}
+            {#if control.refs?.length}
+              <div class="field-label">Referenser</div>
+              <ul class="refs">{#each control.refs as r (r)}<li>{r}</li>{/each}</ul>
             {/if}
             {#if risks.length}
               <div class="field-label">Kopplade risker</div>
@@ -125,7 +152,10 @@
             {/if}
           </aside>
         </div>
-        {#if updated}<p class="meta updated">Senast uppdaterad {updated}{answer.updated?.by ? ` av ${answer.updated.by}` : ''}</p>{/if}
+        <div class="control-foot">
+          {#if inlineExclude && !risks.length}<button type="button" class="link muted" onclick={() => applicable(false)}>Markera som ej tillämplig</button>{/if}
+          {#if updated}<p class="meta updated">Senast uppdaterad {updated}{answer.updated?.by ? ` av ${answer.updated.by}` : ''}</p>{/if}
+        </div>
       {/if}
     </div>
   {/if}

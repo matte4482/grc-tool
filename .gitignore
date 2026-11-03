@@ -40,3 +40,6 @@ exports/
 # Filer som Claude skapar i projektmappen (hör inte till koden)
 Claude outputs/
 docs/
+
+# CIS-PDF:er får inte hamna i repot (licens, ARCHITECTURE B-45)
+*.pdf

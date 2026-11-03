@@ -20,8 +20,11 @@ export function toCsv(rows: (string | number)[][]): string {
   return '﻿' + rows.map((r) => r.map(cell).join(';')).join('\r\n') + '\r\n'
 }
 
+/** En rad per kontroll. Ramverk med nivåer (B-47) får även nivå, automatisk och åtgärdstext sist. */
 export function controlRows(project: Project, framework: Framework): string[][] {
+  const extra = !!framework.profiles
   const rows = [['Avsnitt', 'Grupp', 'ID', 'Namn', 'Tillämplig', 'Status', 'Teknisk del', 'Organisatorisk del', 'Motivering och observation', 'Ansvarig', 'Bifogade filer', 'Evidens på annan plats', 'SoA-motivering', 'Senast uppdaterad']]
+  if (extra) rows[0].push('Nivå', 'Automatisk', 'Så åtgärdas det')
   for (const { section: s, group: g, control: c } of allControls(framework)) {
     const a = answerFor(project, c.id)
     const part = (x?: keyof typeof STATUS_LABELS) => (x ? STATUS_LABELS[x] : '')
@@ -40,6 +43,9 @@ export function controlRows(project: Project, framework: Framework): string[][] 
       a.evidenceNote,
       a.soaJustification,
       a.updated ? a.updated.at.slice(0, 10) : '',
+      ...(extra
+        ? [c.profile ? (framework.profiles?.[c.profile - 1] ?? '') : '', c.automated === undefined ? '' : c.automated ? 'Ja' : 'Nej', c.remediation ?? '']
+        : []),
     ])
   }
   return rows

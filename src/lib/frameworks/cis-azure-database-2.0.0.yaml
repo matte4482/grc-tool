@@ -1,0 +1,332 @@
+# CIS Microsoft Azure Database Services 2.0.0: rekommendationer med nivå (Level 1–2), automatiserad eller manuell och kopplingar.
+# ID, nivå, CIS Controls och Azure Policy-ID kommer från CIS-benchmarken. Rubriker och åtgärder är egna texter (B-45, B-47).
+
+schemaVersion: 1
+id: 'cis-azure-database'
+version: '2.0.0'
+name: 'CIS Microsoft Azure Database Services 2.0.0'
+language: 'sv'
+profiles: ['Level 1', 'Level 2']
+riskManagement: false
+readiness: false
+guidanceLabel: 'Kontrollera'
+source: 'ID, nivåer och kopplingar följer CIS Microsoft Azure Database Services Benchmark v2.0.0 från Center for Internet Security. Rubriker och åtgärder är egna texter.'
+sections:
+  - id: 'recommendations'
+    title: 'Rekommendationer'
+    soa: false
+    optional: true
+    unit: 'rekommendationer'
+    groupLabel: 'Områden'
+    groups:
+      - id: '2'
+        title: 'Azure Cache for Redis (fasas ut)'
+        controls:
+          - id: '2.1'
+            title: 'Microsoft Entra-autentisering är aktiverad'
+            profile: 1
+            automated: false
+            remediation: 'Under Autentisering: aktivera Microsoft Entra-autentisering och ge åtkomst via åtkomstprinciper för data.'
+            refs: ['CIS Controls v8: 5.6']
+          - id: '2.2'
+            title: 'Åtkomst tillåts bara via SSL/TLS'
+            profile: 1
+            automated: true
+            remediation: 'Under Avancerade inställningar: stäng av porten utan SSL (enableNonSslPort = false).'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: 22bee202-a82f-4305-9a2a-6d7f44d4dedb', 'Azure Policy: 766f5de3-c6c0-4327-9f4d-042ab8ae846c']
+          - id: '2.3'
+            title: 'Minst TLS 1.2 krävs'
+            profile: 1
+            automated: false
+            remediation: 'Under Avancerade inställningar: sätt lägsta TLS-version till 1.2.'
+            refs: ['CIS Controls v8: 3.10']
+          - id: '2.4'
+            title: 'Åtkomstprinciper är införda och granskas regelbundet'
+            profile: 2
+            automated: false
+            remediation: 'Använd åtkomstprinciper för data (t.ex. Data Reader och Data Contributor) med minsta behörighet och granska tilldelningarna regelbundet.'
+            refs: ['CIS Controls v8: 6.8']
+          - id: '2.5'
+            title: 'Systemtilldelad hanterad identitet är aktiverad'
+            profile: 1
+            automated: false
+            remediation: 'Under Identitet: aktivera systemtilldelad hanterad identitet för cachen.'
+            refs: ['CIS Controls v8: 5.5']
+          - id: '2.6'
+            title: 'Publik nätverksåtkomst är inaktiverad'
+            profile: 2
+            automated: false
+            remediation: 'Under Privat slutpunkt: stäng av publik nätverksåtkomst efter att privat slutpunkt finns.'
+            refs: ['CIS Controls v8: 4.4', 'Azure Policy: 470baccb-7e51-4549-8b1a-3e5be069f663']
+          - id: '2.7'
+            title: 'Azure Cache for Redis använder Private Link'
+            profile: 2
+            automated: false
+            remediation: 'Skapa en privat slutpunkt för cachen med privat DNS-zon privatelink.redis.cache.windows.net.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 960e650e-9ce3-4316-9590-8ee2c016ca2f']
+          - id: '2.8'
+            title: 'Azure Cache for Redis använder kundhanterade nycklar'
+            profile: 2
+            automated: false
+            remediation: 'Konfigurera kryptering med kundhanterad nyckel från Key Vault (kräver Enterprise-nivå).'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: 09aa11bb-87ec-409f-bf0b-49b7c1561a87']
+          - id: '2.9'
+            title: 'Autentisering med åtkomstnycklar är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Autentisering: stäng av autentisering med åtkomstnycklar efter att klienterna gått över till Entra ID.'
+            refs: ['CIS Controls v8: 5.6', 'Azure Policy: 3827af20-8f80-4b15-8300-6db0873ec901']
+          - id: '2.10'
+            title: 'Uppdateringskanalen är ''Stable'''
+            profile: 1
+            automated: true
+            remediation: 'Under Avancerade inställningar: välj uppdateringskanalen Stable.'
+            refs: ['CIS Controls v8: 2.2']
+      - id: '3'
+        title: 'Azure Cosmos DB'
+        controls:
+          - id: '3.1'
+            title: 'Brandväggen tillåter bara utvalda nätverk, inte alla nätverk'
+            profile: 2
+            automated: true
+            remediation: 'Under Nätverk: välj Valda nätverk och lägg bara till de virtuella nätverk och IP-adresser som behövs.'
+            refs: ['CIS Controls v8: 4.4, 12.2', 'Azure Policy: 862e97cf-49fc-4a5c-9de4-40d4e2e7c8eb']
+          - id: '3.2'
+            title: 'Cosmos DB använder privata slutpunkter där det är möjligt'
+            profile: 2
+            automated: true
+            remediation: 'Skapa en privat slutpunkt för kontot med privat DNS-zon, t.ex. privatelink.documents.azure.com.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 58440f8a-10c5-4151-bdce-dfbaad4a20b7']
+          - id: '3.3'
+            title: 'Lokal autentisering är inaktiverad (disableLocalAuth)'
+            profile: 1
+            automated: true
+            remediation: 'Sätt disableLocalAuth till true (az cosmosdb update --disable-local-auth true) efter att klienterna använder Entra ID och RBAC.'
+            refs: ['CIS Controls v8: 6.7', 'Azure Policy: 5450f5bd-9c72-4390-a9c4-a7aba4edfdd2']
+          - id: '3.4'
+            title: 'Publik nätverksåtkomst är inaktiverad'
+            profile: 2
+            automated: false
+            remediation: 'Under Nätverk: stäng av publik nätverksåtkomst och använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 4.4', 'Azure Policy: 797b37f7-06b8-444c-b1ad-fc62867f335a']
+          - id: '3.5'
+            title: 'Kritisk data krypteras med kundhanterade nycklar (CMK)'
+            profile: 2
+            automated: false
+            remediation: 'Aktivera kundhanterade nycklar när kontot skapas, eller i efterhand under Datakryptering, med nyckel i Key Vault.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: 1f905d99-2ab7-462c-a6b0-f709acca6c8f']
+          - id: '3.6'
+            title: 'Brandväggen tillåter inte all nätverkstrafik'
+            profile: 1
+            automated: true
+            remediation: 'Ta bort IP-regler som 0.0.0.0/0 och begränsa åtkomsten till kända nätverk.'
+            refs: ['CIS Controls v8: 4.4', 'Azure Policy: 12339a85-a25c-4f17-9f82-4766f13f5c4c']
+          - id: '3.7'
+            title: 'Loggning är aktiverad för Cosmos DB'
+            profile: 1
+            automated: false
+            remediation: 'Lägg till en diagnostikinställning som skickar DataPlaneRequests och ControlPlaneRequests till Log Analytics.'
+            refs: ['CIS Controls v8: 8.2']
+      - id: '4'
+        title: 'Azure Data Factory'
+        controls:
+          - id: '4.1'
+            title: 'Data Factory krypteras med kundhanterade nycklar'
+            profile: 2
+            automated: false
+            remediation: 'Konfigurera kundhanterad nyckel från Key Vault för fabriken. Det görs enklast när fabriken skapas.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: 4ec52d6d-beb7-40c4-9a9e-fe753254690e']
+          - id: '4.2'
+            title: 'Data Factory använder hanterade identiteter'
+            profile: 1
+            automated: true
+            remediation: 'Aktivera hanterad identitet för fabriken och använd den i länkade tjänster i stället för nycklar och lösenord.'
+            refs: ['Azure Policy: f78ccdb4-7bf4-4106-8647-270491d2978a']
+          - id: '4.3'
+            title: 'Data Factory lagrar inloggningsuppgifter och hemligheter i Azure Key Vault'
+            profile: 2
+            automated: false
+            remediation: 'Lägg till Key Vault som länkad tjänst och referera till hemligheter därifrån i stället för att spara dem i fabriken.'
+            refs: ['Azure Policy: 127ef6d7-242f-43b3-9eef-947faf1725d0']
+          - id: '4.4'
+            title: 'Data Factory använder RBAC för att tilldela behörigheter'
+            profile: 2
+            automated: false
+            remediation: 'Ge åtkomst till fabriken med inbyggda roller som Data Factory Contributor på rätt nivå, och undvik Owner och Contributor på prenumerationen.'
+      - id: '5'
+        title: 'Azure Database for MySQL'
+        controls:
+          - id: '5.1'
+            title: 'MySQL krypterar lagrad data med kundhanterade nycklar'
+            profile: 2
+            automated: false
+            remediation: 'Konfigurera datakryptering med kundhanterad nyckel och användartilldelad identitet när servern skapas.'
+            refs: ['CIS Controls v8: 3.11']
+          - id: '5.2'
+            title: 'MySQL använder bara Microsoft Entra-autentisering'
+            profile: 1
+            automated: true
+            remediation: 'Under Autentisering: välj endast Microsoft Entra-autentisering och lägg till en Entra-administratör.'
+            refs: ['CIS Controls v8: 5.6', 'Azure Policy: 40e85574-ef33-47e8-a854-7a65c7500560']
+          - id: '5.3'
+            title: 'Publik nätverksåtkomst är inaktiverad för MySQL'
+            profile: 2
+            automated: true
+            remediation: 'Under Nätverk: stäng av publik åtkomst och använd privata slutpunkter eller VNet-integrering.'
+            refs: ['CIS Controls v8: 4.4', 'Azure Policy: c9299215-ae47-4f50-9c54-8a392f68a052']
+          - id: '5.4'
+            title: 'Privata slutpunkter används för MySQL'
+            profile: 2
+            automated: true
+            remediation: 'Skapa en privat slutpunkt med privat DNS-zon privatelink.mysql.database.azure.com.'
+            refs: ['CIS Controls v8: 12.2']
+          - id: '5.5'
+            title: 'Granskningsloggen är aktiverad i MySQL flexible server (audit_log_enabled)'
+            profile: 2
+            automated: true
+            remediation: 'Under Serverparametrar: sätt audit_log_enabled till ON och skicka MySqlAuditLogs till Log Analytics med en diagnostikinställning.'
+            refs: ['CIS Controls v8: 8.2']
+          - id: '5.6'
+            title: 'Granskningsloggen fångar anslutningar i MySQL flexible server (audit_log_events)'
+            profile: 2
+            automated: true
+            remediation: 'Under Serverparametrar: ta med CONNECTION i audit_log_events.'
+            refs: ['CIS Controls v8: 8.2']
+          - id: '5.7'
+            title: 'Felloggfilen är aktiverad i MySQL (error_server_log_file)'
+            profile: 2
+            automated: false
+            remediation: 'Under Serverparametrar: aktivera error_server_log_file och skicka loggarna vidare med en diagnostikinställning.'
+            refs: ['CIS Controls v8: 8.2']
+          - id: '5.8'
+            title: 'MySQL kräver säker transport (require_secure_transport)'
+            profile: 1
+            automated: true
+            remediation: 'Under Serverparametrar: sätt require_secure_transport till ON.'
+            refs: ['CIS Controls v8: 3.10']
+          - id: '5.9'
+            title: 'MySQL flexible server kräver minst TLS 1.2 (tls_version)'
+            profile: 1
+            automated: true
+            remediation: 'Under Serverparametrar: sätt tls_version till TLSv1.2 eller TLSv1.3.'
+            refs: ['CIS Controls v8: 3.10']
+      - id: '6'
+        title: 'Azure Database for PostgreSQL'
+        controls:
+          - id: '6.1'
+            title: 'PostgreSQL krypterar lagrad data med kundhanterade nycklar'
+            profile: 2
+            automated: false
+            remediation: 'Konfigurera datakryptering med kundhanterad nyckel och användartilldelad identitet när servern skapas.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: 12c74c95-0efd-48da-b8d9-2a7d68470c92']
+          - id: '6.2'
+            title: 'PostgreSQL använder bara Microsoft Entra-autentisering'
+            profile: 1
+            automated: false
+            remediation: 'Under Autentisering: välj endast Microsoft Entra-autentisering och lägg till en Entra-administratör.'
+            refs: ['CIS Controls v8: 5.6']
+          - id: '6.3'
+            title: 'Publik nätverksåtkomst är inaktiverad för PostgreSQL'
+            profile: 2
+            automated: true
+            remediation: 'Under Nätverk: stäng av publik åtkomst och använd privata slutpunkter eller VNet-integrering.'
+            refs: ['CIS Controls v8: 4.4', 'Azure Policy: 5e1de0e3-42cb-4ebc-a86d-61d0c619ca48']
+          - id: '6.4'
+            title: 'Privata slutpunkter används för PostgreSQL'
+            profile: 2
+            automated: true
+            remediation: 'Skapa en privat slutpunkt med privat DNS-zon privatelink.postgres.database.azure.com.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 5375a5bb-22c6-46d7-8a43-83417cfb4460']
+          - id: '6.5'
+            title: 'Begränsning av anslutningsförsök är aktiverad i PostgreSQL (connection_throttle.enable)'
+            profile: 1
+            automated: true
+            remediation: 'Under Serverparametrar: sätt connection_throttle.enable till ON.'
+            refs: ['CIS Controls v8: 8.2', 'Azure Policy: dacf07fa-0eea-4486-80bc-b93fae88ac40']
+          - id: '6.6'
+            title: 'PostgreSQL sparar loggfiler i mer än tre dagar (logfiles.retention_days)'
+            profile: 1
+            automated: true
+            remediation: 'Under Serverparametrar: sätt logfiles.retention_days till 4–7, och skicka loggarna till Log Analytics för längre lagring.'
+            refs: ['CIS Controls v8: 8.3']
+          - id: '6.7'
+            title: 'PostgreSQL loggar kontrollpunkter (log_checkpoints)'
+            profile: 1
+            automated: true
+            remediation: 'Under Serverparametrar: sätt log_checkpoints till ON.'
+            refs: ['CIS Controls v8: 8.2', 'Azure Policy: 70be9e12-c935-49ac-9bd8-fd64b85c1f87']
+          - id: '6.8'
+            title: 'PostgreSQL loggar frånkopplingar (log_disconnections)'
+            profile: 1
+            automated: true
+            remediation: 'Under Serverparametrar: sätt log_disconnections till ON.'
+            refs: ['CIS Controls v8: 8.2', 'Azure Policy: 1d14b021-1bae-4f93-b36b-69695e14984a']
+          - id: '6.9'
+            title: 'PostgreSQL loggar anslutningar (log_connections)'
+            profile: 1
+            automated: true
+            remediation: 'Under Serverparametrar: sätt log_connections till ON.'
+            refs: ['CIS Controls v8: 8.2', 'Azure Policy: 086709ac-11b5-478d-a893-9567a16d2ae3']
+          - id: '6.10'
+            title: 'PostgreSQL kräver säker transport (require_secure_transport)'
+            profile: 1
+            automated: true
+            remediation: 'Under Serverparametrar: sätt require_secure_transport till ON.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: c29c38cb-74a7-4505-9a06-e588ab86620a']
+          - id: '6.11'
+            title: 'PostgreSQL kräver minst TLS 1.2 (ssl_min_protocol_version)'
+            profile: 1
+            automated: true
+            remediation: 'Under Serverparametrar: sätt ssl_min_protocol_version till TLSv1.2 eller TLSv1.3.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: a43d5475-c569-45ce-a268-28fa79f4e87a']
+      - id: '9'
+        title: 'Azure SQL Database'
+        controls:
+          - id: '9.1'
+            title: 'Granskning (auditing) är aktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Granskning på SQL-servern: aktivera granskning mot Log Analytics, lagringskonto eller Event Hub.'
+            refs: ['CIS Controls v8: 8.5', 'Azure Policy: a6fb4358-5bf4-4ad7-ba82-2cd2f41ce5e9']
+          - id: '9.2'
+            title: 'Publik nätverksåtkomst är inaktiverad'
+            profile: 2
+            automated: true
+            remediation: 'Under Nätverk på SQL-servern: sätt publik nätverksåtkomst till Inaktivera och använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 4.4', 'Azure Policy: 1b8ca024-1d5c-4dec-8995-b1a932b41780']
+          - id: '9.3'
+            title: 'Inga brandväggsregler för Azure SQL Database är för tillåtande'
+            profile: 1
+            automated: true
+            remediation: 'Ta bort regler som 0.0.0.0–255.255.255.255 och regeln "Tillåt Azure-tjänster" (0.0.0.0) om den inte behövs. Använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 3.3']
+          - id: '9.4'
+            title: 'TDE-skyddet för SQL Server krypteras med kundhanterad nyckel'
+            profile: 2
+            automated: true
+            remediation: 'Under Transparent datakryptering: välj kundhanterad nyckel från Key Vault och aktivera automatisk rotation.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: 0a370ff3-6cab-4e85-8995-295fd854c5b8', 'Azure Policy: ac01ad65-10e5-46df-bdd9-6b0cad13e1d2']
+          - id: '9.5'
+            title: 'Microsoft Entra-autentisering är konfigurerad för SQL-servrar'
+            profile: 1
+            automated: true
+            remediation: 'Under Microsoft Entra ID på SQL-servern: ange en Entra-grupp som administratör, och överväg att kräva endast Entra-autentisering.'
+            refs: ['CIS Controls v8: 5.6', 'Azure Policy: 1f314764-cb73-4fc9-b863-8eca98ac36e9']
+          - id: '9.6'
+            title: 'Datakryptering är aktiverad för SQL-databaser'
+            profile: 1
+            automated: true
+            remediation: 'Under Transparent datakryptering på databasen: kontrollera att datakryptering är På.'
+            refs: ['CIS Controls v8: 3.11']
+          - id: '9.7'
+            title: 'Granskningsloggar sparas i mer än 90 dagar'
+            profile: 1
+            automated: true
+            remediation: 'Sätt lagringstiden för granskningsloggarna till mer än 90 dagar i lagringskontot eller Log Analytics-arbetsytan.'
+            refs: ['CIS Controls v8: 8.3', 'Azure Policy: 89099bee-89e0-4b26-a5f4-165451757743']
+          - id: '9.8'
+            title: 'Minst TLS 1.2 krävs'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk › Anslutning: sätt lägsta TLS-version till 1.2 eller högre.'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: 32e6bbec-16b6-44c2-be37-c5b672d103cf']

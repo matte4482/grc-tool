@@ -10,6 +10,8 @@
 
   const result = $derived(comparison.previous ? compareProjects(comparison.previous, store.project!, store.framework!, localDate()) : null)
   const SHOWN: ControlChange[] = ['improved', 'worsened', 'new', 'unassessed']
+  const risks = $derived(store.framework!.riskManagement)
+  const hasSoa = $derived(store.framework!.sections.some((s) => s.soa))
 </script>
 
 <h2>Progress sedan förra bedömningen</h2>
@@ -41,11 +43,12 @@
   {/each}
 
   {#if c.soa.included.length || c.soa.excluded.length}
-    <h3>SoA</h3>
+    <h3>{hasSoa ? 'SoA' : 'Tillämplighet'}</h3>
     {#if c.soa.included.length}<p>Invalda: {c.soa.included.join(', ')}</p>{/if}
     {#if c.soa.excluded.length}<p>Bortvalda: {c.soa.excluded.join(', ')}</p>{/if}
   {/if}
 
+  {#if risks}
   <h3>Risker</h3>
   <table>
     <thead><tr><th style="width:10%">ID</th><th>Risk</th><th style="width:18%">Ändring</th><th class="num" style="width:12%">Förra</th><th class="num" style="width:12%">Nu</th></tr></thead>
@@ -56,6 +59,7 @@
       {#if !c.risks.added.length && !c.risks.changed.length && !c.risks.removed.length}<tr><td colspan="5" class="muted">Inga ändringar.</td></tr>{/if}
     </tbody>
   </table>
+  {/if}
 
   <h3>Åtgärder</h3>
   <table>

@@ -189,6 +189,8 @@ export const ProjectSchema = z
     previousId: z.uuid().optional(),
     client: z.object({ name: name }),
     framework: z.object({ id: name, version: name }),
+    // Målnivå för ramverk med nivåer, t.ex. 1 = IG1 i CIS Controls (B-47).
+    profile: z.int().min(1).optional(),
     createdAt: isoDateTime,
     updatedAt: isoDateTime,
     riskMethod: RiskMethodSchema.optional(),

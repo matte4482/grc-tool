@@ -1,0 +1,840 @@
+# CIS Controls v8.1: 18 kontroller och 153 skyddsåtgärder med implementeringsgrupp (IG1–IG3).
+# ID och implementeringsgrupper följer CIS. Rubriker, kontrollfrågor och åtgärder är egna texter (B-45, B-47).
+
+schemaVersion: 1
+id: 'cis-controls'
+version: '8.1'
+name: 'CIS Controls v8.1'
+language: 'sv'
+profiles: ['IG1', 'IG2', 'IG3']
+riskManagement: false
+readiness: false
+guidanceLabel: 'Kontrollera'
+source: 'ID och implementeringsgrupper följer CIS Critical Security Controls v8.1 från Center for Internet Security. Rubriker, kontrollfrågor och åtgärder är egna texter.'
+sections:
+  - id: 'safeguards'
+    title: 'Skyddsåtgärder'
+    soa: false
+    optional: true
+    unit: 'skyddsåtgärder'
+    groupLabel: 'Kontroller'
+    groups:
+      - id: '1'
+        title: 'Inventering av organisationens tillgångar'
+        controls:
+          - id: '1.1'
+            title: 'Detaljerad inventarieförteckning över tillgångar'
+            profile: 1
+            guidance: 'Finns en aktuell förteckning över alla enheter (datorer, servrar, nätverksutrustning, mobiler, IoT, molnresurser) med ägare, plats och syfte? Granskas den minst halvårsvis?'
+            remediation: 'Inför ett inventarieregister, gärna i ett CMDB- eller MDM-verktyg, med ägare per tillgång. Utse ansvarig och lägg in en återkommande granskning två gånger per år.'
+          - id: '1.2'
+            title: 'Hantering av okända tillgångar'
+            profile: 1
+            guidance: 'Finns en rutin för vad som händer när en okänd enhet upptäcks i nätverket, och används den minst varje vecka?'
+            remediation: 'Bestäm hur okända enheter hanteras (ta bort, isolera eller lägg till i registret) och vem som gör det. Gå igenom avvikelser varje vecka.'
+          - id: '1.3'
+            title: 'Aktiv upptäckt av tillgångar'
+            profile: 2
+            guidance: 'Används ett verktyg som aktivt söker igenom nätverket efter enheter, minst dagligen?'
+            remediation: 'Inför ett verktyg för aktiv upptäckt, t.ex. nätverksskanner eller funktionen i Defender for Endpoint, och låt resultatet uppdatera inventariet automatiskt.'
+          - id: '1.4'
+            title: 'DHCP-loggning för att uppdatera inventariet'
+            profile: 2
+            guidance: 'Loggas DHCP-tilldelningar och används loggarna för att hitta nya enheter?'
+            remediation: 'Aktivera loggning på DHCP-servrar eller IP-adresshantering och jämför loggarna med inventariet varje vecka.'
+          - id: '1.5'
+            title: 'Passiv upptäckt av tillgångar'
+            profile: 3
+            guidance: 'Används passiv trafikanalys för att upptäcka enheter som inte syns vid aktiv skanning?'
+            remediation: 'Inför passiv upptäckt via nätverkssensorer (t.ex. NDR eller IDS) och koppla resultatet till inventariet.'
+      - id: '2'
+        title: 'Inventering av programvara'
+        controls:
+          - id: '2.1'
+            title: 'Förteckning över programvara'
+            profile: 1
+            guidance: 'Finns en förteckning över godkänd programvara med version, leverantör och affärssyfte? Granskas den halvårsvis?'
+            remediation: 'Upprätta en programvaruförteckning, gärna genererad från MDM- eller inventeringsverktyg, och granska den två gånger per år.'
+          - id: '2.2'
+            title: 'Godkänd programvara har support'
+            profile: 1
+            guidance: 'Har all godkänd programvara leverantörssupport och säkerhetsuppdateringar? Är undantag dokumenterade med riskbedömning?'
+            remediation: 'Ta bort eller ersätt programvara utan support. Dokumentera nödvändiga undantag med kompenserande åtgärder och accepterad restrisk. Granska månadsvis.'
+          - id: '2.3'
+            title: 'Hantering av icke godkänd programvara'
+            profile: 1
+            guidance: 'Upptäcks och åtgärdas programvara som inte är godkänd, minst månadsvis?'
+            remediation: 'Inför en rutin som jämför installerad programvara mot förteckningen och tar bort eller godkänner avvikelser.'
+          - id: '2.4'
+            title: 'Automatisk inventering av programvara'
+            profile: 2
+            guidance: 'Används verktyg som automatiskt inventerar installerad programvara på alla enheter?'
+            remediation: 'Använd MDM, Intune, Defender for Endpoint eller motsvarande för automatisk inventering och rapportering.'
+          - id: '2.5'
+            title: 'Tillåtelselista för programvara'
+            profile: 2
+            guidance: 'Kan bara godkänd programvara köras, t.ex. via AppLocker eller WDAC?'
+            remediation: 'Inför tillåtelselistning med AppLocker, Windows Defender Application Control eller motsvarande. Börja i granskningsläge och gå sedan över till blockering.'
+          - id: '2.6'
+            title: 'Tillåtelselista för bibliotek'
+            profile: 2
+            guidance: 'Begränsas vilka programbibliotek (t.ex. .dll, .so) som får laddas?'
+            remediation: 'Utöka tillåtelselistningen till bibliotek och följ upp blockeringar regelbundet.'
+          - id: '2.7'
+            title: 'Tillåtelselista för skript'
+            profile: 3
+            guidance: 'Begränsas vilka skript (PowerShell, Python, makron) som får köras, t.ex. genom signering?'
+            remediation: 'Kräv signerade skript, använd Constrained Language Mode i PowerShell och blockera osignerade makron.'
+      - id: '3'
+        title: 'Dataskydd'
+        controls:
+          - id: '3.1'
+            title: 'Process för datahantering'
+            profile: 1
+            guidance: 'Finns en beslutad process för hur data hanteras: känslighet, ägare, lagring, gallring och kassering?'
+            remediation: 'Ta fram en rutin för datahantering som täcker klassning, ägarskap, lagring och gallring. Låt ledningen besluta den och granska den årligen.'
+          - id: '3.2'
+            title: 'Förteckning över data'
+            profile: 1
+            guidance: 'Finns en förteckning över känsliga data och var de lagras? Granskas den årligen?'
+            remediation: 'Kartlägg känsliga informationsmängder, system och ägare utifrån processen i 3.1 och håll förteckningen aktuell.'
+          - id: '3.3'
+            title: 'Åtkomstlistor för data'
+            profile: 1
+            guidance: 'Begränsas åtkomst till filer, databaser och applikationer utifrån behov?'
+            remediation: 'Gå igenom behörigheter på filytor, SharePoint, databaser och molnlagring. Ta bort breda behörigheter som "Alla" och tilldela via grupper.'
+          - id: '3.4'
+            title: 'Gallring av data'
+            profile: 1
+            guidance: 'Gallras data enligt fastställda lagringstider, med både minsta och längsta tid?'
+            remediation: 'Fastställ lagringstider per informationstyp och inför automatisk gallring där det går, t.ex. lagringsprinciper i Microsoft Purview.'
+          - id: '3.5'
+            title: 'Säker kassering av data'
+            profile: 1
+            guidance: 'Raderas data och lagringsmedia säkert när de inte längre behövs?'
+            remediation: 'Inför rutin för säker radering och destruktion av media, med intyg från leverantör vid extern hantering.'
+          - id: '3.6'
+            title: 'Kryptering av data på användarenheter'
+            profile: 1
+            guidance: 'Är hårddiskarna på bärbara datorer och mobiler krypterade?'
+            remediation: 'Aktivera BitLocker eller FileVault via MDM och kräv kryptering i efterlevnadspolicyer för mobiler.'
+          - id: '3.7'
+            title: 'Klassningsschema för data'
+            profile: 2
+            guidance: 'Finns ett klassningsschema (t.ex. öppen, intern, känslig) som används och granskas årligen?'
+            remediation: 'Ta fram ett klassningsschema med få nivåer och märk data, t.ex. med känslighetsetiketter i Microsoft Purview.'
+          - id: '3.8'
+            title: 'Dokumenterade dataflöden'
+            profile: 2
+            guidance: 'Finns dokumentation över dataflöden, även till och från tjänsteleverantörer?'
+            remediation: 'Dokumentera dataflöden för de viktigaste systemen och uppdatera vid förändringar.'
+          - id: '3.9'
+            title: 'Kryptering av flyttbara media'
+            profile: 2
+            guidance: 'Krypteras data på USB-minnen och andra flyttbara media?'
+            remediation: 'Kräv BitLocker To Go eller motsvarande, eller blockera flyttbara media via policy.'
+          - id: '3.10'
+            title: 'Kryptering av känslig data under överföring'
+            profile: 2
+            guidance: 'Skyddas känslig data med kryptering vid överföring, t.ex. TLS 1.2 eller senare och SSH?'
+            remediation: 'Kräv TLS 1.2 eller senare för webbtjänster och API:er, stäng av okrypterade protokoll och använd SSH eller SFTP för administration och filöverföring.'
+          - id: '3.11'
+            title: 'Kryptering av känslig data i vila'
+            profile: 2
+            guidance: 'Är känslig data krypterad där den lagras: servrar, databaser och molnlagring?'
+            remediation: 'Aktivera kryptering i vila för lagring och databaser, och använd kundhanterade nycklar där kraven motiverar det.'
+          - id: '3.12'
+            title: 'Separering utifrån känslighet'
+            profile: 2
+            guidance: 'Lagras och bearbetas data av olika känslighet åtskilt?'
+            remediation: 'Segmentera system och lagring så att känslig data inte delar miljö med mindre skyddad data.'
+          - id: '3.13'
+            title: 'Skydd mot dataläckage (DLP)'
+            profile: 3
+            guidance: 'Finns en DLP-lösning som upptäcker känslig data i e-post, molntjänster och på enheter?'
+            remediation: 'Inför DLP, t.ex. Microsoft Purview DLP, börja med övervakning och gå över till blockering för de viktigaste datatyperna.'
+          - id: '3.14'
+            title: 'Loggning av åtkomst till känslig data'
+            profile: 3
+            guidance: 'Loggas åtkomst och ändringar av känslig data?'
+            remediation: 'Aktivera granskningsloggning för filytor, databaser och molnlagring med känslig data och skicka loggarna till central loggning.'
+      - id: '4'
+        title: 'Säker konfiguration av tillgångar och programvara'
+        controls:
+          - id: '4.1'
+            title: 'Process för säker konfiguration'
+            profile: 1
+            guidance: 'Finns dokumenterade säkerhetskonfigurationer (baslinjer) för enheter och programvara, och granskas de årligen?'
+            remediation: 'Ta fram baslinjer, gärna utifrån CIS Benchmarks eller Microsofts säkerhetsbaslinjer, och tillämpa dem via GPO, Intune eller Azure Policy.'
+          - id: '4.2'
+            title: 'Säker konfiguration av nätverksutrustning'
+            profile: 1
+            guidance: 'Finns säkerhetskonfiguration för brandväggar, switchar och routrar, och granskas den årligen?'
+            remediation: 'Ta fram baslinjer för nätverksutrustning och följ upp avvikelser vid förändringar och årligen.'
+          - id: '4.3'
+            title: 'Automatisk skärmlåsning'
+            profile: 1
+            guidance: 'Låses datorer automatiskt efter högst 15 minuters inaktivitet, och mobiler efter högst 2 minuter?'
+            remediation: 'Sätt skärmlås via GPO eller Intune: högst 15 minuter för datorer och högst 2 minuter för mobiler.'
+          - id: '4.4'
+            title: 'Brandvägg på servrar'
+            profile: 1
+            guidance: 'Har servrar en aktiv värdbrandvägg eller motsvarande med standardregeln neka?'
+            remediation: 'Aktivera värdbrandväggen på alla servrar och öppna bara nödvändiga portar. I molnet används även nätverkssäkerhetsgrupper.'
+          - id: '4.5'
+            title: 'Brandvägg på användarenheter'
+            profile: 1
+            guidance: 'Har användarenheter en aktiv brandvägg som nekar oönskad inkommande trafik?'
+            remediation: 'Aktivera Windows-brandväggen eller motsvarande via policy och låt användare inte stänga av den.'
+          - id: '4.6'
+            title: 'Säker administration av tillgångar'
+            profile: 1
+            guidance: 'Administreras enheter och programvara via säkra protokoll och versionshanterad konfiguration?'
+            remediation: 'Använd SSH, HTTPS och hanterad konfiguration (t.ex. infrastruktur som kod). Stäng av Telnet och okrypterad HTTP för administration.'
+          - id: '4.7'
+            title: 'Standardkonton'
+            profile: 1
+            guidance: 'Är standardkonton (t.ex. admin, root, förinställda leverantörskonton) inaktiverade eller har de bytt lösenord?'
+            remediation: 'Inaktivera eller döp om standardkonton och byt alla standardlösenord vid installation.'
+          - id: '4.8'
+            title: 'Onödiga tjänster'
+            profile: 2
+            guidance: 'Är onödiga tjänster och funktioner avinstallerade eller avstängda?'
+            remediation: 'Stäng av tjänster som inte behövs, t.ex. fildelning, gamla protokoll och webbtjänster på servrar utan behov.'
+          - id: '4.9'
+            title: 'Betrodda DNS-servrar'
+            profile: 2
+            guidance: 'Använder enheterna organisationens kontrollerade DNS-servrar eller en betrodd DNS-tjänst?'
+            remediation: 'Styr DNS-inställningar via DHCP och policy till interna eller betrodda filtrerande DNS-tjänster.'
+          - id: '4.10'
+            title: 'Automatisk låsning av bärbara enheter'
+            profile: 2
+            guidance: 'Låses bärbara enheter efter ett antal misslyckade inloggningar (högst 20 för bärbara datorer, 10 för mobiler)?'
+            remediation: 'Konfigurera kontolåsning eller radering efter misslyckade försök via Intune eller MDM.'
+          - id: '4.11'
+            title: 'Fjärradering av bärbara enheter'
+            profile: 2
+            guidance: 'Kan förlorade eller stulna bärbara enheter raderas på distans?'
+            remediation: 'Registrera enheterna i MDM och säkerställ att fjärradering fungerar. Testa rutinen.'
+          - id: '4.12'
+            title: 'Separata arbetsytor på mobiler'
+            profile: 3
+            guidance: 'Separeras organisationens appar och data från privata på mobila enheter?'
+            remediation: 'Använd t.ex. Android Work Profile eller Intune-skyddsprinciper för appar (MAM) för att skilja arbetsdata från privata.'
+      - id: '5'
+        title: 'Kontohantering'
+        controls:
+          - id: '5.1'
+            title: 'Förteckning över konton'
+            profile: 1
+            guidance: 'Finns en förteckning över alla användar- och administratörskonton, med ägare, och granskas den kvartalsvis?'
+            remediation: 'Ta fram kontoförteckning från Entra ID och lokala system och granska den kvartalsvis mot anställningar och uppdrag.'
+          - id: '5.2'
+            title: 'Unika lösenord'
+            profile: 1
+            guidance: 'Har alla konton unika lösenord, med minst 8 tecken vid MFA och 14 tecken annars?'
+            remediation: 'Inför lösenordspolicy, lösenordshanterare och Windows LAPS för lokala administratörskonton.'
+          - id: '5.3'
+            title: 'Inaktivering av vilande konton'
+            profile: 1
+            guidance: 'Inaktiveras konton som inte använts på 45 dagar?'
+            remediation: 'Inför automatisk eller återkommande genomgång av inaktiva konton, t.ex. med åtkomstgranskningar i Entra ID.'
+          - id: '5.4'
+            title: 'Separata administratörskonton'
+            profile: 1
+            guidance: 'Används administratörsbehörighet bara via särskilda adminkonton, inte vardagskonton för e-post och webb?'
+            remediation: 'Skapa separata adminkonton utan e-post och ta bort administratörsrättigheter från vardagskonton.'
+          - id: '5.5'
+            title: 'Förteckning över tjänstekonton'
+            profile: 2
+            guidance: 'Finns en förteckning över tjänstekonton med ägare, syfte och granskning kvartalsvis?'
+            remediation: 'Inventera tjänstekonton och tjänsteprincipaler, ange ägare och ersätt dem med hanterade identiteter där det går.'
+          - id: '5.6'
+            title: 'Central kontohantering'
+            profile: 2
+            guidance: 'Hanteras konton centralt i en katalogtjänst, t.ex. Entra ID eller Active Directory?'
+            remediation: 'Koppla system till den centrala katalogen via SSO och provisionering i stället för lokala konton.'
+      - id: '6'
+        title: 'Behörighetshantering'
+        controls:
+          - id: '6.1'
+            title: 'Process för att tilldela behörighet'
+            profile: 1
+            guidance: 'Finns en dokumenterad process för att bevilja behörighet vid anställning och rollbyte?'
+            remediation: 'Inför en beställnings- och godkännandeprocess, gärna automatiserad via HR-system eller åtkomstpaket i Entra ID.'
+          - id: '6.2'
+            title: 'Process för att ta bort behörighet'
+            profile: 1
+            guidance: 'Tas behörigheter bort direkt vid avslutad anställning eller rollbyte?'
+            remediation: 'Inför en avslutsprocess som spärrar konton och tar bort behörigheter samma dag, helst automatiskt från HR-systemet.'
+          - id: '6.3'
+            title: 'MFA för externt exponerade applikationer'
+            profile: 1
+            guidance: 'Krävs MFA för alla applikationer som nås från internet?'
+            remediation: 'Kräv MFA med villkorsstyrd åtkomst i Entra ID för alla molntjänster och externa applikationer.'
+          - id: '6.4'
+            title: 'MFA för fjärråtkomst'
+            profile: 1
+            guidance: 'Krävs MFA för VPN och annan fjärråtkomst till nätverket?'
+            remediation: 'Koppla VPN och fjärråtkomst till Entra ID eller annan MFA-lösning.'
+          - id: '6.5'
+            title: 'MFA för administrativ åtkomst'
+            profile: 1
+            guidance: 'Krävs MFA för alla administratörskonton, både i molnet och lokalt?'
+            remediation: 'Kräv phishing-resistent MFA för administratörer, t.ex. FIDO2 eller Windows Hello for Business, via villkorsstyrd åtkomst.'
+          - id: '6.6'
+            title: 'Förteckning över autentiseringssystem'
+            profile: 2
+            guidance: 'Finns en förteckning över system för autentisering och behörighet, även externa?'
+            remediation: 'Dokumentera vilka identitetssystem som används och granska förteckningen årligen.'
+          - id: '6.7'
+            title: 'Central åtkomstkontroll'
+            profile: 2
+            guidance: 'Styrs åtkomst centralt via katalogtjänst eller SSO?'
+            remediation: 'Anslut applikationer till Entra ID med SSO och styr åtkomst via grupper.'
+          - id: '6.8'
+            title: 'Rollbaserad åtkomstkontroll'
+            profile: 3
+            guidance: 'Är behörigheter definierade per roll och granskas de årligen?'
+            remediation: 'Ta fram rollmodell med behörigheter per roll och inför årliga åtkomstgranskningar.'
+      - id: '7'
+        title: 'Kontinuerlig sårbarhetshantering'
+        controls:
+          - id: '7.1'
+            title: 'Process för sårbarhetshantering'
+            profile: 1
+            guidance: 'Finns en dokumenterad process för sårbarhetshantering som granskas årligen?'
+            remediation: 'Ta fram en process som beskriver skanning, prioritering, åtgärdstider och uppföljning.'
+          - id: '7.2'
+            title: 'Process för åtgärd av sårbarheter'
+            profile: 1
+            guidance: 'Finns en riskbaserad plan för att åtgärda sårbarheter, med uppföljning minst månadsvis?'
+            remediation: 'Fastställ åtgärdstider per allvarlighetsgrad och följ upp öppna sårbarheter månadsvis.'
+          - id: '7.3'
+            title: 'Automatisk uppdatering av operativsystem'
+            profile: 1
+            guidance: 'Installeras säkerhetsuppdateringar för operativsystem automatiskt, minst månadsvis?'
+            remediation: 'Använd Windows Update for Business, Azure Update Manager eller motsvarande med automatiska uppdateringsfönster.'
+          - id: '7.4'
+            title: 'Automatisk uppdatering av applikationer'
+            profile: 1
+            guidance: 'Uppdateras applikationer automatiskt, minst månadsvis?'
+            remediation: 'Inför automatisk uppdatering av vanliga applikationer via Intune, WinGet eller tredjepartsverktyg.'
+          - id: '7.5'
+            title: 'Sårbarhetsskanning av interna tillgångar'
+            profile: 2
+            guidance: 'Görs autentiserad och oautentiserad sårbarhetsskanning av interna tillgångar minst kvartalsvis?'
+            remediation: 'Inför sårbarhetsskanning, t.ex. Defender Vulnerability Management eller en extern skanner, och följ upp resultatet.'
+          - id: '7.6'
+            title: 'Sårbarhetsskanning av externa tillgångar'
+            profile: 2
+            guidance: 'Skannas internetexponerade tillgångar efter sårbarheter minst månadsvis?'
+            remediation: 'Skanna externa IP-adresser och domäner månadsvis, t.ex. med Defender EASM eller en extern tjänst.'
+          - id: '7.7'
+            title: 'Åtgärd av upptäckta sårbarheter'
+            profile: 2
+            guidance: 'Åtgärdas upptäckta sårbarheter enligt processen, minst månadsvis?'
+            remediation: 'Följ upp skanningsresultat mot åtgärdstiderna och rapportera avvikelser till ledningen.'
+      - id: '8'
+        title: 'Hantering av granskningsloggar'
+        controls:
+          - id: '8.1'
+            title: 'Process för logghantering'
+            profile: 1
+            guidance: 'Finns en dokumenterad process för vilka loggar som samlas in, hur de granskas och hur länge de sparas?'
+            remediation: 'Ta fram en loggpolicy som anger loggkällor, lagringstid, granskning och ansvar.'
+          - id: '8.2'
+            title: 'Insamling av granskningsloggar'
+            profile: 1
+            guidance: 'Är granskningsloggning aktiverad på enheter, system och molntjänster?'
+            remediation: 'Aktivera granskningsloggning i operativsystem, Entra ID, Microsoft 365 och Azure (aktivitetslogg och diagnostikinställningar).'
+          - id: '8.3'
+            title: 'Tillräcklig lagring för loggar'
+            profile: 1
+            guidance: 'Finns tillräckligt med lagringsutrymme för loggarna enligt policyn?'
+            remediation: 'Dimensionera logglagringen för den fastställda lagringstiden och övervaka att den inte tar slut.'
+          - id: '8.4'
+            title: 'Tidssynkronisering'
+            profile: 2
+            guidance: 'Synkroniseras tiden mot minst två gemensamma tidskällor?'
+            remediation: 'Konfigurera NTP mot gemensamma tidskällor på alla servrar och nätverksenheter.'
+          - id: '8.5'
+            title: 'Detaljerade granskningsloggar'
+            profile: 2
+            guidance: 'Innehåller loggarna detaljer som händelse, tid, användare, källa och resultat för känsliga system?'
+            remediation: 'Aktivera utökad loggning för system med känslig data så att loggarna räcker för utredning.'
+          - id: '8.6'
+            title: 'Loggning av DNS-frågor'
+            profile: 2
+            guidance: 'Loggas DNS-frågor där det är möjligt?'
+            remediation: 'Aktivera DNS-loggning på interna DNS-servrar eller via filtrerande DNS-tjänst.'
+          - id: '8.7'
+            title: 'Loggning av URL-anrop'
+            profile: 2
+            guidance: 'Loggas webbanrop (URL) där det är möjligt?'
+            remediation: 'Logga webbtrafik via proxy, brandvägg eller Defender for Endpoint.'
+          - id: '8.8'
+            title: 'Loggning av kommandorad'
+            profile: 2
+            guidance: 'Loggas kommandon i PowerShell, bash och fjärradministration?'
+            remediation: 'Aktivera PowerShell-skriptblockloggning och processloggning med kommandorad, och samla in dem centralt.'
+          - id: '8.9'
+            title: 'Central loggning'
+            profile: 2
+            guidance: 'Samlas loggarna centralt, t.ex. i en SIEM eller Log Analytics?'
+            remediation: 'Skicka loggar till central loggplattform, t.ex. Microsoft Sentinel eller Log Analytics.'
+          - id: '8.10'
+            title: 'Lagringstid för loggar'
+            profile: 2
+            guidance: 'Sparas granskningsloggar i minst 90 dagar?'
+            remediation: 'Ställ in lagringstid på minst 90 dagar, längre om lagkrav eller avtal kräver det.'
+          - id: '8.11'
+            title: 'Granskning av loggar'
+            profile: 2
+            guidance: 'Granskas loggar minst varje vecka för att hitta avvikelser?'
+            remediation: 'Inför veckovis granskning med larmregler och en ansvarig som följer upp avvikelser.'
+          - id: '8.12'
+            title: 'Loggar från tjänsteleverantörer'
+            profile: 3
+            guidance: 'Samlas loggar in från tjänsteleverantörer, t.ex. inloggningar och ändringar i SaaS-tjänster?'
+            remediation: 'Hämta loggar från viktiga molntjänster via API eller koppling till SIEM.'
+      - id: '9'
+        title: 'Skydd för e-post och webbläsare'
+        controls:
+          - id: '9.1'
+            title: 'Webbläsare och e-postklienter med support'
+            profile: 1
+            guidance: 'Används bara webbläsare och e-postklienter som har support och är uppdaterade?'
+            remediation: 'Standardisera på webbläsare och e-postklient med support och uppdatera dem automatiskt.'
+          - id: '9.2'
+            title: 'DNS-filtrering'
+            profile: 1
+            guidance: 'Används DNS-filtrering för att blockera kända skadliga domäner?'
+            remediation: 'Inför filtrerande DNS-tjänst eller Defender for Endpoint-webbskydd på alla enheter.'
+          - id: '9.3'
+            title: 'URL-filtrering'
+            profile: 2
+            guidance: 'Används nätverksbaserade URL-filter för att begränsa skadliga och olämpliga webbplatser?'
+            remediation: 'Inför URL-filtrering i proxy, brandvägg eller Defender for Endpoint och uppdatera kategorierna.'
+          - id: '9.4'
+            title: 'Tillägg i webbläsare och e-post'
+            profile: 2
+            guidance: 'Begränsas vilka tillägg som får installeras i webbläsare och e-postklienter?'
+            remediation: 'Styr tillåtna tillägg via policy för Edge, Chrome och Outlook.'
+          - id: '9.5'
+            title: 'DMARC'
+            profile: 2
+            guidance: 'Har organisationens domäner SPF, DKIM och DMARC, med DMARC på karantän eller avvisa?'
+            remediation: 'Publicera SPF och DKIM, inför DMARC med rapportering och gå stegvis till p=quarantine eller p=reject.'
+          - id: '9.6'
+            title: 'Blockering av onödiga filtyper'
+            profile: 2
+            guidance: 'Blockeras filtyper i e-post som inte behövs, t.ex. körbara filer?'
+            remediation: 'Blockera farliga bilagor i e-postfiltret, t.ex. med standardlistan i Defender for Office 365.'
+          - id: '9.7'
+            title: 'Skydd mot skadlig kod på e-postservern'
+            profile: 3
+            guidance: 'Skannas e-post efter skadlig kod, inklusive sandlådeanalys av bilagor?'
+            remediation: 'Aktivera skydd mot skadlig kod och säkra bilagor i e-posttjänsten.'
+      - id: '10'
+        title: 'Skydd mot skadlig kod'
+        controls:
+          - id: '10.1'
+            title: 'Program mot skadlig kod'
+            profile: 1
+            guidance: 'Finns skydd mot skadlig kod på alla enheter där det är möjligt?'
+            remediation: 'Installera och aktivera Microsoft Defender eller motsvarande på alla klienter och servrar.'
+          - id: '10.2'
+            title: 'Automatisk uppdatering av signaturer'
+            profile: 1
+            guidance: 'Uppdateras signaturer automatiskt?'
+            remediation: 'Säkerställ automatiska uppdateringar och övervaka enheter med gamla signaturer.'
+          - id: '10.3'
+            title: 'Autorun för flyttbara media'
+            profile: 1
+            guidance: 'Är autorun och autoplay avstängda för flyttbara media?'
+            remediation: 'Stäng av autorun och autoplay via GPO eller Intune.'
+          - id: '10.4'
+            title: 'Skanning av flyttbara media'
+            profile: 2
+            guidance: 'Skannas flyttbara media automatiskt när de ansluts?'
+            remediation: 'Aktivera automatisk skanning av flyttbara media i skyddet mot skadlig kod.'
+          - id: '10.5'
+            title: 'Skydd mot exploatering'
+            profile: 2
+            guidance: 'Är skydd mot exploatering aktiverat, t.ex. DEP, ASLR och regler för minskning av attackytan?'
+            remediation: 'Aktivera exploateringsskydd och ASR-regler i Defender, först i granskningsläge.'
+          - id: '10.6'
+            title: 'Central hantering av skyddet'
+            profile: 2
+            guidance: 'Hanteras skyddet mot skadlig kod centralt?'
+            remediation: 'Hantera skyddet centralt i Defender-portalen, Intune eller motsvarande konsol.'
+          - id: '10.7'
+            title: 'Beteendebaserat skydd'
+            profile: 2
+            guidance: 'Används beteendebaserat skydd (EDR) och inte bara signaturer?'
+            remediation: 'Inför EDR, t.ex. Microsoft Defender for Endpoint, med central övervakning av larm.'
+      - id: '11'
+        title: 'Återställning av data'
+        controls:
+          - id: '11.1'
+            title: 'Process för återställning av data'
+            profile: 1
+            guidance: 'Finns en dokumenterad process för säkerhetskopiering och återställning, med omfattning, prioritering och skydd?'
+            remediation: 'Ta fram en rutin för säkerhetskopiering som anger vad som kopieras, hur ofta, hur länge och i vilken ordning system återställs.'
+          - id: '11.2'
+            title: 'Automatisk säkerhetskopiering'
+            profile: 1
+            guidance: 'Görs säkerhetskopior automatiskt, minst veckovis och oftare för känslig data?'
+            remediation: 'Schemalägg automatiska säkerhetskopior, t.ex. med Azure Backup, och följ upp misslyckade jobb.'
+          - id: '11.3'
+            title: 'Skydd av säkerhetskopior'
+            profile: 1
+            guidance: 'Skyddas säkerhetskopiorna lika väl som originaldata, t.ex. med kryptering och åtkomstkontroll?'
+            remediation: 'Kryptera säkerhetskopior, begränsa åtkomsten och aktivera mjuk borttagning.'
+          - id: '11.4'
+            title: 'Isolerad kopia av data'
+            profile: 1
+            guidance: 'Finns en isolerad kopia som inte kan ändras eller raderas från produktionsmiljön (offline eller oföränderlig)?'
+            remediation: 'Inför oföränderliga eller frånkopplade säkerhetskopior, t.ex. oföränderliga valv i Azure Backup.'
+          - id: '11.5'
+            title: 'Test av återställning'
+            profile: 2
+            guidance: 'Testas återställning minst kvartalsvis för ett urval av system?'
+            remediation: 'Genomför och dokumentera återställningstester kvartalsvis och åtgärda brister.'
+      - id: '12'
+        title: 'Hantering av nätverksinfrastruktur'
+        controls:
+          - id: '12.1'
+            title: 'Uppdaterad nätverksinfrastruktur'
+            profile: 1
+            guidance: 'Har nätverksutrustningen aktuell programvara med support?'
+            remediation: 'Uppdatera firmware regelbundet och ersätt utrustning utan support.'
+          - id: '12.2'
+            title: 'Säker nätverksarkitektur'
+            profile: 2
+            guidance: 'Finns en säker nätverksarkitektur med segmentering, minsta behörighet och tillgänglighet?'
+            remediation: 'Segmentera nätverket efter funktion och känslighet, t.ex. med VLAN, subnät och nätverkssäkerhetsgrupper.'
+          - id: '12.3'
+            title: 'Säker administration av nätverket'
+            profile: 2
+            guidance: 'Administreras nätverksutrustning säkert, med versionshanterad konfiguration och krypterade protokoll?'
+            remediation: 'Administrera via dedikerat nät och krypterade protokoll, och versionshantera konfigurationen.'
+          - id: '12.4'
+            title: 'Arkitekturskisser'
+            profile: 2
+            guidance: 'Finns aktuella nätverks- och arkitekturskisser som granskas årligen?'
+            remediation: 'Ta fram och underhåll nätverksdiagram, även för molnmiljön.'
+          - id: '12.5'
+            title: 'Central AAA för nätverket'
+            profile: 2
+            guidance: 'Hanteras autentisering, behörighet och loggning för nätverksutrustning centralt?'
+            remediation: 'Koppla nätverksutrustning till RADIUS eller TACACS+ med central loggning.'
+          - id: '12.6'
+            title: 'Säkra protokoll för nätverkshantering'
+            profile: 2
+            guidance: 'Används säkra protokoll, t.ex. 802.1X och WPA2/WPA3 Enterprise?'
+            remediation: 'Inför 802.1X för trådbundet och trådlöst nät och stäng av osäkra protokoll.'
+          - id: '12.7'
+            title: 'VPN för fjärranslutna enheter'
+            profile: 2
+            guidance: 'Ansluter fjärranslutna enheter via VPN eller motsvarande med central autentisering?'
+            remediation: 'Kräv VPN eller Zero Trust-åtkomst med central autentisering för fjärranslutna enheter.'
+          - id: '12.8'
+            title: 'Särskilda enheter för administration'
+            profile: 3
+            guidance: 'Används särskilda, avgränsade enheter för administrativt arbete?'
+            remediation: 'Inför administrativa arbetsstationer (PAW) eller avgränsade virtuella miljöer för administration.'
+      - id: '13'
+        title: 'Nätverksövervakning och försvar'
+        controls:
+          - id: '13.1'
+            title: 'Central larmhantering'
+            profile: 2
+            guidance: 'Samlas säkerhetslarm centralt och korreleras?'
+            remediation: 'Inför SIEM, t.ex. Microsoft Sentinel, och samla larm från Defender, brandväggar och identitetssystem.'
+          - id: '13.2'
+            title: 'Intrångsdetektering på värdar'
+            profile: 2
+            guidance: 'Finns intrångsdetektering på enheter (HIDS eller EDR)?'
+            remediation: 'Använd EDR eller HIDS på servrar och klienter och övervaka larmen.'
+          - id: '13.3'
+            title: 'Intrångsdetektering i nätverket'
+            profile: 2
+            guidance: 'Finns intrångsdetektering i nätverket, t.ex. IDS eller NDR?'
+            remediation: 'Inför IDS eller NDR vid nätverkets gränser och mellan viktiga segment.'
+          - id: '13.4'
+            title: 'Trafikfiltrering mellan nätverkssegment'
+            profile: 2
+            guidance: 'Filtreras trafik mellan nätverkssegment?'
+            remediation: 'Inför regler mellan segment med brandvägg eller nätverkssäkerhetsgrupper och tillåt bara nödvändig trafik.'
+          - id: '13.5'
+            title: 'Åtkomstkontroll för fjärranslutna tillgångar'
+            profile: 2
+            guidance: 'Kontrolleras fjärranslutna enheters säkerhetsstatus innan de får åtkomst?'
+            remediation: 'Använd villkorsstyrd åtkomst med krav på kompatibel enhet i Intune.'
+          - id: '13.6'
+            title: 'Flödesloggar'
+            profile: 2
+            guidance: 'Samlas flödesloggar in från nätverket och brandväggar?'
+            remediation: 'Aktivera flödesloggar, t.ex. VNet-flödesloggar i Azure, och samla dem centralt.'
+          - id: '13.7'
+            title: 'Intrångsskydd på värdar'
+            profile: 3
+            guidance: 'Finns intrångsskydd (HIPS) som kan blockera attacker på enheter?'
+            remediation: 'Aktivera blockerande funktioner i EDR, t.ex. ASR-regler och nätverksskydd.'
+          - id: '13.8'
+            title: 'Intrångsskydd i nätverket'
+            profile: 3
+            guidance: 'Finns intrångsskydd (IPS) som kan blockera attacker i nätverket?'
+            remediation: 'Aktivera IPS i brandväggar, t.ex. Azure Firewall Premium.'
+          - id: '13.9'
+            title: 'Åtkomstkontroll på portnivå'
+            profile: 3
+            guidance: 'Används portbaserad åtkomstkontroll, t.ex. 802.1X med certifikat?'
+            remediation: 'Inför 802.1X med certifikatbaserad autentisering på nätverksportar.'
+          - id: '13.10'
+            title: 'Filtrering i applikationslagret'
+            profile: 3
+            guidance: 'Filtreras trafik i applikationslagret, t.ex. med WAF eller proxy?'
+            remediation: 'Inför webbapplikationsbrandvägg för publika webbtjänster och proxy för utgående trafik.'
+          - id: '13.11'
+            title: 'Justering av larmtrösklar'
+            profile: 3
+            guidance: 'Justeras tröskelvärden för larm minst månadsvis?'
+            remediation: 'Gå igenom larm och falska positiva månadsvis och justera reglerna.'
+      - id: '14'
+        title: 'Säkerhetsmedvetenhet och utbildning'
+        controls:
+          - id: '14.1'
+            title: 'Program för säkerhetsmedvetenhet'
+            profile: 1
+            guidance: 'Finns ett utbildningsprogram i säkerhet för all personal, vid anställning och minst årligen?'
+            remediation: 'Inför ett årligt utbildningsprogram med introduktion för nyanställda och följ upp genomförandet.'
+          - id: '14.2'
+            title: 'Social manipulation'
+            profile: 1
+            guidance: 'Utbildas personalen i att känna igen nätfiske och annan social manipulation?'
+            remediation: 'Genomför utbildning och regelbundna nätfiskeövningar.'
+          - id: '14.3'
+            title: 'Autentisering'
+            profile: 1
+            guidance: 'Utbildas personalen i säker autentisering: MFA, lösenord och inloggningsuppgifter?'
+            remediation: 'Ta med MFA, lösenordshanterare och hantering av inloggningsuppgifter i utbildningen.'
+          - id: '14.4'
+            title: 'Datahantering'
+            profile: 1
+            guidance: 'Utbildas personalen i att hantera, lagra och kassera känslig data?'
+            remediation: 'Ta med klassning, lagring och säker kassering av data i utbildningen.'
+          - id: '14.5'
+            title: 'Oavsiktlig exponering av data'
+            profile: 1
+            guidance: 'Utbildas personalen om hur data oavsiktligt exponeras, t.ex. felskickad e-post eller förlorade enheter?'
+            remediation: 'Ta med vanliga misstag och hur de undviks i utbildningen.'
+          - id: '14.6'
+            title: 'Rapportering av incidenter'
+            profile: 1
+            guidance: 'Vet personalen hur man känner igen och rapporterar en säkerhetsincident?'
+            remediation: 'Utbilda i tecken på incidenter och gör rapporteringsvägen enkel och känd.'
+          - id: '14.7'
+            title: 'Saknade säkerhetsuppdateringar'
+            profile: 1
+            guidance: 'Vet personalen hur man upptäcker och rapporterar att en enhet saknar uppdateringar?'
+            remediation: 'Utbilda personalen i att kontrollera uppdateringar och rapportera problem till IT.'
+          - id: '14.8'
+            title: 'Osäkra nätverk'
+            profile: 1
+            guidance: 'Utbildas personalen om riskerna med att arbeta via osäkra nätverk, t.ex. öppna wifi?'
+            remediation: 'Ta med säkra anslutningar och VPN i utbildningen.'
+          - id: '14.9'
+            title: 'Rollanpassad utbildning'
+            profile: 2
+            guidance: 'Får roller med särskilt ansvar, t.ex. administratörer och utvecklare, anpassad utbildning?'
+            remediation: 'Ta fram utbildning för administratörer, utvecklare och andra nyckelroller.'
+      - id: '15'
+        title: 'Hantering av tjänsteleverantörer'
+        controls:
+          - id: '15.1'
+            title: 'Förteckning över tjänsteleverantörer'
+            profile: 1
+            guidance: 'Finns en förteckning över tjänsteleverantörer med klassning och kontaktperson?'
+            remediation: 'Ta fram en leverantörsförteckning med tjänst, klassning, avtal och kontaktperson och granska den årligen.'
+          - id: '15.2'
+            title: 'Policy för leverantörsstyrning'
+            profile: 2
+            guidance: 'Finns en policy för hur tjänsteleverantörer väljs, följs upp och avslutas?'
+            remediation: 'Ta fram en policy för leverantörsstyrning som täcker urval, krav, uppföljning och avslut.'
+          - id: '15.3'
+            title: 'Klassning av leverantörer'
+            profile: 2
+            guidance: 'Klassas leverantörer utifrån datas känslighet, volym och tillgänglighetskrav?'
+            remediation: 'Klassa leverantörer i kritiska, viktiga och övriga och anpassa kraven efter det.'
+          - id: '15.4'
+            title: 'Säkerhetskrav i avtal'
+            profile: 2
+            guidance: 'Innehåller avtalen säkerhetskrav, t.ex. incidentrapportering, kryptering och radering av data?'
+            remediation: 'Inför standardiserade säkerhetsbilagor i avtal med leverantörer som hanterar känslig data.'
+          - id: '15.5'
+            title: 'Bedömning av leverantörer'
+            profile: 3
+            guidance: 'Bedöms leverantörerna utifrån klassningen, t.ex. med frågeformulär eller SOC 2-rapport?'
+            remediation: 'Gör leverantörsbedömningar årligen för kritiska leverantörer.'
+          - id: '15.6'
+            title: 'Övervakning av leverantörer'
+            profile: 3
+            guidance: 'Övervakas leverantörerna löpande, t.ex. förändringar, incidenter och säkerhetsbetyg?'
+            remediation: 'Följ upp leverantörernas säkerhet löpande och vid incidenter.'
+          - id: '15.7'
+            title: 'Säker avveckling av leverantörer'
+            profile: 3
+            guidance: 'Avslutas leverantörer säkert: konton spärras, data raderas och flöden stängs?'
+            remediation: 'Inför en avslutsrutin med spärr av konton, radering av data och intyg från leverantören.'
+      - id: '16'
+        title: 'Säkerhet i applikationsprogramvara'
+        controls:
+          - id: '16.1'
+            title: 'Säker utvecklingsprocess'
+            profile: 2
+            guidance: 'Finns en dokumenterad process för säker utveckling?'
+            remediation: 'Ta fram en process för säker utveckling, t.ex. utifrån OWASP SAMM eller Microsoft SDL.'
+          - id: '16.2'
+            title: 'Hantering av sårbarheter i programvara'
+            profile: 2
+            guidance: 'Finns en process för att ta emot och åtgärda rapporterade sårbarheter i egen programvara?'
+            remediation: 'Inför en kontaktväg för sårbarhetsrapporter och en process för bedömning och åtgärd.'
+          - id: '16.3'
+            title: 'Grundorsaksanalys'
+            profile: 2
+            guidance: 'Görs grundorsaksanalys av sårbarheter i egen programvara?'
+            remediation: 'Analysera grundorsaken till allvarliga sårbarheter och åtgärda i processen, inte bara i koden.'
+          - id: '16.4'
+            title: 'Förteckning över tredjepartskomponenter'
+            profile: 2
+            guidance: 'Finns en förteckning över tredjepartskomponenter (SBOM) som granskas månadsvis?'
+            remediation: 'Generera SBOM i byggprocessen och granska komponenterna regelbundet.'
+          - id: '16.5'
+            title: 'Uppdaterade tredjepartskomponenter'
+            profile: 2
+            guidance: 'Används bara uppdaterade och betrodda tredjepartskomponenter?'
+            remediation: 'Inför beroendeskanning, t.ex. Dependabot, och uppdatera sårbara komponenter.'
+          - id: '16.6'
+            title: 'Allvarlighetsgradering av sårbarheter'
+            profile: 2
+            guidance: 'Finns ett system för att gradera allvarlighet i applikationssårbarheter?'
+            remediation: 'Inför gradering, t.ex. med CVSS, och åtgärdstider per nivå.'
+          - id: '16.7'
+            title: 'Härdningsmallar för applikationsinfrastruktur'
+            profile: 2
+            guidance: 'Används standardiserade härdningsmallar för servrar, databaser och molntjänster?'
+            remediation: 'Använd härdade mallar och infrastruktur som kod för applikationsmiljöer.'
+          - id: '16.8'
+            title: 'Separata produktions- och testmiljöer'
+            profile: 2
+            guidance: 'Är produktions- och testmiljöer åtskilda?'
+            remediation: 'Separera miljöer med egna prenumerationer eller nätverk och olika behörigheter.'
+          - id: '16.9'
+            title: 'Utbildning i säker kodning'
+            profile: 2
+            guidance: 'Utbildas utvecklare i säker kodning minst årligen?'
+            remediation: 'Genomför årlig utbildning i säker kodning för utvecklare.'
+          - id: '16.10'
+            title: 'Säkra designprinciper'
+            profile: 2
+            guidance: 'Tillämpas säkra designprinciper, t.ex. minsta behörighet och validering av indata?'
+            remediation: 'Inför designgranskning med säkerhetsprinciper i utvecklingsprocessen.'
+          - id: '16.11'
+            title: 'Beprövade säkerhetskomponenter'
+            profile: 2
+            guidance: 'Används beprövade moduler och tjänster för autentisering, kryptering och loggning i stället för egenutvecklade?'
+            remediation: 'Använd plattformens tjänster, t.ex. Entra ID, Key Vault och etablerade bibliotek.'
+          - id: '16.12'
+            title: 'Säkerhetskontroller på kodnivå'
+            profile: 3
+            guidance: 'Används statisk och dynamisk analys (SAST och DAST) i utvecklingen?'
+            remediation: 'Inför SAST och DAST i byggkedjan och följ upp resultaten.'
+          - id: '16.13'
+            title: 'Penetrationstester av applikationer'
+            profile: 3
+            guidance: 'Penetrationstestas kritiska applikationer?'
+            remediation: 'Genomför penetrationstester av kritiska applikationer, med autentiserad testning.'
+          - id: '16.14'
+            title: 'Hotmodellering'
+            profile: 3
+            guidance: 'Görs hotmodellering för nya och ändrade applikationer?'
+            remediation: 'Inför hotmodellering, t.ex. STRIDE, vid design av nya system och större förändringar.'
+      - id: '17'
+        title: 'Incidenthantering'
+        controls:
+          - id: '17.1'
+            title: 'Personal för incidenthantering'
+            profile: 1
+            guidance: 'Finns utsedd person med ersättare som ansvarar för incidenthantering?'
+            remediation: 'Utse incidentansvarig och ersättare, internt eller hos leverantör.'
+          - id: '17.2'
+            title: 'Kontaktuppgifter för rapportering'
+            profile: 1
+            guidance: 'Finns aktuella kontaktuppgifter för att rapportera incidenter, både internt och till myndigheter och partner?'
+            remediation: 'Upprätta en kontaktlista med interna roller, leverantörer, försäkringsbolag och myndigheter, t.ex. CERT-SE, och granska den årligen.'
+          - id: '17.3'
+            title: 'Process för att rapportera incidenter'
+            profile: 1
+            guidance: 'Finns en process för hur personal rapporterar incidenter, med tidsgränser och mottagare?'
+            remediation: 'Dokumentera rapporteringsvägen och gör den känd för all personal.'
+          - id: '17.4'
+            title: 'Process för incidenthantering'
+            profile: 2
+            guidance: 'Finns en dokumenterad incidenthanteringsprocess med roller, kommunikation och lagkrav?'
+            remediation: 'Ta fram en incidenthanteringsplan med faser, roller, eskalering och rapporteringskrav.'
+          - id: '17.5'
+            title: 'Roller och ansvar vid incidenter'
+            profile: 2
+            guidance: 'Är roller och ansvar vid incidenter fördelade, t.ex. juridik, IT, kommunikation och ledning?'
+            remediation: 'Fördela roller i incidentplanen och se till att de är kända.'
+          - id: '17.6'
+            title: 'Kommunikation vid incidenter'
+            profile: 2
+            guidance: 'Finns alternativa kommunikationsvägar om ordinarie system inte fungerar?'
+            remediation: 'Bestäm primära och sekundära kommunikationsvägar, t.ex. telefonlista och separat chattkanal.'
+          - id: '17.7'
+            title: 'Övningar'
+            profile: 2
+            guidance: 'Övas incidenthanteringen minst årligen?'
+            remediation: 'Genomför årliga övningar, t.ex. skrivbordsövningar, och dokumentera lärdomar.'
+          - id: '17.8'
+            title: 'Utvärdering efter incidenter'
+            profile: 2
+            guidance: 'Utvärderas incidenter i efterhand för att förbättra hanteringen?'
+            remediation: 'Gör en utvärdering efter varje större incident och följ upp åtgärderna.'
+          - id: '17.9'
+            title: 'Tröskelvärden för incidenter'
+            profile: 3
+            guidance: 'Finns kriterier för vad som är en incident och hur allvarlig den är?'
+            remediation: 'Definiera tröskelvärden och allvarlighetsnivåer, kopplade till rapporteringskrav.'
+      - id: '18'
+        title: 'Penetrationstester'
+        controls:
+          - id: '18.1'
+            title: 'Program för penetrationstester'
+            profile: 2
+            guidance: 'Finns ett program för penetrationstester med omfattning, frekvens och krav på leverantör?'
+            remediation: 'Ta fram ett program för penetrationstester anpassat efter verksamhetens storlek och risk.'
+          - id: '18.2'
+            title: 'Externa penetrationstester'
+            profile: 2
+            guidance: 'Görs externa penetrationstester minst årligen?'
+            remediation: 'Genomför årliga externa penetrationstester av internetexponerade system.'
+          - id: '18.3'
+            title: 'Åtgärd av resultat från penetrationstester'
+            profile: 2
+            guidance: 'Åtgärdas fynden från penetrationstester enligt en prioriterad plan?'
+            remediation: 'För in fynden i åtgärdsplanen med prioritet och följ upp tills de är åtgärdade.'
+          - id: '18.4'
+            title: 'Validering av säkerhetsåtgärder'
+            profile: 3
+            guidance: 'Verifieras att säkerhetsåtgärder fungerar efter tester, t.ex. att larm utlöses?'
+            remediation: 'Använd testresultaten för att verifiera och justera detektion och skydd.'
+          - id: '18.5'
+            title: 'Interna penetrationstester'
+            profile: 3
+            guidance: 'Görs interna penetrationstester minst årligen?'
+            remediation: 'Genomför årliga interna penetrationstester, inklusive Active Directory och Entra ID.'

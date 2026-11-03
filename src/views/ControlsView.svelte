@@ -1,10 +1,11 @@
 <script lang="ts">
-  // Grundkrav eller Annex A: bedömning per krav och kontroll (README 4.7).
+  // Ett avsnitt i ramverket, t.ex. Grundkrav, Annex A eller CIS-rekommendationer: bedömning per kontroll (README 4.7).
 
   import { onMount, untrack } from 'svelte'
   import ControlItem from '../components/ControlItem.svelte'
   import StatusBar from '../components/StatusBar.svelte'
-  import { NO_FILTER, STATUSES, STATUS_LABELS, attention, filterControls, isExcluded, linkedRisks, type Attention, type ControlFilter } from '../lib/assessment'
+  import { NO_FILTER, STATUSES, STATUS_LABELS, attention, filterControls, linkedRisks, type Attention, type ControlFilter } from '../lib/assessment'
+  import { canExclude, exclusion } from '../lib/scope'
   import { groupProgress, percent } from '../lib/compliance'
   import type { Section } from '../lib/frameworks/schema'
   import { store } from '../lib/project/store.svelte'
@@ -50,7 +51,7 @@
     <div class="big-pct">{percent(total.fulfilled, total.applicable)} %</div>
     <p class="meta">{total.fulfilled} av {total.applicable} tillämpliga uppfyllda</p>
 
-    <div class="field-label">{section.soa ? 'Teman' : 'Kapitel'}</div>
+    <div class="field-label">{section.groupLabel ?? (section.soa ? 'Teman' : 'Kapitel')}</div>
     <ul class="group-list">
       {#each progress as g (g.id)}
         <li>
@@ -87,7 +88,7 @@
         <option value="all">Alla statusar</option>
         {#each STATUSES as s (s)}<option value={s}>{STATUS_LABELS[s]}</option>{/each}
       </select>
-      {#if section.soa}
+      {#if canExclude(section) || store.framework?.profiles}
         <label class="check"><input type="checkbox" bind:checked={filter.hideExcluded} /> Dölj ej tillämpliga</label>
       {/if}
       <span class="toolbar-end">
@@ -108,7 +109,7 @@
         <h3 id="grp-h-{g.id}"><span class="group-id">{g.id}</span> {g.title}</h3>
         <ul class="control-list">
           {#each g.controls as c (c.id)}
-            <ControlItem control={c} excluded={isExcluded(project, section, c.id)} risks={risks.get(c.id) ?? []} bind:open={() => openIds[c.id] ?? false, (v) => (openIds[c.id] = v)} />
+            <ControlItem control={c} {section} excluded={exclusion(project, section, c.id)} risks={risks.get(c.id) ?? []} bind:open={() => openIds[c.id] ?? false, (v) => (openIds[c.id] = v)} />
           {/each}
         </ul>
       </section>

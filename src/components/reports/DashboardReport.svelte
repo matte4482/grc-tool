@@ -1,10 +1,10 @@
 <script lang="ts">
-  // Lägesbild på en sida: redo för revision, uppfyllnad, risker och åtgärder (fas 6).
+  // Lägesbild på en sida: redo för revision eller uppfyllnad per nivå, uppfyllnad, risker och åtgärder (fas 6, B-47).
 
   import { actionSummary } from '../../lib/actions'
   import { soaSummary, totalAttention } from '../../lib/assessment'
   import { assessmentProgress, groupProgress, percent, sectionProgress } from '../../lib/compliance'
-  import { VERDICT_LABELS, readiness } from '../../lib/dashboard'
+  import { VERDICT_LABELS, profileProgress, readiness } from '../../lib/dashboard'
   import { store } from '../../lib/project/store.svelte'
   import { heatmap, riskSummary } from '../../lib/risk/rules'
   import { localDate } from '../../lib/ui/format'
@@ -16,7 +16,9 @@
   const ready = $derived(readiness(project, framework))
   const total = $derived(assessmentProgress(project, framework))
   const sections = $derived(sectionProgress(project, framework))
-  const themes = $derived(framework.sections.filter((s) => s.soa).flatMap((s) => groupProgress(project, s)))
+  const themes = $derived(framework.sections.filter((s) => s.soa || framework.sections.length === 1).flatMap((s) => groupProgress(project, s)))
+  const levels = $derived(profileProgress(project, framework))
+  const target = $derived(levels.find((l) => l.target))
   const risks = $derived(riskSummary(project))
   const actions = $derived(actionSummary(project, localDate()))
   const soa = $derived(soaSummary(project, framework))
@@ -28,19 +30,32 @@
 {#if showSummary && project.engagement.summary}<p>{project.engagement.summary}</p>{/if}
 <div class="kpis">
   <div class="kpi"><b>{percent(total.fulfilled, total.applicable)} %</b>uppfyllda av {total.applicable} tillämpliga</div>
-  <div class="kpi"><b>{ready.pct} %</b>{VERDICT_LABELS[ready.verdict]}</div>
-  <div class="kpi"><b>{risks.aboveThreshold}</b>risker över acceptansnivån</div>
+  {#if framework.readiness}
+    <div class="kpi"><b>{ready.pct} %</b>redo för revision · {VERDICT_LABELS[ready.verdict].toLowerCase()}</div>
+  {:else if target}
+    <div class="kpi"><b>{target.pct} %</b>uppfyllda på målnivån {target.label}</div>
+  {/if}
+  {#if framework.riskManagement}<div class="kpi"><b>{risks.aboveThreshold}</b>risker över acceptansnivån</div>{/if}
   <div class="kpi"><b>{actions.open}</b>öppna åtgärder, {actions.overdue} försenade</div>
 </div>
 
 <div class="two-col">
   <div>
-    <h3>Redo för revision</h3>
-    <table>
-      <tbody>
-        {#each ready.items as i (i.key)}<tr><td>{i.label}</td><td class="num">{i.applies ? `${i.done} av ${i.total}` : '–'}</td><td class="num">{i.applies ? `${i.pct} %` : '–'}</td></tr>{/each}
-      </tbody>
-    </table>
+    {#if framework.readiness}
+      <h3>Redo för revision</h3>
+      <table>
+        <tbody>
+          {#each ready.items as i (i.key)}<tr><td>{i.label}</td><td class="num">{i.applies ? `${i.done} av ${i.total}` : '–'}</td><td class="num">{i.applies ? `${i.pct} %` : '–'}</td></tr>{/each}
+        </tbody>
+      </table>
+    {:else if levels.length}
+      <h3>Uppfyllnad per nivå</h3>
+      <table>
+        <tbody>
+          {#each levels as l (l.level)}<tr><td>{l.label}{l.target ? ' (målnivå)' : ''}</td><td class="num">{l.fulfilled} av {l.applicable}</td><td class="num">{l.pct} %</td></tr>{/each}
+        </tbody>
+      </table>
+    {/if}
   </div>
   <div>
     <h3>Uppfyllnad per avsnitt</h3>
@@ -60,21 +75,23 @@
 </div>
 
 <div class="two-col section">
-  <div>
-    <h3>Riskprofil</h3>
-    <div class="two-col">
-      <div><MatrixTable counts={heatmap(project, 'before')} caption="Före behandling" /></div>
-      <div><MatrixTable counts={heatmap(project, 'actual')} caption="Faktisk restrisk" /></div>
+  {#if framework.riskManagement}
+    <div>
+      <h3>Riskprofil</h3>
+      <div class="two-col">
+        <div><MatrixTable counts={heatmap(project, 'before')} caption="Före behandling" /></div>
+        <div><MatrixTable counts={heatmap(project, 'actual')} caption="Faktisk restrisk" /></div>
+      </div>
     </div>
-  </div>
+  {/if}
   <div>
-    <h3>Att göra före revision</h3>
+    <h3>{framework.readiness ? 'Att göra före revision' : 'Att göra'}</h3>
     <table>
       <tbody>
         <tr><td>Ej bedömda krav och kontroller</td><td class="num">{todo.notAssessed}</td></tr>
         <tr><td>Uppfyllda utan evidens</td><td class="num">{todo.noEvidence}</td></tr>
         <tr><td>Saknar ansvarig</td><td class="num">{todo.noOwner}</td></tr>
-        <tr><td>Risker som väntar på godkännande</td><td class="num">{risks.awaitingApproval}</td></tr>
+        {#if framework.riskManagement}<tr><td>Risker som väntar på godkännande</td><td class="num">{risks.awaitingApproval}</td></tr>{/if}
         {#if framework.sections.some((s) => s.soa)}<tr><td>Bortval i SoA utan motivering</td><td class="num">{soa.missing}</td></tr>{/if}
         <tr><td>Försenade åtgärder</td><td class="num">{actions.overdue}</td></tr>
       </tbody>

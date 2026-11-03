@@ -51,14 +51,6 @@ h3 {
   padding: 0 28px;
 }
 
-.eyebrow {
-  font-size: 12px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--gold);
-  font-weight: 600;
-}
-
 header.app {
   background: #000; /* samma svart som logotypen */
   color: #f2efe8;
@@ -101,7 +93,6 @@ header.app .version {
 }
 
 .meta,
-.info,
 footer {
   color: var(--ink-soft);
   font-size: 14px;
@@ -307,9 +298,6 @@ input {
   line-height: 1.25;
   margin: 8px 0 10px;
 }
-.intro p {
-  color: var(--ink-soft);
-}
 
 .start-grid {
   display: grid;
@@ -436,11 +424,6 @@ input {
   font-size: 13px;
   color: var(--ink-faint);
 }
-.fw-desc {
-  font-size: 14px;
-  color: var(--ink-soft);
-  margin-top: 4px;
-}
 .fw-card.upcoming .fw-name {
   color: var(--ink-soft);
 }
@@ -490,7 +473,7 @@ input {
 
 .form-foot {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
@@ -978,6 +961,46 @@ h3.sub {
   margin-top: 10px;
 }
 
+/* Nivå, åtgärd och referenser (B-47) */
+.tag {
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  padding: 0 6px;
+  white-space: nowrap;
+}
+.tag.muted {
+  color: var(--ink-faint);
+}
+.refs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-faint);
+  word-break: break-all;
+}
+.na-row,
+.control-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.control-foot .updated {
+  margin-left: auto;
+}
+.na-row + .field-label {
+  margin-top: 4px;
+}
+.profile-list .target {
+  font-weight: 600;
+}
+.mini-bar.wide {
+  display: block;
+  width: 100%;
+}
+
 /* Status */
 .status-picker {
   display: flex;
@@ -1150,10 +1173,6 @@ button.danger {
   background: var(--red);
   border-color: var(--red);
   color: #fff;
-}
-
-main > .info {
-  margin-top: 24px;
 }
 
 /* ── Riskvyer (fas 3) ──────────────────────────────────────────────────── */

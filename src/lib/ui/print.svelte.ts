@@ -3,6 +3,7 @@
 import { tick } from 'svelte'
 import { downloadFile } from '../storage/download'
 import { wordDocument } from '../report/word'
+import { store } from '../project/store.svelte'
 
 export type ReportId = 'full' | 'dashboard' | 'gap' | 'soa' | 'plan' | 'progress'
 
@@ -14,6 +15,10 @@ export const REPORT_TITLES: Record<ReportId, string> = {
   plan: 'Riskbehandlingsplan',
   progress: 'Progressrapport',
 }
+
+/** Rapportens rubrik. Utan riskhantering är planen en åtgärdsplan (B-47). */
+export const reportTitle = (id: ReportId): string =>
+  id === 'plan' && store.framework?.riskManagement === false ? 'Åtgärdsplan' : REPORT_TITLES[id]
 
 class Printer {
   report = $state<ReportId | null>(null)
@@ -38,7 +43,7 @@ class Printer {
     await tick()
     const html = document.querySelector('.print-sheet .report')?.outerHTML ?? ''
     this.report = null
-    downloadFile(fileName, wordDocument(REPORT_TITLES[id], html), 'application/msword')
+    downloadFile(fileName, wordDocument(reportTitle(id), html), 'application/msword')
   }
 }
 

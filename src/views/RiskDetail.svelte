@@ -178,7 +178,7 @@
       <div><dt>Faktisk restrisk</dt><dd><LevelBadge score={actual} /></dd></div>
     </dl>
     {#if warn.length && actual}<p class="warn-up">▲ Faktisk {riskValue(actual)} — {warn.join(', ')}</p>{/if}
-    {#if risk.treatment === 'accept'}<p class="meta">Risken accepteras, så restrisken är risken före behandling.</p>{/if}
+    {#if risk.treatment === 'accept'}<p class="meta">Accepteras: restrisk = före behandling.</p>{/if}
   </section>
 </div>
 
@@ -217,7 +217,7 @@
       </table>
     </div>
   {:else}
-    <p class="meta">Inga kontroller kopplade. Utan kopplingar blir restrisken samma som risken före behandling.</p>
+    <p class="meta">Inga kontroller kopplade.</p>
   {/if}
 </section>
 
@@ -228,7 +228,6 @@
 
 <section class="card">
   <h2>Evidens</h2>
-  <p class="meta">Underlag för bedömningen, t.ex. anteckningar från riskworkshopen.</p>
   <EvidenceList owner={{ kind: 'risk', id: riskId }} />
 </section>
 

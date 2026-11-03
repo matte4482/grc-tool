@@ -16,6 +16,7 @@ export type ParseResult = { ok: true; project: Project } | { ok: false; errors: 
 export function createProject(opts: {
   client: string
   framework: Pick<Framework, 'id' | 'version'>
+  profile?: number
   now?: Date
   id?: string
 }): Project {
@@ -26,6 +27,7 @@ export function createProject(opts: {
     id: opts.id ?? crypto.randomUUID(),
     client: { name: opts.client.trim() },
     framework: { id: opts.framework.id, version: opts.framework.version },
+    profile: opts.profile,
     createdAt: now,
     updatedAt: now,
   })
@@ -130,7 +132,7 @@ export function emptyAnswer(): ControlAssessment {
  * tom lista betyder att allt stämmer.
  *
  * - Alla kontroll-ID:n i projektet ska finnas i ramverket.
- * - Bara kontroller i SoA-avsnitt får väljas bort.
+ * - Bara kontroller i SoA-avsnitt, eller avsnitt med optional, får väljas bort.
  * - En kontroll som är kopplad till en risk får inte vara bortvald (låst som tillämplig).
  * - Risker och åtgärder får bara peka på risker som finns.
  */
@@ -142,8 +144,8 @@ export function checkAgainstFramework(project: Project, framework: Framework): s
       `Projektet gäller ${project.framework.id} ${project.framework.version}, men ramverket är ${framework.id} ${framework.version}.`,
     )
 
-  const soaById = new Map<string, boolean>()
-  for (const s of framework.sections) for (const g of s.groups) for (const c of g.controls) soaById.set(c.id, s.soa)
+  const soaById = new Map<string, boolean>() // om kontrollen får väljas bort
+  for (const s of framework.sections) for (const g of s.groups) for (const c of g.controls) soaById.set(c.id, s.soa || !!s.optional)
 
   const known = (id: string, where: string) => {
     if (!soaById.has(id)) problems.push(`${where}: okänd kontroll ${id}`)
@@ -151,7 +153,7 @@ export function checkAgainstFramework(project: Project, framework: Framework): s
 
   for (const [id, a] of Object.entries(project.controls)) {
     known(id, 'Bedömning')
-    if (!a.applicable && soaById.get(id) === false) problems.push(`${id} kan inte väljas bort, den ingår inte i SoA.`)
+    if (!a.applicable && soaById.get(id) === false) problems.push(`${id} kan inte väljas bort.`)
   }
 
   const riskIds = new Set(project.risks.map((r) => r.id))

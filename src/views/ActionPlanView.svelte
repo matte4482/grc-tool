@@ -22,7 +22,7 @@
   import { store } from '../lib/project/store.svelte'
   import { localDate } from '../lib/ui/format'
   import { nav } from '../lib/ui/nav.svelte'
-  import { printer } from '../lib/ui/print.svelte'
+  import { printer, reportTitle } from '../lib/ui/print.svelte'
 
   const onshow = nav.show
 
@@ -69,10 +69,7 @@
 
 {#if proposed.length}
   <section class="card">
-    <div class="card-head">
-      <h2>Förslag</h2>
-      <span class="meta">Brister utan åtgärd. Förslagen sparas inte förrän de blir åtgärder.</span>
-    </div>
+    <h2>Förslag</h2>
     <ul class="suggestions">
       {#each shownSuggestions as s (s.key)}
         <li>
@@ -116,7 +113,7 @@
   <label class="check"><input type="checkbox" bind:checked={filter.overdue} /> Bara försenade</label>
   <span class="toolbar-end">
     <button type="button" onclick={newAction}>+ Ny åtgärd</button>
-    <button type="button" onclick={() => printer.print('plan')}>Skriv ut riskbehandlingsplan</button>
+    <button type="button" onclick={() => printer.print('plan')}>Skriv ut {reportTitle('plan').toLowerCase()}</button>
   </span>
 </div>
 
@@ -130,7 +127,7 @@
   {:else if project.actions.length}
     <p class="meta">Inga åtgärder matchar filtret.</p>
   {:else}
-    <p class="meta">Inga åtgärder än. Skapa dem från förslagen ovan eller med "+ Ny åtgärd".</p>
+    <p class="meta">Inga åtgärder ännu.</p>
   {/if}
 </section>
 

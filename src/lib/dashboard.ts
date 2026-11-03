@@ -7,6 +7,7 @@ import { answerFor, isExcluded } from './assessment'
 import { percent, sectionProgress } from './compliance'
 import { needsEvidence } from './evidence/evidence'
 import { approvalState } from './risk/rules'
+import { exclusion } from './scope'
 
 export interface ReadinessItem {
   key: 'assessed' | 'mandatory' | 'controls' | 'evidence' | 'soa' | 'risks' | 'actions'
@@ -21,9 +22,9 @@ export interface ReadinessItem {
 export type Verdict = 'ready' | 'close' | 'not_ready'
 
 export const VERDICT_LABELS: Record<Verdict, string> = {
-  ready: 'Redo för certifieringsrevision',
-  close: 'Nära, men något återstår',
-  not_ready: 'Inte redo för revision',
+  ready: 'Redo',
+  close: 'Nära',
+  not_ready: 'Inte redo',
 }
 
 export interface Readiness {
@@ -78,8 +79,8 @@ export function readiness(project: Project, framework: Framework): Readiness {
     ...(soaSections.length ? [item('controls', 'Tillämpliga kontroller uppfyllda', sum(soaSections, 'fulfilled'), sum(soaSections, 'applicable'))] : []),
     item('evidence', 'Evidens för uppfyllda', withEvidence, claimed),
     ...(soaSections.length ? [item('soa', 'Bortval i SoA motiverade', justified, excluded)] : []),
-    item('risks', 'Risker behandlade och godkända', handled, project.risks.length, true),
-    item('actions', 'Brister med planerad åtgärd (ansvarig och deadline)', planned, open.length + unplanned),
+    ...(framework.riskManagement ? [item('risks', 'Risker behandlade och godkända', handled, project.risks.length, true)] : []),
+    item('actions', 'Brister med planerad åtgärd', planned, open.length + unplanned),
   ]
   const counted = items.filter((i) => i.applies)
   const pct = Math.round(counted.reduce((n, i) => n + i.pct, 0) / counted.length)
@@ -87,4 +88,38 @@ export function readiness(project: Project, framework: Framework): Readiness {
   const mandatoryOk = !required || required.done === required.total
   const verdict: Verdict = pct >= 90 && mandatoryOk ? 'ready' : pct >= 70 ? 'close' : 'not_ready'
   return { items, pct, verdict }
+}
+
+export interface ProfileProgress {
+  level: number
+  label: string
+  applicable: number
+  assessed: number
+  fulfilled: number
+  pct: number
+  /** Projektets målnivå. */
+  target: boolean
+}
+
+/**
+ * Uppfyllnad per nivå för ramverk med nivåer, t.ex. IG1–IG3 (B-47). Varje nivå räknar
+ * sina egna och lägre nivåers kontroller, oavsett projektets målnivå. Ej tillämpliga räknas inte.
+ */
+export function profileProgress(project: Project, framework: Framework): ProfileProgress[] {
+  const all = allControls(framework).filter(({ section, control }) => !exclusion({ controls: project.controls }, section, control.id))
+  return (framework.profiles ?? []).map((label, i) => {
+    const level = i + 1
+    const list = all.filter(({ control }) => (control.profile ?? 1) <= level)
+    const statuses = list.map(({ control }) => answerFor(project, control.id).status)
+    const fulfilled = statuses.filter((s) => s === 'fulfilled').length
+    return {
+      level,
+      label,
+      applicable: list.length,
+      assessed: statuses.filter((s) => s !== 'not_assessed').length,
+      fulfilled,
+      pct: percent(fulfilled, list.length),
+      target: project.profile === level,
+    }
+  })
 }

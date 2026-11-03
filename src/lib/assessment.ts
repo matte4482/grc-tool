@@ -6,6 +6,7 @@ import type { Control, Framework, Group, Section } from './frameworks/schema'
 import { needsEvidence } from './evidence/evidence'
 import { emptyAnswer } from './project/project'
 import type { ControlAssessment, Project, Status } from './project/schema'
+import { canExclude, exclusion } from './scope'
 
 export const STATUS_LABELS: Record<Status, string> = {
   fulfilled: 'Uppfylld',
@@ -25,9 +26,9 @@ export function answerFor(project: Project, controlId: string): ControlAssessmen
   return project.controls[controlId] ?? EMPTY
 }
 
-/** Om kontrollen är bortvald i SoA. Bara kontroller i ett SoA-avsnitt kan vara bortvalda. */
+/** Om kontrollen inte bedöms: bortvald i SoA, ej tillämplig eller utanför målnivån (scope.ts). */
 export function isExcluded(project: Project, section: Section, controlId: string): boolean {
-  return section.soa && project.controls[controlId]?.applicable === false
+  return exclusion(project, section, controlId) !== undefined
 }
 
 /** Tillämplig och delvis eller ej uppfylld, alltså en brist. */
@@ -82,11 +83,11 @@ export function clearParts(draft: Project, controlId: string, now: string): void
 }
 
 /**
- * Väljer in eller bort en kontroll i SoA. Kontroller kopplade till risker kan
- * inte väljas bort. Returnerar false om ändringen inte gjordes.
+ * Väljer in eller bort en kontroll, i SoA eller som ej tillämplig. Kontroller kopplade
+ * till risker kan inte väljas bort. Returnerar false om ändringen inte gjordes.
  */
 export function setApplicable(draft: Project, section: Section, controlId: string, applicable: boolean, now: string): boolean {
-  if (!section.soa) return false
+  if (!canExclude(section)) return false
   if (!applicable && linkedRisks(draft).has(controlId)) return false
   edit(draft, controlId, now, (a) => (a.applicable = applicable))
   return true
@@ -114,7 +115,7 @@ export function filterControls(project: Project, section: Section, filter: Contr
     if (filter.status !== 'all' && (excluded || a.status !== filter.status)) return false
     if (filter.attention && (excluded || !needsAttention(a, filter.attention))) return false
     if (!q) return true
-    return [c.id, c.title, c.guidance ?? '', a.comment, a.owner, a.evidenceNote, ...a.evidence.map((e) => e.file)].some((t) => t.toLowerCase().includes(q))
+    return [c.id, c.title, c.guidance ?? '', c.remediation ?? '', a.comment, a.owner, a.evidenceNote, ...a.evidence.map((e) => e.file)].some((t) => t.toLowerCase().includes(q))
   }
   return section.groups.map((g) => ({ ...g, controls: g.controls.filter(matches) })).filter((g) => g.controls.length > 0)
 }

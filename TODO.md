@@ -6,7 +6,7 @@ Småfix och konkreta punkter som ska åtgärdas. Claude läser den här filen in
 - Ange fil och rad när det går, och i vilken fas punkten senast måste vara åtgärdad.
 - Större beslut hör hemma i ARCHITECTURE.md, inte här.
 
-*Senast uppdaterad: 15 oktober 2026*
+*Senast uppdaterad: 28 oktober 2026*
 
 ## Fas 1 (filsparande), klar 5 okt 2026
 
@@ -72,6 +72,18 @@ Logiken är testad, men följande är inte provat i riktiga webbläsare. Bocka a
 - [ ] **O-06: rutin för att dela ut en ny version.** Förslag finns i ARCHITECTURE. Skriv rutinen i README när den är bestämd. Före M4.
 - [x] **Logotyp som bild** i sidhuvudet och rapporterna (`src/lib/ui/logo.jpg`, B-42). *(15 okt 2026)*
 - [ ] **Kundtest (M4):** en hel gapanalys hos en befintlig kund. Mät tiden mot hur det görs i dag.
+
+## CIS Controls och CIS Benchmarks (B-45–B-47)
+
+- [x] **CIS Controls v8.1 och fyra CIS Azure-benchmarks som ramverk**, med målnivå, ej tillämplig i listan, egna åtgärdstexter och åtgärdsplan (B-47). *(28 okt 2026)*
+- [ ] **Prova en CIS-analys i Chrome eller Edge från disk:** skapa ett CIS Controls-projekt på IG1, bedöm några skyddsåtgärder, markera en som ej tillämplig, skapa åtgärder från förslag, byt målnivå och skriv ut gapanalys och åtgärdsplan.
+- [ ] **Granska de svenska rubrikerna och åtgärdstexterna** i `cis-controls-8.1.yaml` och `cis-azure-*.yaml`. De är skrivna utifrån Microsoft Learn och CIS-ID:n; portalvägar och CLI-kommandon kan behöva justeras när Azure ändras.
+- [ ] **Stäm av med CIS** att egna kontroller med hänvisning till CIS-ID:n är tillåtna i betalda uppdrag.
+- [x] **PDF:erna i `src/lib/frameworks/`** (CIS Azure-benchmarks) ignoreras nu av git (`*.pdf` i `.gitignore`). Flytta dem gärna ut ur repot. *(28 okt 2026)*
+
+## Efter M4
+
+- [ ] **Import från granskningsverktyg: Prowler, Defender for Cloud, Lynis, OpenSCAP och CIS-CAT Lite** (O-07). Översätt resultaten till `grc-fynd` (B-33) och koppla fynden till kontrollerna i projektets ramverk (B-46). För CIS Azure-ramverken är kontroll-ID:t CIS-ID:t. Kontrollera först verktygens utdataformat.
 
 ## Småfix, när som helst
 

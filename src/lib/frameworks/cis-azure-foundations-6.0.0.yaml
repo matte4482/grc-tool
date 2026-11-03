@@ -1,0 +1,806 @@
+# CIS Microsoft Azure Foundations 6.0.0: rekommendationer med nivå (Level 1–2), automatiserad eller manuell och kopplingar.
+# ID, nivå, CIS Controls och Azure Policy-ID kommer från CIS-benchmarken. Rubriker och åtgärder är egna texter (B-45, B-47).
+
+schemaVersion: 1
+id: 'cis-azure-foundations'
+version: '6.0.0'
+name: 'CIS Microsoft Azure Foundations 6.0.0'
+language: 'sv'
+profiles: ['Level 1', 'Level 2']
+riskManagement: false
+readiness: false
+guidanceLabel: 'Kontrollera'
+source: 'ID, nivåer och kopplingar följer CIS Microsoft Azure Foundations Benchmark v6.0.0 från Center for Internet Security. Rubriker och åtgärder är egna texter.'
+sections:
+  - id: 'recommendations'
+    title: 'Rekommendationer'
+    soa: false
+    optional: true
+    unit: 'rekommendationer'
+    groupLabel: 'Områden'
+    groups:
+      - id: '2'
+        title: 'Analystjänster'
+        controls:
+          - id: '2.1.1'
+            title: 'Azure Databricks driftsätts i ett kundhanterat virtuellt nätverk (VNet)'
+            profile: 1
+            automated: true
+            remediation: 'Driftsätt arbetsytan med VNet-injektion i ett eget virtuellt nätverk. Det går inte att ändra i efterhand, så en befintlig arbetsyta måste skapas om.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 9c25c9e4-ee12-4882-afd2-11fb9d87893f']
+          - id: '2.1.2'
+            title: 'Nätverkssäkerhetsgrupper är konfigurerade för Databricks-subnät'
+            profile: 1
+            automated: true
+            remediation: 'Koppla en nätverkssäkerhetsgrupp till både det publika och det privata Databricks-subnätet och begränsa trafiken till det som behövs.'
+            refs: ['CIS Controls v8: 4.4, 13.4']
+          - id: '2.1.3'
+            title: 'Trafiken mellan klustrets arbetsnoder är krypterad'
+            profile: 2
+            automated: false
+            remediation: 'Aktivera kryptering mellan arbetsnoder med ett init-skript för klustret, eller använd en arbetsyta med Premium-nivå som stöder det.'
+            refs: ['CIS Controls v8: 3.10']
+          - id: '2.1.4'
+            title: 'Användare och grupper synkroniseras från Microsoft Entra ID till Azure Databricks'
+            profile: 1
+            automated: false
+            remediation: 'Aktivera SCIM-provisionering från Entra ID till Databricks-kontot så att användare och grupper hanteras centralt.'
+            refs: ['CIS Controls v8: 5.6']
+          - id: '2.1.5'
+            title: 'Unity Catalog är konfigurerat för Azure Databricks'
+            profile: 1
+            automated: false
+            remediation: 'Skapa en metastore i Unity Catalog, koppla arbetsytan till den och styr åtkomst till data via katalogens behörigheter.'
+            refs: ['CIS Controls v8: 5.6, 6.7']
+          - id: '2.1.6'
+            title: 'Personliga åtkomsttoken i Databricks är begränsade och har utgångsdatum'
+            profile: 1
+            automated: false
+            remediation: 'Begränsa vem som får skapa personliga token, sätt en högsta livslängd i administratörsinställningarna och använd tjänsteprincipaler för automatisering.'
+            refs: ['CIS Controls v8: 6.2']
+          - id: '2.1.7'
+            title: 'Leverans av diagnostikloggar är konfigurerad för Azure Databricks'
+            profile: 1
+            automated: true
+            remediation: 'Lägg till en diagnostikinställning på arbetsytan som skickar loggarna till Log Analytics eller ett lagringskonto.'
+            refs: ['CIS Controls v8: 8.2', 'Azure Policy: 138ff14d-b687-4faa-a81c-898c91a87fa2']
+          - id: '2.1.8'
+            title: 'Kritisk data i Azure Databricks krypteras med kundhanterade nycklar (CMK)'
+            profile: 2
+            automated: false
+            remediation: 'Konfigurera kundhanterade nycklar från Key Vault för hanterade tjänster och diskar i arbetsytan (kräver Premium-nivå).'
+            refs: ['CIS Controls v8: 3.11']
+          - id: '2.1.9'
+            title: '''No Public IP'' är satt till ''Enabled'''
+            profile: 1
+            automated: true
+            remediation: 'Driftsätt arbetsytan med säker klusteranslutning (No Public IP) så att klusternoderna saknar publika IP-adresser.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 51c1490f-3319-459c-bbbc-7f391bbed753']
+          - id: '2.1.10'
+            title: '''Allow Public Network Access'' är satt till ''Disabled'''
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk på arbetsytan: stäng av publik nätverksåtkomst och använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 0e7849de-b939-4c50-ab48-fc6b0f5eeba2']
+          - id: '2.1.11'
+            title: 'Privata slutpunkter används för åtkomst till Azure Databricks-arbetsytor'
+            profile: 2
+            automated: true
+            remediation: 'Skapa privata slutpunkter för arbetsytan (databricks_ui_api och browser_authentication) med privat DNS-zon.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 258823f2-4595-4b52-b333-cc96192710d8']
+          - id: '2.1.12'
+            title: 'Grupper i Azure Databricks granskas regelbundet'
+            profile: 1
+            automated: false
+            remediation: 'Granska gruppernas medlemmar och behörigheter minst kvartalsvis och ta bort det som inte behövs.'
+            refs: ['CIS Controls v8: 6.8']
+      - id: '3'
+        title: 'Beräkningstjänster'
+        controls:
+          - id: '3.1.1'
+            title: 'Bara identiteter med MFA har åtkomst till privilegierade virtuella maskiner'
+            profile: 2
+            automated: false
+            remediation: 'Kräv MFA med villkorsstyrd åtkomst för alla som har roller som ger inloggning eller administration på virtuella maskiner.'
+            refs: ['CIS Controls v8: 6.5']
+      - id: '5'
+        title: 'Identitetstjänster'
+        controls:
+          - id: '5.1.1'
+            title: '''Security defaults'' är aktiverat i Microsoft Entra ID'
+            profile: 1
+            automated: true
+            guidance: 'Gäller klienter utan villkorsstyrd åtkomst (Entra ID Free).'
+            remediation: 'Entra ID › Översikt › Egenskaper › Hantera standardinställningar för säkerhet: aktivera. Använder organisationen villkorsstyrd åtkomst ersätter den security defaults.'
+            refs: ['CIS Controls v8: 4.8, 6.3, 6.5']
+          - id: '5.1.2'
+            title: 'MFA krävs för att registrera eller ansluta enheter till Microsoft Entra'
+            profile: 1
+            automated: false
+            remediation: 'Entra ID › Enheter › Enhetsinställningar: sätt "Kräv multifaktorautentisering för att registrera eller ansluta enheter" till Ja, eller kräv det i villkorsstyrd åtkomst.'
+            refs: ['CIS Controls v8: 6.3, 6.4']
+          - id: '5.1.3'
+            title: 'MFA är aktiverat för alla användare'
+            profile: 1
+            automated: true
+            remediation: 'Kräv MFA för alla användare med security defaults eller villkorsstyrd åtkomst, och följ upp registreringen i rapporten för autentiseringsmetoder.'
+            refs: ['CIS Controls v8: 6.3, 6.4']
+          - id: '5.1.4'
+            title: 'Användare kan inte låta betrodda enheter komma ihåg MFA'
+            profile: 1
+            automated: false
+            remediation: 'Stäng av "Låt användare komma ihåg multifaktorautentisering på betrodda enheter" i MFA-inställningarna. Styr inloggningsfrekvensen med villkorsstyrd åtkomst i stället.'
+            refs: ['CIS Controls v8: 6.3, 6.4']
+          - id: '5.3.1'
+            title: 'Administratörskonton används inte i det dagliga arbetet'
+            profile: 1
+            automated: false
+            remediation: 'Skapa separata adminkonton utan e-post och licenser för vardagsarbete, och ta bort administratörsroller från vardagskonton.'
+            refs: ['CIS Controls v8: 5.4']
+          - id: '5.3.2'
+            title: 'Gästanvändare granskas regelbundet'
+            profile: 1
+            automated: false
+            remediation: 'Inför åtkomstgranskningar för gäster i Entra ID, minst kvartalsvis, och ta bort gäster som inte längre behövs.'
+            refs: ['CIS Controls v8: 5.1, 5.3', 'Azure Policy: e9ac8f8e-ce22-4355-8f04-99b911d6be52', 'Azure Policy: 94e1c2ac-cbbe-4cac-a2b5-389c812dee87', 'Azure Policy: 339353f6-2387-4a45-abe4-7f529d121046']
+          - id: '5.3.3'
+            title: 'Rollen ''User Access Administrator'' används restriktivt'
+            profile: 1
+            automated: true
+            remediation: 'Ta bort permanenta tilldelningar av User Access Administrator på rotnivå (/) och ge rollen bara tillfälligt via PIM vid behov.'
+            refs: ['CIS Controls v8: 6.8']
+          - id: '5.3.4'
+            title: 'Alla privilegierade rolltilldelningar granskas regelbundet'
+            profile: 1
+            automated: false
+            remediation: 'Inför åtkomstgranskningar i PIM för privilegierade roller i Entra ID och Azure, minst kvartalsvis.'
+            refs: ['CIS Controls v8: 6.8']
+          - id: '5.3.5'
+            title: 'Inaktiverade användarkonton saknar läs-, skriv- och ägarbehörighet'
+            profile: 1
+            automated: false
+            remediation: 'Ta bort rolltilldelningar för inaktiverade konton och lägg till borttagning av behörigheter i rutinen för avslutad anställning.'
+            refs: ['CIS Controls v8: 5.1', 'Azure Policy: 0cfea604-3201-4e14-88fc-fae4c427a6c5', 'Azure Policy: 8d7e1fde-fe26-4b5f-8108-f8e432cbc2be']
+          - id: '5.3.6'
+            title: 'Tilldelningar av rollen ''Tenant Creator'' granskas regelbundet'
+            profile: 1
+            automated: false
+            remediation: 'Granska vem som har rollen Tenant Creator minst kvartalsvis och begränsa den till ett fåtal namngivna personer.'
+            refs: ['CIS Controls v8: 5.4']
+          - id: '5.3.7'
+            title: 'Alla icke-privilegierade rolltilldelningar granskas regelbundet'
+            profile: 1
+            automated: false
+            remediation: 'Inför åtkomstgranskningar för övriga rolltilldelningar på prenumerationer och resursgrupper, minst halvårsvis.'
+            refs: ['CIS Controls v8: 6.8']
+          - id: '5.4'
+            title: 'Inga anpassade administratörsroller för prenumerationer finns'
+            profile: 1
+            automated: true
+            remediation: 'Ta bort anpassade roller med åtgärden "*" på prenumerationsnivå och använd inbyggda roller som Owner eller Contributor vid behov.'
+            refs: ['CIS Controls v8: 5.4, 6.8', 'Azure Policy: a451c1ef-c6ca-483d-87ed-f49761e3ffb5']
+          - id: '5.5'
+            title: 'En anpassad roll har behörighet att administrera resurslås'
+            profile: 2
+            automated: false
+            remediation: 'Skapa en anpassad roll med Microsoft.Authorization/locks/* och tilldela den till dem som ska hantera resurslås.'
+            refs: ['CIS Controls v8: 3.3, 6.8']
+          - id: '5.6'
+            title: 'Ingen får flytta prenumerationer in i eller ut ur Microsoft Entra-klienten'
+            profile: 2
+            automated: false
+            remediation: 'Under Prenumerationer › Hantera principer: sätt både "Prenumeration lämnar" och "Prenumeration ansluter" till Tillåt ingen.'
+            refs: ['CIS Controls v8: 5.4, 6.1, 6.2']
+          - id: '5.7'
+            title: 'Prenumerationen har två eller tre ägare'
+            profile: 1
+            automated: true
+            remediation: 'Se till att varje prenumeration har minst två och högst tre ägare. Använd PIM för tillfällig ägarbehörighet i stället för permanenta tilldelningar.'
+            refs: ['CIS Controls v8: 5.1', 'Azure Policy: 09024ccc-0c5f-475e-9457-b7c0d9ed487b', 'Azure Policy: 4f11b553-d42e-4e3a-89be-32ca364cad4c']
+      - id: '6'
+        title: 'Styrning och förvaltning'
+        controls:
+          - id: '6.1.1.1'
+            title: 'En diagnostikinställning finns för prenumerationens aktivitetslogg'
+            profile: 1
+            automated: true
+            remediation: 'Monitor › Aktivitetslogg › Exportera aktivitetsloggar: lägg till en diagnostikinställning som skickar loggen till Log Analytics.'
+            refs: ['CIS Controls v8: 8.9']
+          - id: '6.1.1.2'
+            title: 'Diagnostikinställningen fångar lämpliga kategorier'
+            profile: 1
+            automated: true
+            guidance: 'Vilka kategorier i aktivitetsloggen som skickas vidare.'
+            remediation: 'Välj minst kategorierna Administrative, Alert, Policy och Security i diagnostikinställningen för aktivitetsloggen.'
+            refs: ['CIS Controls v8: 8.5', 'Azure Policy: 3b980d31-7904-4bb7-8575-5665739a8052', 'Azure Policy: b954148f-4c11-4c38-8221-be76711e194a', 'Azure Policy: c5447c04-a4d7-4ba8-a263-c9ee321a6858']
+          - id: '6.1.1.3'
+            title: 'Lagringskontot med aktivitetsloggarna krypteras med kundhanterad nyckel (CMK)'
+            profile: 2
+            automated: false
+            remediation: 'Under Kryptering på lagringskontot: välj kundhanterade nycklar med en nyckel i Key Vault.'
+            refs: ['CIS Controls v8: 3.11', 'Azure Policy: fbb99e8e-e444-4da0-9ff1-75c92f5a85b2']
+          - id: '6.1.1.4'
+            title: 'Loggning är aktiverad för Azure Key Vault'
+            profile: 1
+            automated: true
+            remediation: 'Lägg till en diagnostikinställning på varje Key Vault med kategorin AuditEvent till Log Analytics.'
+            refs: ['CIS Controls v8: 8.5', 'Azure Policy: cf820ca0-f99e-4f3e-84fb-66e913812d21']
+          - id: '6.1.1.5'
+            title: 'Flödesloggar för nätverkssäkerhetsgrupper skickas till Log Analytics'
+            profile: 2
+            automated: false
+            remediation: 'Aktivera flödesloggar med Trafikanalys i Network Watcher. Microsoft ersätter NSG-flödesloggar med VNet-flödesloggar (se 6.1.1.6).'
+            refs: ['CIS Controls v8: 13.6', 'Azure Policy: 27960feb-a23c-4577-8d36-ef8b5f35e0be', 'Azure Policy: c251913d-7d24-4958-af87-478ed3b9ba41', 'Azure Policy: 4c3c6c5f-0d47-4402-99b8-aa543dd8bcee']
+          - id: '6.1.1.6'
+            title: 'Flödesloggar för virtuella nätverk skickas till Log Analytics'
+            profile: 2
+            automated: false
+            remediation: 'Network Watcher › Flödesloggar: skapa VNet-flödesloggar och aktivera Trafikanalys mot en Log Analytics-arbetsyta.'
+            refs: ['CIS Controls v8: 13.6', 'Azure Policy: 2f080164-9f4d-497e-9db6-416dc9f7b48a', 'Azure Policy: 4c3c6c5f-0d47-4402-99b8-aa543dd8bcee']
+          - id: '6.1.1.7'
+            title: 'Aktivitetsloggar från Microsoft Graph skickas till ett lämpligt mål'
+            profile: 2
+            automated: false
+            remediation: 'Entra ID › Diagnostikinställningar: skicka kategorin MicrosoftGraphActivityLogs till Log Analytics eller SIEM.'
+            refs: ['CIS Controls v8: 8.2']
+          - id: '6.1.1.8'
+            title: 'Aktivitetsloggar från Microsoft Entra skickas till ett lämpligt mål'
+            profile: 2
+            automated: false
+            remediation: 'Entra ID › Diagnostikinställningar: skicka granskningsloggar och inloggningsloggar till Log Analytics eller SIEM.'
+            refs: ['CIS Controls v8: 8.2']
+          - id: '6.1.1.9'
+            title: 'Intune-loggar skickas till Log Analytics'
+            profile: 2
+            automated: false
+            remediation: 'Intune › Klientadministration › Diagnostikinställningar: skicka AuditLogs, OperationalLogs och DeviceComplianceOrg till Log Analytics.'
+            refs: ['CIS Controls v8: 8.2']
+          - id: '6.1.2.1'
+            title: 'Larm i aktivitetsloggen när en policytilldelning skapas'
+            profile: 1
+            automated: true
+            remediation: 'Skapa en larmregel i Monitor för aktivitetsloggen med operationen Microsoft.Authorization/policyAssignments/write och en åtgärdsgrupp som når ansvariga.'
+            refs: ['CIS Controls v8: 8.5', 'Azure Policy: c5447c04-a4d7-4ba8-a263-c9ee321a6858']
+          - id: '6.1.2.2'
+            title: 'Larm i aktivitetsloggen när en policytilldelning tas bort'
+            profile: 1
+            automated: true
+            remediation: 'Skapa en larmregel för operationen Microsoft.Authorization/policyAssignments/delete med åtgärdsgrupp.'
+            refs: ['CIS Controls v8: 8.5', 'Azure Policy: c5447c04-a4d7-4ba8-a263-c9ee321a6858']
+          - id: '6.1.2.3'
+            title: 'Larm i aktivitetsloggen när en nätverkssäkerhetsgrupp skapas eller ändras'
+            profile: 1
+            automated: true
+            remediation: 'Skapa en larmregel för Microsoft.Network/networkSecurityGroups/write med åtgärdsgrupp.'
+            refs: ['CIS Controls v8: 8.5', 'Azure Policy: b954148f-4c11-4c38-8221-be76711e194a']
+          - id: '6.1.2.4'
+            title: 'Larm i aktivitetsloggen när en nätverkssäkerhetsgrupp tas bort'
+            profile: 1
+            automated: true
+            remediation: 'Skapa en larmregel för Microsoft.Network/networkSecurityGroups/delete med åtgärdsgrupp.'
+            refs: ['CIS Controls v8: 8.5', 'Azure Policy: b954148f-4c11-4c38-8221-be76711e194a']
+          - id: '6.1.2.5'
+            title: 'Larm i aktivitetsloggen när en säkerhetslösning skapas eller ändras'
+            profile: 1
+            automated: true
+            remediation: 'Skapa en larmregel för Microsoft.Security/securitySolutions/write med åtgärdsgrupp.'
+            refs: ['CIS Controls v8: 8.5', 'Azure Policy: 3b980d31-7904-4bb7-8575-5665739a8052']
+          - id: '6.1.2.6'
+            title: 'Larm i aktivitetsloggen när en säkerhetslösning tas bort'
+            profile: 1
+            automated: true
+            remediation: 'Skapa en larmregel för Microsoft.Security/securitySolutions/delete med åtgärdsgrupp.'
+            refs: ['CIS Controls v8: 8.5', 'Azure Policy: 3b980d31-7904-4bb7-8575-5665739a8052']
+          - id: '6.1.2.7'
+            title: 'Larm i aktivitetsloggen när en brandväggsregel för SQL Server skapas eller ändras'
+            profile: 1
+            automated: true
+            remediation: 'Skapa en larmregel för Microsoft.Sql/servers/firewallRules/write med åtgärdsgrupp.'
+            refs: ['CIS Controls v8: 8.5', 'Azure Policy: b954148f-4c11-4c38-8221-be76711e194a']
+          - id: '6.1.2.8'
+            title: 'Larm i aktivitetsloggen när en brandväggsregel för SQL Server tas bort'
+            profile: 1
+            automated: true
+            remediation: 'Skapa en larmregel för Microsoft.Sql/servers/firewallRules/delete med åtgärdsgrupp.'
+            refs: ['CIS Controls v8: 8.5', 'Azure Policy: b954148f-4c11-4c38-8221-be76711e194a']
+          - id: '6.1.2.9'
+            title: 'Larm i aktivitetsloggen när en publik IP-adress skapas eller ändras'
+            profile: 1
+            automated: true
+            remediation: 'Skapa en larmregel för Microsoft.Network/publicIPAddresses/write med åtgärdsgrupp.'
+            refs: ['CIS Controls v8: 8.5']
+          - id: '6.1.2.10'
+            title: 'Larm i aktivitetsloggen när en publik IP-adress tas bort'
+            profile: 1
+            automated: true
+            remediation: 'Skapa en larmregel för Microsoft.Network/publicIPAddresses/delete med åtgärdsgrupp.'
+            refs: ['CIS Controls v8: 8.5']
+          - id: '6.1.2.11'
+            title: 'Larm i aktivitetsloggen för Service Health'
+            profile: 1
+            automated: true
+            remediation: 'Skapa ett Service Health-larm för prenumerationen med de tjänster och regioner som används och en åtgärdsgrupp.'
+            refs: ['CIS Controls v8: 8.5']
+          - id: '6.1.3.1'
+            title: 'Application Insights är konfigurerat'
+            profile: 2
+            automated: true
+            remediation: 'Skapa en arbetsytebaserad Application Insights-resurs och koppla applikationerna till den.'
+            refs: ['CIS Controls v8: 8.2']
+          - id: '6.1.4'
+            title: 'Resursloggning i Azure Monitor är aktiverad för alla tjänster som stöder det'
+            profile: 1
+            automated: false
+            remediation: 'Lägg till diagnostikinställningar på resurserna, gärna i stor skala med de inbyggda Azure Policy-initiativen för diagnostikinställningar.'
+            refs: ['CIS Controls v8: 8.5, 8.9', 'Azure Policy: cf820ca0-f99e-4f3e-84fb-66e913812d21', 'Azure Policy: 91a78b24-f231-4a8a-8da9-02c35b2b6510', 'Azure Policy: 428256e6-1fac-4f48-a757-df34c2b3336d', 'Azure Policy: 057ef27e-665e-4328-8ea3-04b3122bd9fb', 'Azure Policy: c95c74d9-38fe-4f0d-af86-0c7d626a315c', 'Azure Policy: 83a214f7-d01a-484b-91a9-ed54470c9a6a', 'Azure Policy: 383856f8-de7f-44a2-81fc-e5135b5c2aa4', 'Azure Policy: 34f95f76-5386-4de7-b824-0d8478470c9d', 'Azure Policy: b4330a05-a843-4bc8-bf9a-cacce50c67f4', 'Azure Policy: f8d36e2f-389b-4ee4-898d-21aeb69a0f45', 'Azure Policy: f9be5368-9bf5-4b84-9e0a-7850da98bb46', 'Azure Policy: 8a04f872-51e9-4313-97fb-fc1c3543011c']
+          - id: '6.1.5'
+            title: 'SKU:erna Basic, Free och Consumption används inte i produktion som kräver övervakning och SLA'
+            profile: 2
+            automated: false
+            remediation: 'Byt till Standard- eller Premium-SKU för produktionsresurser som kräver SLA och övervakning, t.ex. publika IP-adresser, lastbalanserare och App Service-planer.'
+            refs: ['CIS Controls v8: 2.2']
+          - id: '6.2'
+            title: 'Resurslås finns på verksamhetskritiska resurser'
+            profile: 2
+            automated: false
+            remediation: 'Lägg till raderingslås (CanNotDelete) på verksamhetskritiska resurser eller resursgrupper, och skrivskyddslås där inga ändringar ska göras.'
+            refs: ['CIS Controls v8: 3.3']
+      - id: '7'
+        title: 'Nätverkstjänster'
+        controls:
+          - id: '7.1'
+            title: 'RDP-åtkomst från internet är bedömd och begränsad'
+            profile: 1
+            automated: true
+            remediation: 'Ta bort regler i nätverkssäkerhetsgrupper som tillåter port 3389 från Internet eller 0.0.0.0/0. Använd Azure Bastion eller just-in-time-åtkomst.'
+            refs: ['CIS Controls v8: 13.4', 'Azure Policy: 22730e10-96f6-4aac-ad84-9383d35b5917']
+          - id: '7.2'
+            title: 'SSH-åtkomst från internet är bedömd och begränsad'
+            profile: 1
+            automated: true
+            remediation: 'Ta bort regler som tillåter port 22 från Internet eller 0.0.0.0/0. Använd Azure Bastion eller just-in-time-åtkomst.'
+            refs: ['CIS Controls v8: 13.4', 'Azure Policy: 22730e10-96f6-4aac-ad84-9383d35b5917']
+          - id: '7.3'
+            title: 'UDP-åtkomst från internet är bedömd och begränsad'
+            profile: 1
+            automated: true
+            remediation: 'Ta bort regler som tillåter UDP från Internet, särskilt portar som kan missbrukas för förstärkningsattacker (t.ex. 53, 123, 161, 389, 1900).'
+            refs: ['CIS Controls v8: 13.4', 'Azure Policy: 9daedab3-fb2d-461e-b861-71790eead4f6']
+          - id: '7.4'
+            title: 'HTTP(S)-åtkomst från internet är bedömd och begränsad'
+            profile: 1
+            automated: true
+            remediation: 'Begränsa port 80 och 443 från Internet till resurser som ska vara publika, och placera dem bakom Application Gateway med WAF eller Front Door.'
+            refs: ['CIS Controls v8: 13.4', 'Azure Policy: 9daedab3-fb2d-461e-b861-71790eead4f6']
+          - id: '7.5'
+            title: 'Flödesloggar för nätverkssäkerhetsgrupper sparas minst 90 dagar'
+            profile: 2
+            automated: true
+            remediation: 'Sätt lagringstiden i flödesloggens inställningar till 90 dagar eller mer, eller 0 för obegränsad lagring.'
+            refs: ['CIS Controls v8: 8.3, 8.10']
+          - id: '7.6'
+            title: 'Network Watcher är aktiverat i alla regioner som används'
+            profile: 2
+            automated: true
+            remediation: 'Aktivera Network Watcher i varje region där prenumerationen har resurser. Det görs oftast automatiskt när ett virtuellt nätverk skapas.'
+            refs: ['CIS Controls v8: 12.2, 12.4', 'Azure Policy: b6e2945c-0b7b-40f5-9233-7a5323b5cdc6']
+          - id: '7.7'
+            title: 'Publika IP-adresser granskas regelbundet'
+            profile: 1
+            automated: false
+            remediation: 'Lista alla publika IP-adresser regelbundet, t.ex. med Azure Resource Graph, och ta bort de som inte behövs.'
+            refs: ['CIS Controls v8: 12.1']
+          - id: '7.8'
+            title: 'Flödesloggar för virtuella nätverk sparas minst 90 dagar'
+            profile: 2
+            automated: true
+            remediation: 'Sätt lagringstiden för VNet-flödesloggarna till 90 dagar eller mer.'
+            refs: ['CIS Controls v8: 8.3, 8.10']
+          - id: '7.9'
+            title: 'Punkt-till-plats-VPN i Azure VPN Gateway använder bara Microsoft Entra-autentisering'
+            profile: 2
+            automated: true
+            remediation: 'Under Punkt-till-plats-konfiguration på VPN-gatewayen: välj Azure Active Directory som enda autentiseringstyp.'
+            refs: ['CIS Controls v8: 5.6', 'Azure Policy: 21a6bc25-125e-4d13-b82d-2e19b7208ab7']
+          - id: '7.10'
+            title: 'Web Application Firewall (WAF) är aktiverad på Azure Application Gateway'
+            profile: 2
+            automated: true
+            remediation: 'Använd SKU:n WAF v2 och koppla en WAF-policy i förebyggande läge (Prevention) till Application Gateway.'
+            refs: ['CIS Controls v8: 13.10', 'Azure Policy: 564feb30-bf6a-4854-b4bb-0d2d2d1e6c66']
+          - id: '7.11'
+            title: 'Alla subnät är kopplade till nätverkssäkerhetsgrupper'
+            profile: 1
+            automated: true
+            remediation: 'Koppla en nätverkssäkerhetsgrupp till varje subnät, utom subnät som inte stöder det (t.ex. GatewaySubnet och AzureFirewallSubnet).'
+            refs: ['CIS Controls v8: 4.4', 'Azure Policy: e71308d3-144b-4262-b144-efdc3cc90517']
+          - id: '7.12'
+            title: 'Application Gateway kräver minst TLS 1.2'
+            profile: 1
+            automated: true
+            remediation: 'Välj en fördefinierad SSL-policy med minsta version TLS 1.2, t.ex. AppGwSslPolicy20220101, eller en anpassad policy.'
+            refs: ['CIS Controls v8: 3.10']
+          - id: '7.13'
+            title: 'HTTP/2 är aktiverat på Azure Application Gateway'
+            profile: 1
+            automated: true
+            remediation: 'Aktivera HTTP2 under Konfiguration på Application Gateway.'
+            refs: ['CIS Controls v8: 2.2']
+          - id: '7.14'
+            title: 'WAF-policyn på Application Gateway inspekterar begärandets innehåll'
+            profile: 2
+            automated: true
+            remediation: 'Aktivera inspektion av begärandets brödtext (request body inspection) under Policyinställningar i WAF-policyn.'
+            refs: ['CIS Controls v8: 13.10', 'Azure Policy: ca85ef9a-741d-461d-8b7a-18c2da82c666']
+          - id: '7.15'
+            title: 'WAF-policyn på Application Gateway har botskydd aktiverat'
+            profile: 2
+            automated: true
+            remediation: 'Lägg till regeluppsättningen Microsoft_BotManagerRuleSet under Hanterade regler i WAF-policyn.'
+            refs: ['CIS Controls v8: 13.10', 'Azure Policy: ebea0d86-7fbd-42e3-8a46-27e7568c2525']
+          - id: '7.16'
+            title: 'Azure Network Security Perimeter skyddar PaaS-resurser'
+            profile: 2
+            automated: false
+            remediation: 'Skapa en nätverkssäkerhetsperimeter, koppla PaaS-resurser som lagringskonton och Key Vault till den och tillåt bara nödvändig in- och utgående åtkomst.'
+            refs: ['CIS Controls v8: 13.4']
+      - id: '8'
+        title: 'Säkerhetstjänster'
+        controls:
+          - id: '8.1.1.1'
+            title: 'Microsoft Defender CSPM är aktiverat'
+            profile: 2
+            automated: true
+            remediation: 'Defender for Cloud › Miljöinställningar › prenumerationen › Defender-planer: aktivera Defender CSPM.'
+            refs: ['CIS Controls v8: 7.5, 7.6', 'Azure Policy: 1f90fc71-a595-4066-8974-d4d0802e8ef0']
+          - id: '8.1.2.1'
+            title: 'Microsoft Defender for APIs är aktiverat'
+            profile: 2
+            automated: true
+            remediation: 'Aktivera planen APIs under Defender-planer och koppla API Management-instanserna.'
+            refs: ['CIS Controls v8: 16.2', 'Azure Policy: 7926a6d1-b268-4586-8197-e8ae90c877d7']
+          - id: '8.1.3.1'
+            title: 'Defender for Servers är aktiverat'
+            profile: 2
+            automated: true
+            remediation: 'Aktivera planen Servers (Plan 1 eller Plan 2) under Defender-planer.'
+            refs: ['CIS Controls v8: 7.5, 10.1', 'Azure Policy: 4da35fc9-c9e7-4960-aec9-797fe7d9051d']
+          - id: '8.1.3.2'
+            title: 'Sårbarhetsanalys för maskiner är aktiverad'
+            profile: 2
+            automated: false
+            remediation: 'Under Servers › Inställningar: aktivera sårbarhetsanalys med Microsoft Defender Vulnerability Management.'
+            refs: ['CIS Controls v8: 7.5, 7.6', 'Azure Policy: 501541f7-f7e7-4cd6-868c-4190fdad3ac9']
+          - id: '8.1.3.3'
+            title: 'Komponenten för slutpunktsskydd är aktiverad'
+            profile: 2
+            automated: true
+            remediation: 'Under Servers › Inställningar: aktivera Endpoint protection (integrationen med Defender for Endpoint).'
+            refs: ['CIS Controls v8: 7.5, 10.1, 13.2']
+          - id: '8.1.3.4'
+            title: 'Agentlös skanning av maskiner är aktiverad'
+            profile: 2
+            automated: false
+            remediation: 'Under Servers › Inställningar: aktivera Agentless scanning for machines (kräver Plan 2 eller Defender CSPM).'
+            refs: ['CIS Controls v8: 7.5, 7.6']
+          - id: '8.1.3.5'
+            title: 'Övervakning av filintegritet (FIM) är aktiverad'
+            profile: 2
+            automated: false
+            remediation: 'Under Servers › Inställningar: aktivera File Integrity Monitoring (kräver Plan 2) och välj vilka filer och registernycklar som övervakas.'
+            refs: ['CIS Controls v8: 7.5, 7.6']
+          - id: '8.1.4.1'
+            title: 'Microsoft Defender for Containers är aktiverat'
+            profile: 2
+            automated: true
+            remediation: 'Aktivera planen Containers under Defender-planer, med alla komponenter.'
+            refs: ['CIS Controls v8: 7.5, 7.6', 'Azure Policy: 1c988dd6-ade4-430f-a608-2a3e5b0a6d38']
+          - id: '8.1.5.1'
+            title: 'Microsoft Defender for Storage är aktiverat'
+            profile: 2
+            automated: true
+            remediation: 'Aktivera planen Storage under Defender-planer, gärna med skanning efter skadlig kod.'
+            refs: ['CIS Controls v8: 7.5', 'Azure Policy: 640d2586-54d2-465f-877f-9ffc1d2109f4']
+          - id: '8.1.5.2'
+            title: 'Larm från Advanced Threat Protection för lagringskonton bevakas'
+            profile: 2
+            automated: false
+            remediation: 'Se till att larm från Defender for Storage når någon som agerar, t.ex. via e-postaviseringar, Sentinel eller en åtgärdsgrupp.'
+            refs: ['CIS Controls v8: 8.5']
+          - id: '8.1.6.1'
+            title: 'Microsoft Defender for App Services är aktiverat'
+            profile: 2
+            automated: true
+            remediation: 'Aktivera planen App Service under Defender-planer.'
+            refs: ['CIS Controls v8: 7.5, 7.6, 16.11', 'Azure Policy: 2913021d-f2fd-4f3d-b958-22354e2bdbcb']
+          - id: '8.1.7.1'
+            title: 'Microsoft Defender for Azure Cosmos DB är aktiverat'
+            profile: 2
+            automated: true
+            remediation: 'Under Defender-planer › Databaser › Välj typer: aktivera Azure Cosmos DB.'
+            refs: ['CIS Controls v8: 7.5, 16.11', 'Azure Policy: adbe85b5-83e6-4350-ab58-bf3a4f736e5e']
+          - id: '8.1.7.2'
+            title: 'Microsoft Defender for Open-Source Relational Databases är aktiverat'
+            profile: 2
+            automated: true
+            remediation: 'Under Defender-planer › Databaser › Välj typer: aktivera Open-source relational databases.'
+            refs: ['CIS Controls v8: 7.5, 16.11', 'Azure Policy: 0a9fbe0d-c5c4-4da8-87d8-f4fd77338835']
+          - id: '8.1.7.3'
+            title: 'Microsoft Defender for Azure SQL Databases (även Managed Instance) är aktiverat'
+            profile: 2
+            automated: true
+            remediation: 'Under Defender-planer › Databaser › Välj typer: aktivera Azure SQL Databases.'
+            refs: ['CIS Controls v8: 7.5, 16.11', 'Azure Policy: 7fe3b40f-802b-4cdd-8bd4-fd799c948cc2', 'Azure Policy: abfb7388-5bf4-4ad7-ba99-2cd2f41cebb9', 'Azure Policy: 3bc8a0d5-38e0-4a3d-a657-2cb64468fc34', 'Azure Policy: d38668f5-d155-42c7-ab3d-9b57b50f8fbf', 'Azure Policy: d31e5c31-63b2-4f12-887b-e49456834fa1', 'Azure Policy: 938c4981-c2c9-4168-9cd6-972b8675f906']
+          - id: '8.1.7.4'
+            title: 'Microsoft Defender for SQL Servers on Machines är aktiverat'
+            profile: 2
+            automated: true
+            remediation: 'Under Defender-planer › Databaser › Välj typer: aktivera SQL servers on machines.'
+            refs: ['CIS Controls v8: 7.5, 16.11', 'Azure Policy: 6581d072-105e-4418-827f-bd446d56421b', 'Azure Policy: abfb4388-5bf4-4ad7-ba82-2cd2f41ceae9']
+          - id: '8.1.8.1'
+            title: 'Microsoft Defender for Key Vault är aktiverat'
+            profile: 2
+            automated: true
+            remediation: 'Aktivera planen Key Vault under Defender-planer.'
+            refs: ['CIS Controls v8: 7.5', 'Azure Policy: 0e6763cc-5078-4e64-889d-ff4d9a839047']
+          - id: '8.1.9.1'
+            title: 'Microsoft Defender for Resource Manager är aktiverat'
+            profile: 2
+            automated: true
+            remediation: 'Aktivera planen Resource Manager under Defender-planer.'
+            refs: ['CIS Controls v8: 5.4, 7.5', 'Azure Policy: c3d20c29-b36d-48fe-808b-99a87530ad99']
+          - id: '8.1.10'
+            title: 'Defender for Cloud kontrollerar att virtuella maskiners operativsystem är uppdaterade'
+            profile: 1
+            automated: true
+            remediation: 'Säkerställ att rekommendationen om systemuppdateringar är aktiv och att maskinerna har periodisk bedömning påslagen i Azure Update Manager.'
+            refs: ['CIS Controls v8: 7.3', 'Azure Policy: f85bf3e0-d513-442e-89c3-1784ad63382b', 'Azure Policy: bd876905-5b84-4f73-ab2d-2e7a7c4568d9']
+          - id: '8.1.11'
+            title: 'Aktuella policyer i Microsoft Cloud Security Benchmark är inte inaktiverade'
+            profile: 1
+            automated: false
+            remediation: 'Under Miljöinställningar › Säkerhetsprinciper: se till att policyerna i MCSB-initiativet har effekten Audit eller AuditIfNotExists, inte Disabled. Undantag dokumenteras som undantag (exemptions).'
+            refs: ['CIS Controls v8: 4.1, 4.2']
+          - id: '8.1.12'
+            title: 'Säkerhetsaviseringar skickas till alla med rollen Owner'
+            profile: 1
+            automated: true
+            remediation: 'Under Miljöinställningar › E-postaviseringar: välj rollen Owner bland mottagarna.'
+            refs: ['CIS Controls v8: 17.2']
+          - id: '8.1.13'
+            title: 'En e-postadress till säkerhetskontakt är angiven'
+            profile: 1
+            automated: true
+            remediation: 'Under Miljöinställningar › E-postaviseringar: ange en funktionsadress till säkerhetsteamet under Ytterligare e-postadresser.'
+            refs: ['CIS Controls v8: 17.2', 'Azure Policy: 4f4f78b8-e367-4b10-a341-d9a4ad5cf1c7']
+          - id: '8.1.14'
+            title: 'Aviseringar om larm från en viss allvarlighetsgrad är aktiverade'
+            profile: 1
+            automated: true
+            remediation: 'Under E-postaviseringar: aktivera aviseringar om larm med allvarlighetsgraden Hög eller lägre efter organisationens behov.'
+            refs: ['CIS Controls v8: 13.11', 'Azure Policy: 6e2593d9-add6-4083-9c9b-4b7d2188c899', 'Azure Policy: 0b15565f-aa9e-48ba-8619-45960f2c314d']
+          - id: '8.1.15'
+            title: 'Aviseringar om attackvägar från en viss risknivå är aktiverade'
+            profile: 1
+            automated: true
+            remediation: 'Under E-postaviseringar: aktivera aviseringar om attackvägar från lämplig risknivå (kräver Defender CSPM).'
+            refs: ['CIS Controls v8: 13.11']
+          - id: '8.1.16'
+            title: 'Microsoft Defender External Attack Surface Management (EASM) är aktiverat'
+            profile: 2
+            automated: false
+            remediation: 'Skapa en Defender EASM-resurs, lägg till organisationens domäner och IP-intervall och följ upp resultaten.'
+            refs: ['CIS Controls v8: 7.6']
+          - id: '8.2.1'
+            title: 'Microsoft Defender for IoT Hub är aktiverat'
+            profile: 2
+            automated: false
+            remediation: 'Aktivera Defender for IoT under Säkerhet på varje IoT Hub.'
+            refs: ['CIS Controls v8: 7.5, 13.6']
+          - id: '8.3.1'
+            title: 'Alla nycklar i Key Vault med RBAC har utgångsdatum'
+            profile: 1
+            automated: true
+            remediation: 'Sätt utgångsdatum på alla aktiverade nycklar, t.ex. med az keyvault key set-attributes --expires, och inför en rotationsrutin.'
+            refs: ['CIS Controls v8: 3.1, 6.2', 'Azure Policy: 152b15f7-8e1f-4c1f-ab71-8c010ba5dbc0']
+          - id: '8.3.2'
+            title: 'Alla nycklar i Key Vault med åtkomstprinciper (äldre modell) har utgångsdatum'
+            profile: 1
+            automated: true
+            remediation: 'Sätt utgångsdatum på alla aktiverade nycklar och planera övergång till RBAC.'
+            refs: ['CIS Controls v8: 3.1, 6.2', 'Azure Policy: 152b15f7-8e1f-4c1f-ab71-8c010ba5dbc0']
+          - id: '8.3.3'
+            title: 'Alla hemligheter i Key Vault med RBAC har utgångsdatum'
+            profile: 1
+            automated: true
+            remediation: 'Sätt utgångsdatum på alla aktiverade hemligheter, t.ex. med az keyvault secret set-attributes --expires.'
+            refs: ['CIS Controls v8: 3.1, 6.2', 'Azure Policy: 98728c90-32c7-4049-8429-847dc0f4fe37']
+          - id: '8.3.4'
+            title: 'Alla hemligheter i Key Vault med åtkomstprinciper (äldre modell) har utgångsdatum'
+            profile: 1
+            automated: true
+            remediation: 'Sätt utgångsdatum på alla aktiverade hemligheter och planera övergång till RBAC.'
+            refs: ['CIS Controls v8: 3.1, 6.2', 'Azure Policy: 98728c90-32c7-4049-8429-847dc0f4fe37']
+          - id: '8.3.5'
+            title: 'Rensningsskydd (purge protection) är aktiverat'
+            profile: 1
+            automated: true
+            remediation: 'Under Egenskaper på Key Vault: aktivera rensningsskydd. Mjuk borttagning är redan påslagen som standard. Det går inte att stänga av igen.'
+            refs: ['CIS Controls v8: 11.1', 'Azure Policy: 0b60c0b2-2dc2-4e1c-b5c9-abbed971de53']
+          - id: '8.3.6'
+            title: 'Rollbaserad åtkomstkontroll (RBAC) är aktiverad för Azure Key Vault'
+            profile: 2
+            automated: true
+            remediation: 'Under Åtkomstkonfiguration: byt behörighetsmodell till Azure RBAC och tilldela roller som Key Vault Secrets User i stället för åtkomstprinciper.'
+            refs: ['CIS Controls v8: 3.3, 6.8', 'Azure Policy: 12d4fa5e-1f9f-4c21-97a9-b99b3c6611b5']
+          - id: '8.3.7'
+            title: 'Publik nätverksåtkomst är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk på Key Vault: stäng av publik åtkomst och använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 405c5871-3e91-4644-8a63-58e19d68ff5b']
+          - id: '8.3.8'
+            title: 'Privata slutpunkter används för åtkomst till Azure Key Vault'
+            profile: 2
+            automated: true
+            remediation: 'Skapa en privat slutpunkt för Key Vault med privat DNS-zon privatelink.vaultcore.azure.net.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: a6abeaec-4d90-4a02-805f-6b26c4d3fbe9']
+          - id: '8.3.9'
+            title: 'Automatisk nyckelrotation är aktiverad i Azure Key Vault'
+            profile: 2
+            automated: true
+            remediation: 'Skapa en rotationsprincip för varje nyckel (Rotation policy) med automatisk rotation före utgångsdatum.'
+            refs: ['CIS Controls v8: 6.2', 'Azure Policy: d8cf8476-a2ec-4916-896e-992351803c44']
+          - id: '8.3.10'
+            title: 'Azure Key Vault Managed HSM används när det krävs'
+            profile: 2
+            automated: false
+            remediation: 'Använd Managed HSM för nycklar som enligt krav måste skyddas i en dedikerad HSM med en klient (FIPS 140-3 nivå 3).'
+            refs: ['CIS Controls v8: 3.12', 'Azure Policy: 587c79fe-dd04-4a5e-9d0b-f89598c7261b']
+          - id: '8.3.11'
+            title: 'Certifikatens giltighetstid är högst 12 månader'
+            profile: 1
+            automated: true
+            remediation: 'Sätt giltighetstiden i certifikatens utfärdandeprincip till högst 12 månader och aktivera automatisk förnyelse.'
+            refs: ['CIS Controls v8: 4.6', 'Azure Policy: 0a075868-4c26-42ef-914c-5bc007359560']
+          - id: '8.4.1'
+            title: 'En Azure Bastion-värd finns'
+            profile: 2
+            automated: true
+            remediation: 'Driftsätt Azure Bastion i det virtuella nätverket och använd den för RDP och SSH i stället för publika IP-adresser.'
+            refs: ['CIS Controls v8: 12.1, 13.4']
+          - id: '8.5'
+            title: 'Azure DDoS Network Protection är aktiverat på virtuella nätverk'
+            profile: 2
+            automated: true
+            remediation: 'Skapa en DDoS-skyddsplan och aktivera den på virtuella nätverk med publika resurser.'
+            refs: ['CIS Controls v8: 13.8', 'Azure Policy: a7aca53f-2ed4-4466-a25e-0b45ade68efd']
+      - id: '9'
+        title: 'Lagringstjänster'
+        controls:
+          - id: '9.1.1'
+            title: 'Mjuk borttagning är aktiverad för Azure-filresurser'
+            profile: 1
+            automated: true
+            remediation: 'Under Dataskydd på lagringskontot: aktivera mjuk borttagning för filresurser med minst 7 dagars lagring.'
+            refs: ['CIS Controls v8: 11.1']
+          - id: '9.1.2'
+            title: 'SMB-filresurser kräver minst SMB 3.1.1'
+            profile: 1
+            automated: true
+            remediation: 'Under Filresursinställningar: välj säkerhetsprofilen Maximum security eller endast SMB 3.1.1.'
+            refs: ['CIS Controls v8: 12.6']
+          - id: '9.1.3'
+            title: 'SMB-filresurser kräver kanalkryptering med minst AES-256-GCM'
+            profile: 1
+            automated: true
+            remediation: 'Under Filresursinställningar: välj bara AES-256-GCM som kanalkryptering för SMB.'
+            refs: ['CIS Controls v8: 3.10']
+          - id: '9.2.1'
+            title: 'Mjuk borttagning av blobbar är aktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Dataskydd på lagringskontot: aktivera mjuk borttagning för blobbar med lämplig lagringstid, t.ex. 7–14 dagar.'
+            refs: ['CIS Controls v8: 11.1']
+          - id: '9.2.2'
+            title: 'Mjuk borttagning av containrar är aktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Dataskydd på lagringskontot: aktivera mjuk borttagning för containrar.'
+            refs: ['CIS Controls v8: 11.1']
+          - id: '9.2.3'
+            title: 'Versionshantering är aktiverad för Blob Storage'
+            profile: 2
+            automated: true
+            remediation: 'Under Dataskydd på lagringskontot: aktivera versionshantering för blobbar, gärna med livscykelregel som rensar gamla versioner.'
+            refs: ['CIS Controls v8: 11.1', 'Azure Policy: c36a325b-ae04-4863-ad4f-19c6678f8e08']
+          - id: '9.3.1.1'
+            title: 'Påminnelser om nyckelrotation är aktiverade för varje lagringskonto'
+            profile: 1
+            automated: true
+            remediation: 'Under Åtkomstnycklar: välj Ställ in rotationspåminnelse och ange ett intervall, t.ex. 90 dagar.'
+            refs: ['CIS Controls v8: 4.1', 'Azure Policy: 044985bb-afe1-42cd-8a36-9d5d42424537']
+          - id: '9.3.1.2'
+            title: 'Åtkomstnycklar till lagringskonton förnyas regelbundet'
+            profile: 1
+            automated: true
+            remediation: 'Rotera åtkomstnycklarna minst var 90:e dag, en nyckel i taget, och uppdatera de tjänster som använder dem. Bättre är att gå över till Entra ID-autentisering.'
+            refs: ['CIS Controls v8: 4.6, 6.2', 'Azure Policy: 044985bb-afe1-42cd-8a36-9d5d42424537']
+          - id: '9.3.1.3'
+            title: 'Åtkomst med lagringskontonyckel är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration: sätt "Tillåt åtkomst med lagringskontonyckel" till Inaktiverad efter att alla klienter gått över till Entra ID.'
+            refs: ['CIS Controls v8: 3.3, 6.2', 'Azure Policy: 8c6a50c6-9ffd-4ae7-986f-5fa6111f9a54']
+          - id: '9.3.2.1'
+            title: 'Privata slutpunkter används för åtkomst till lagringskonton'
+            profile: 2
+            automated: true
+            remediation: 'Skapa privata slutpunkter för de tjänster som används (blob, file, queue, table) med privata DNS-zoner.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 6edd7eda-6dd8-40f7-810d-67160c639cd9']
+          - id: '9.3.2.2'
+            title: 'Publik nätverksåtkomst är inaktiverad för lagringskonton'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk: sätt publik nätverksåtkomst till Inaktiverad och använd privata slutpunkter.'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: b2982f36-99f2-4db5-8eff-283140c09693']
+          - id: '9.3.2.3'
+            title: 'Standardregeln för nätverksåtkomst till lagringskonton är Deny'
+            profile: 1
+            automated: true
+            remediation: 'Under Nätverk: välj "Aktiverad från valda virtuella nätverk och IP-adresser" så att standardåtgärden blir Deny.'
+            refs: ['CIS Controls v8: 12.2', 'Azure Policy: 34c877ad-507e-4c82-993e-3452a6e0ad3c', 'Azure Policy: 2a1a9cdf-e04d-429a-8416-3bfb72a1b26f']
+          - id: '9.3.3.1'
+            title: 'Microsoft Entra-auktorisering är förval i Azure-portalen'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration: aktivera "Standard till Microsoft Entra-auktorisering i Azure-portalen".'
+            refs: ['CIS Controls v8: 3.3']
+          - id: '9.3.4'
+            title: 'Säker överföring krävs'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration: aktivera "Säker överföring krävs" (az storage account update --https-only true).'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: 404c3081-a854-4457-ae30-26a93ef643f9']
+          - id: '9.3.5'
+            title: 'Betrodda Microsoft-tjänster får åtkomst till lagringskontot'
+            profile: 2
+            automated: true
+            remediation: 'Under Nätverk › Undantag: markera "Tillåt Azure-tjänster i listan över betrodda tjänster att komma åt lagringskontot".'
+            refs: ['CIS Controls v8: 3.3, 13.5', 'Azure Policy: c9d007d0-c057-4772-b18c-01e546713bcd']
+          - id: '9.3.6'
+            title: 'Lagringskonton kräver minst TLS 1.2'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration: sätt lägsta TLS-version till 1.2 (az storage account update --min-tls-version TLS1_2).'
+            refs: ['CIS Controls v8: 3.10', 'Azure Policy: fe83a0eb-a853-422d-aac2-1bffd182c5d0']
+          - id: '9.3.7'
+            title: 'Replikering mellan klienter är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Objektreplikering: stäng av "Tillåt replikering mellan klienter".'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 92a89a79-6c52-4a7e-a03f-61306fc49312']
+          - id: '9.3.8'
+            title: 'Anonym åtkomst till blobbar är inaktiverad'
+            profile: 1
+            automated: true
+            remediation: 'Under Konfiguration: sätt "Tillåt anonym åtkomst till blobbar" till Inaktiverad (az storage account update --allow-blob-public-access false).'
+            refs: ['CIS Controls v8: 3.3', 'Azure Policy: 4fa4b6c0-31ca-4c0d-b10d-24b96f62a751']
+          - id: '9.3.9'
+            title: 'Raderingslås från Azure Resource Manager finns på lagringskonton'
+            profile: 1
+            automated: false
+            remediation: 'Lägg till ett lås av typen CanNotDelete på lagringskontot under Lås.'
+            refs: ['CIS Controls v8: 3']
+          - id: '9.3.10'
+            title: 'Skrivskyddslås från Azure Resource Manager har övervägts för lagringskonton'
+            profile: 2
+            automated: false
+            remediation: 'Bedöm om lagringskontot ska ha ett ReadOnly-lås. Tänk på att det kan hindra funktioner som listning av nycklar.'
+            refs: ['CIS Controls v8: 3']
+          - id: '9.3.11'
+            title: 'Kritiska lagringskonton använder geo-redundant lagring (GRS)'
+            profile: 2
+            automated: true
+            remediation: 'Byt redundans till GRS eller GZRS under Redundans för lagringskonton med kritisk data.'
+            refs: ['CIS Controls v8: 11.1', 'Azure Policy: bf045164-79ba-4215-8f95-f8048dc1780b']
