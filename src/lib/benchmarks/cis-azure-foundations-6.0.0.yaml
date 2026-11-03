@@ -1,0 +1,968 @@
+# CIS Microsoft Azure Foundations Benchmark v6.0.0: ID, nivå och kopplingar.
+# Rubrikerna är egna svenska översättningar. CIS beskrivningar och anvisningar ingår inte (B-45).
+# level: profilnivå (1 eller 2). automated: kan kontrolleras automatiskt. ig: lägsta implementeringsgrupp i CIS Controls v8.
+# cisControls: skyddsåtgärder i CIS Controls v8. azurePolicy: ID för inbyggda Azure Policy-definitioner.
+
+schemaVersion: 1
+id: cis-azure-foundations
+version: '6.0.0'
+name: CIS Microsoft Azure Foundations Benchmark
+publisher: Center for Internet Security (CIS)
+language: sv
+sections:
+  - id: '2'
+    title: 'Analystjänster'
+  - id: '2.1'
+    title: 'Azure Databricks'
+  - id: '3'
+    title: 'Beräkningstjänster'
+  - id: '3.1'
+    title: 'Virtuella maskiner'
+  - id: '5'
+    title: 'Identitetstjänster'
+  - id: '5.1'
+    title: 'Standardinställningar för säkerhet (MFA per användare)'
+  - id: '5.3'
+    title: 'Periodiska behörighetsgranskningar'
+  - id: '6'
+    title: 'Styrning och förvaltning'
+  - id: '6.1'
+    title: 'Loggning och övervakning'
+  - id: '6.1.1'
+    title: 'Diagnostikinställningar'
+  - id: '6.1.2'
+    title: 'Larm i aktivitetsloggen'
+  - id: '6.1.3'
+    title: 'Application Insights'
+  - id: '7'
+    title: 'Nätverkstjänster'
+  - id: '8'
+    title: 'Säkerhetstjänster'
+  - id: '8.1'
+    title: 'Microsoft Defender for Cloud'
+  - id: '8.1.1'
+    title: 'Microsoft Cloud Security Posture Management (CSPM)'
+  - id: '8.1.2'
+    title: 'Defender-plan: API:er'
+  - id: '8.1.3'
+    title: 'Defender-plan: Servrar'
+  - id: '8.1.4'
+    title: 'Defender-plan: Containrar'
+  - id: '8.1.5'
+    title: 'Defender-plan: Lagring'
+  - id: '8.1.6'
+    title: 'Defender-plan: App Service'
+  - id: '8.1.7'
+    title: 'Defender-plan: Databaser'
+  - id: '8.1.8'
+    title: 'Defender-plan: Key Vault'
+  - id: '8.1.9'
+    title: 'Defender-plan: Resource Manager'
+  - id: '8.2'
+    title: 'Microsoft Defender for IoT'
+  - id: '8.3'
+    title: 'Key Vault'
+  - id: '8.4'
+    title: 'Azure Bastion'
+  - id: '9'
+    title: 'Lagringstjänster'
+  - id: '9.1'
+    title: 'Azure Files'
+  - id: '9.2'
+    title: 'Azure Blob Storage'
+  - id: '9.3'
+    title: 'Lagringskonton'
+  - id: '9.3.1'
+    title: 'Hemligheter och nycklar'
+  - id: '9.3.2'
+    title: 'Nätverk'
+  - id: '9.3.3'
+    title: 'Identitet och åtkomst'
+recommendations:
+  - id: '2.1.1'
+    title: 'Azure Databricks driftsätts i ett kundhanterat virtuellt nätverk (VNet)'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['9c25c9e4-ee12-4882-afd2-11fb9d87893f']
+  - id: '2.1.2'
+    title: 'Nätverkssäkerhetsgrupper är konfigurerade för Databricks-subnät'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['4.4', '13.4']
+    azurePolicy: []
+  - id: '2.1.3'
+    title: 'Trafiken mellan klustrets arbetsnoder är krypterad'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: []
+  - id: '2.1.4'
+    title: 'Användare och grupper synkroniseras från Microsoft Entra ID till Azure Databricks'
+    level: 1
+    automated: false
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: []
+  - id: '2.1.5'
+    title: 'Unity Catalog är konfigurerat för Azure Databricks'
+    level: 1
+    automated: false
+    ig: 2
+    cisControls: ['5.6', '6.7']
+    azurePolicy: []
+  - id: '2.1.6'
+    title: 'Personliga åtkomsttoken i Databricks är begränsade och har utgångsdatum'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['6.2']
+    azurePolicy: []
+  - id: '2.1.7'
+    title: 'Leverans av diagnostikloggar är konfigurerad för Azure Databricks'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['8.2']
+    azurePolicy: ['138ff14d-b687-4faa-a81c-898c91a87fa2']
+  - id: '2.1.8'
+    title: 'Kritisk data i Azure Databricks krypteras med kundhanterade nycklar (CMK)'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: []
+  - id: '2.1.9'
+    title: '''No Public IP'' är satt till ''Enabled'''
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['51c1490f-3319-459c-bbbc-7f391bbed753']
+  - id: '2.1.10'
+    title: '''Allow Public Network Access'' är satt till ''Disabled'''
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['0e7849de-b939-4c50-ab48-fc6b0f5eeba2']
+  - id: '2.1.11'
+    title: 'Privata slutpunkter används för åtkomst till Azure Databricks-arbetsytor'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['258823f2-4595-4b52-b333-cc96192710d8']
+  - id: '2.1.12'
+    title: 'Grupper i Azure Databricks granskas regelbundet'
+    level: 1
+    automated: false
+    ig: 3
+    cisControls: ['6.8']
+    azurePolicy: []
+  - id: '3.1.1'
+    title: 'Bara identiteter med MFA har åtkomst till privilegierade virtuella maskiner'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['6.5']
+    azurePolicy: []
+  - id: '5.1.1'
+    title: '''Security defaults'' är aktiverat i Microsoft Entra ID'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['4.8', '6.3', '6.5']
+    azurePolicy: []
+  - id: '5.1.2'
+    title: 'MFA krävs för att registrera eller ansluta enheter till Microsoft Entra'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['6.3', '6.4']
+    azurePolicy: []
+  - id: '5.1.3'
+    title: 'MFA är aktiverat för alla användare'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['6.3', '6.4']
+    azurePolicy: []
+  - id: '5.1.4'
+    title: 'Användare kan inte låta betrodda enheter komma ihåg MFA'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['6.3', '6.4']
+    azurePolicy: []
+  - id: '5.3.1'
+    title: 'Administratörskonton används inte i det dagliga arbetet'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['5.4']
+    azurePolicy: []
+  - id: '5.3.2'
+    title: 'Gästanvändare granskas regelbundet'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['5.1', '5.3']
+    azurePolicy: ['e9ac8f8e-ce22-4355-8f04-99b911d6be52', '94e1c2ac-cbbe-4cac-a2b5-389c812dee87', '339353f6-2387-4a45-abe4-7f529d121046']
+  - id: '5.3.3'
+    title: 'Rollen ''User Access Administrator'' används restriktivt'
+    level: 1
+    automated: true
+    ig: 3
+    cisControls: ['6.8']
+    azurePolicy: []
+  - id: '5.3.4'
+    title: 'Alla privilegierade rolltilldelningar granskas regelbundet'
+    level: 1
+    automated: false
+    ig: 3
+    cisControls: ['6.8']
+    azurePolicy: []
+  - id: '5.3.5'
+    title: 'Inaktiverade användarkonton saknar läs-, skriv- och ägarbehörighet'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['5.1']
+    azurePolicy: ['0cfea604-3201-4e14-88fc-fae4c427a6c5', '8d7e1fde-fe26-4b5f-8108-f8e432cbc2be']
+  - id: '5.3.6'
+    title: 'Tilldelningar av rollen ''Tenant Creator'' granskas regelbundet'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['5.4']
+    azurePolicy: []
+  - id: '5.3.7'
+    title: 'Alla icke-privilegierade rolltilldelningar granskas regelbundet'
+    level: 1
+    automated: false
+    ig: 3
+    cisControls: ['6.8']
+    azurePolicy: []
+  - id: '5.4'
+    title: 'Inga anpassade administratörsroller för prenumerationer finns'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['5.4', '6.8']
+    azurePolicy: ['a451c1ef-c6ca-483d-87ed-f49761e3ffb5']
+  - id: '5.5'
+    title: 'En anpassad roll har behörighet att administrera resurslås'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['3.3', '6.8']
+    azurePolicy: []
+  - id: '5.6'
+    title: 'Ingen får flytta prenumerationer in i eller ut ur Microsoft Entra-klienten'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['5.4', '6.1', '6.2']
+    azurePolicy: []
+  - id: '5.7'
+    title: 'Prenumerationen har två eller tre ägare'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['5.1']
+    azurePolicy: ['09024ccc-0c5f-475e-9457-b7c0d9ed487b', '4f11b553-d42e-4e3a-89be-32ca364cad4c']
+  - id: '6.1.1.1'
+    title: 'En diagnostikinställning finns för prenumerationens aktivitetslogg'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.9']
+    azurePolicy: []
+  - id: '6.1.1.2'
+    title: 'Diagnostikinställningen fångar lämpliga kategorier'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: ['3b980d31-7904-4bb7-8575-5665739a8052', 'b954148f-4c11-4c38-8221-be76711e194a', 'c5447c04-a4d7-4ba8-a263-c9ee321a6858']
+  - id: '6.1.1.3'
+    title: 'Lagringskontot med aktivitetsloggarna krypteras med kundhanterad nyckel (CMK)'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['fbb99e8e-e444-4da0-9ff1-75c92f5a85b2']
+  - id: '6.1.1.4'
+    title: 'Loggning är aktiverad för Azure Key Vault'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: ['cf820ca0-f99e-4f3e-84fb-66e913812d21']
+  - id: '6.1.1.5'
+    title: 'Flödesloggar för nätverkssäkerhetsgrupper skickas till Log Analytics'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['13.6']
+    azurePolicy: ['27960feb-a23c-4577-8d36-ef8b5f35e0be', 'c251913d-7d24-4958-af87-478ed3b9ba41', '4c3c6c5f-0d47-4402-99b8-aa543dd8bcee']
+  - id: '6.1.1.6'
+    title: 'Flödesloggar för virtuella nätverk skickas till Log Analytics'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['13.6']
+    azurePolicy: ['2f080164-9f4d-497e-9db6-416dc9f7b48a', '4c3c6c5f-0d47-4402-99b8-aa543dd8bcee']
+  - id: '6.1.1.7'
+    title: 'Aktivitetsloggar från Microsoft Graph skickas till ett lämpligt mål'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['8.2']
+    azurePolicy: []
+  - id: '6.1.1.8'
+    title: 'Aktivitetsloggar från Microsoft Entra skickas till ett lämpligt mål'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['8.2']
+    azurePolicy: []
+  - id: '6.1.1.9'
+    title: 'Intune-loggar skickas till Log Analytics'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['8.2']
+    azurePolicy: []
+  - id: '6.1.2.1'
+    title: 'Larm i aktivitetsloggen när en policytilldelning skapas'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: ['c5447c04-a4d7-4ba8-a263-c9ee321a6858']
+  - id: '6.1.2.2'
+    title: 'Larm i aktivitetsloggen när en policytilldelning tas bort'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: ['c5447c04-a4d7-4ba8-a263-c9ee321a6858']
+  - id: '6.1.2.3'
+    title: 'Larm i aktivitetsloggen när en nätverkssäkerhetsgrupp skapas eller ändras'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: ['b954148f-4c11-4c38-8221-be76711e194a']
+  - id: '6.1.2.4'
+    title: 'Larm i aktivitetsloggen när en nätverkssäkerhetsgrupp tas bort'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: ['b954148f-4c11-4c38-8221-be76711e194a']
+  - id: '6.1.2.5'
+    title: 'Larm i aktivitetsloggen när en säkerhetslösning skapas eller ändras'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: ['3b980d31-7904-4bb7-8575-5665739a8052']
+  - id: '6.1.2.6'
+    title: 'Larm i aktivitetsloggen när en säkerhetslösning tas bort'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: ['3b980d31-7904-4bb7-8575-5665739a8052']
+  - id: '6.1.2.7'
+    title: 'Larm i aktivitetsloggen när en brandväggsregel för SQL Server skapas eller ändras'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: ['b954148f-4c11-4c38-8221-be76711e194a']
+  - id: '6.1.2.8'
+    title: 'Larm i aktivitetsloggen när en brandväggsregel för SQL Server tas bort'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: ['b954148f-4c11-4c38-8221-be76711e194a']
+  - id: '6.1.2.9'
+    title: 'Larm i aktivitetsloggen när en publik IP-adress skapas eller ändras'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: []
+  - id: '6.1.2.10'
+    title: 'Larm i aktivitetsloggen när en publik IP-adress tas bort'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: []
+  - id: '6.1.2.11'
+    title: 'Larm i aktivitetsloggen för Service Health'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: []
+  - id: '6.1.3.1'
+    title: 'Application Insights är konfigurerat'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['8.2']
+    azurePolicy: []
+  - id: '6.1.4'
+    title: 'Resursloggning i Azure Monitor är aktiverad för alla tjänster som stöder det'
+    level: 1
+    automated: false
+    ig: 2
+    cisControls: ['8.5', '8.9']
+    azurePolicy: ['cf820ca0-f99e-4f3e-84fb-66e913812d21', '91a78b24-f231-4a8a-8da9-02c35b2b6510', '428256e6-1fac-4f48-a757-df34c2b3336d', '057ef27e-665e-4328-8ea3-04b3122bd9fb', 'c95c74d9-38fe-4f0d-af86-0c7d626a315c', '83a214f7-d01a-484b-91a9-ed54470c9a6a', '383856f8-de7f-44a2-81fc-e5135b5c2aa4', '34f95f76-5386-4de7-b824-0d8478470c9d', 'b4330a05-a843-4bc8-bf9a-cacce50c67f4', 'f8d36e2f-389b-4ee4-898d-21aeb69a0f45', 'f9be5368-9bf5-4b84-9e0a-7850da98bb46', '8a04f872-51e9-4313-97fb-fc1c3543011c']
+  - id: '6.1.5'
+    title: 'SKU:erna Basic, Free och Consumption används inte i produktion som kräver övervakning och SLA'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: []
+  - id: '6.2'
+    title: 'Resurslås finns på verksamhetskritiska resurser'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: []
+  - id: '7.1'
+    title: 'RDP-åtkomst från internet är bedömd och begränsad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['13.4']
+    azurePolicy: ['22730e10-96f6-4aac-ad84-9383d35b5917']
+  - id: '7.2'
+    title: 'SSH-åtkomst från internet är bedömd och begränsad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['13.4']
+    azurePolicy: ['22730e10-96f6-4aac-ad84-9383d35b5917']
+  - id: '7.3'
+    title: 'UDP-åtkomst från internet är bedömd och begränsad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['13.4']
+    azurePolicy: ['9daedab3-fb2d-461e-b861-71790eead4f6']
+  - id: '7.4'
+    title: 'HTTP(S)-åtkomst från internet är bedömd och begränsad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['13.4']
+    azurePolicy: ['9daedab3-fb2d-461e-b861-71790eead4f6']
+  - id: '7.5'
+    title: 'Flödesloggar för nätverkssäkerhetsgrupper sparas minst 90 dagar'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['8.3', '8.10']
+    azurePolicy: []
+  - id: '7.6'
+    title: 'Network Watcher är aktiverat i alla regioner som används'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['12.2', '12.4']
+    azurePolicy: ['b6e2945c-0b7b-40f5-9233-7a5323b5cdc6']
+  - id: '7.7'
+    title: 'Publika IP-adresser granskas regelbundet'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['12.1']
+    azurePolicy: []
+  - id: '7.8'
+    title: 'Flödesloggar för virtuella nätverk sparas minst 90 dagar'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['8.3', '8.10']
+    azurePolicy: []
+  - id: '7.9'
+    title: 'Punkt-till-plats-VPN i Azure VPN Gateway använder bara Microsoft Entra-autentisering'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: ['21a6bc25-125e-4d13-b82d-2e19b7208ab7']
+  - id: '7.10'
+    title: 'Web Application Firewall (WAF) är aktiverad på Azure Application Gateway'
+    level: 2
+    automated: true
+    ig: 3
+    cisControls: ['13.10']
+    azurePolicy: ['564feb30-bf6a-4854-b4bb-0d2d2d1e6c66']
+  - id: '7.11'
+    title: 'Alla subnät är kopplade till nätverkssäkerhetsgrupper'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['4.4']
+    azurePolicy: ['e71308d3-144b-4262-b144-efdc3cc90517']
+  - id: '7.12'
+    title: 'Application Gateway kräver minst TLS 1.2'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: []
+  - id: '7.13'
+    title: 'HTTP/2 är aktiverat på Azure Application Gateway'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: []
+  - id: '7.14'
+    title: 'WAF-policyn på Application Gateway inspekterar begärandets innehåll'
+    level: 2
+    automated: true
+    ig: 3
+    cisControls: ['13.10']
+    azurePolicy: ['ca85ef9a-741d-461d-8b7a-18c2da82c666']
+  - id: '7.15'
+    title: 'WAF-policyn på Application Gateway har botskydd aktiverat'
+    level: 2
+    automated: true
+    ig: 3
+    cisControls: ['13.10']
+    azurePolicy: ['ebea0d86-7fbd-42e3-8a46-27e7568c2525']
+  - id: '7.16'
+    title: 'Azure Network Security Perimeter skyddar PaaS-resurser'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['13.4']
+    azurePolicy: []
+  - id: '8.1.1.1'
+    title: 'Microsoft Defender CSPM är aktiverat'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['7.5', '7.6']
+    azurePolicy: ['1f90fc71-a595-4066-8974-d4d0802e8ef0']
+  - id: '8.1.2.1'
+    title: 'Microsoft Defender for APIs är aktiverat'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['16.2']
+    azurePolicy: ['7926a6d1-b268-4586-8197-e8ae90c877d7']
+  - id: '8.1.3.1'
+    title: 'Defender for Servers är aktiverat'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['7.5', '10.1']
+    azurePolicy: ['4da35fc9-c9e7-4960-aec9-797fe7d9051d']
+  - id: '8.1.3.2'
+    title: 'Sårbarhetsanalys för maskiner är aktiverad'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['7.5', '7.6']
+    azurePolicy: ['501541f7-f7e7-4cd6-868c-4190fdad3ac9']
+  - id: '8.1.3.3'
+    title: 'Komponenten för slutpunktsskydd är aktiverad'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['7.5', '10.1', '13.2']
+    azurePolicy: []
+  - id: '8.1.3.4'
+    title: 'Agentlös skanning av maskiner är aktiverad'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['7.5', '7.6']
+    azurePolicy: []
+  - id: '8.1.3.5'
+    title: 'Övervakning av filintegritet (FIM) är aktiverad'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['7.5', '7.6']
+    azurePolicy: []
+  - id: '8.1.4.1'
+    title: 'Microsoft Defender for Containers är aktiverat'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['7.5', '7.6']
+    azurePolicy: ['1c988dd6-ade4-430f-a608-2a3e5b0a6d38']
+  - id: '8.1.5.1'
+    title: 'Microsoft Defender for Storage är aktiverat'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['7.5']
+    azurePolicy: ['640d2586-54d2-465f-877f-9ffc1d2109f4']
+  - id: '8.1.5.2'
+    title: 'Larm från Advanced Threat Protection för lagringskonton bevakas'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: []
+  - id: '8.1.6.1'
+    title: 'Microsoft Defender for App Services är aktiverat'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['7.5', '7.6', '16.11']
+    azurePolicy: ['2913021d-f2fd-4f3d-b958-22354e2bdbcb']
+  - id: '8.1.7.1'
+    title: 'Microsoft Defender for Azure Cosmos DB är aktiverat'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['7.5', '16.11']
+    azurePolicy: ['adbe85b5-83e6-4350-ab58-bf3a4f736e5e']
+  - id: '8.1.7.2'
+    title: 'Microsoft Defender for Open-Source Relational Databases är aktiverat'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['7.5', '16.11']
+    azurePolicy: ['0a9fbe0d-c5c4-4da8-87d8-f4fd77338835']
+  - id: '8.1.7.3'
+    title: 'Microsoft Defender for Azure SQL Databases (även Managed Instance) är aktiverat'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['7.5', '16.11']
+    azurePolicy: ['7fe3b40f-802b-4cdd-8bd4-fd799c948cc2', 'abfb7388-5bf4-4ad7-ba99-2cd2f41cebb9', '3bc8a0d5-38e0-4a3d-a657-2cb64468fc34', 'd38668f5-d155-42c7-ab3d-9b57b50f8fbf', 'd31e5c31-63b2-4f12-887b-e49456834fa1', '938c4981-c2c9-4168-9cd6-972b8675f906']
+  - id: '8.1.7.4'
+    title: 'Microsoft Defender for SQL Servers on Machines är aktiverat'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['7.5', '16.11']
+    azurePolicy: ['6581d072-105e-4418-827f-bd446d56421b', 'abfb4388-5bf4-4ad7-ba82-2cd2f41ceae9']
+  - id: '8.1.8.1'
+    title: 'Microsoft Defender for Key Vault är aktiverat'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['7.5']
+    azurePolicy: ['0e6763cc-5078-4e64-889d-ff4d9a839047']
+  - id: '8.1.9.1'
+    title: 'Microsoft Defender for Resource Manager är aktiverat'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['5.4', '7.5']
+    azurePolicy: ['c3d20c29-b36d-48fe-808b-99a87530ad99']
+  - id: '8.1.10'
+    title: 'Defender for Cloud kontrollerar att virtuella maskiners operativsystem är uppdaterade'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['7.3']
+    azurePolicy: ['f85bf3e0-d513-442e-89c3-1784ad63382b', 'bd876905-5b84-4f73-ab2d-2e7a7c4568d9']
+  - id: '8.1.11'
+    title: 'Aktuella policyer i Microsoft Cloud Security Benchmark är inte inaktiverade'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['4.1', '4.2']
+    azurePolicy: []
+  - id: '8.1.12'
+    title: 'Säkerhetsaviseringar skickas till alla med rollen Owner'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['17.2']
+    azurePolicy: []
+  - id: '8.1.13'
+    title: 'En e-postadress till säkerhetskontakt är angiven'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['17.2']
+    azurePolicy: ['4f4f78b8-e367-4b10-a341-d9a4ad5cf1c7']
+  - id: '8.1.14'
+    title: 'Aviseringar om larm från en viss allvarlighetsgrad är aktiverade'
+    level: 1
+    automated: true
+    ig: 3
+    cisControls: ['13.11']
+    azurePolicy: ['6e2593d9-add6-4083-9c9b-4b7d2188c899', '0b15565f-aa9e-48ba-8619-45960f2c314d']
+  - id: '8.1.15'
+    title: 'Aviseringar om attackvägar från en viss risknivå är aktiverade'
+    level: 1
+    automated: true
+    ig: 3
+    cisControls: ['13.11']
+    azurePolicy: []
+  - id: '8.1.16'
+    title: 'Microsoft Defender External Attack Surface Management (EASM) är aktiverat'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['7.6']
+    azurePolicy: []
+  - id: '8.2.1'
+    title: 'Microsoft Defender for IoT Hub är aktiverat'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['7.5', '13.6']
+    azurePolicy: []
+  - id: '8.3.1'
+    title: 'Alla nycklar i Key Vault med RBAC har utgångsdatum'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.1', '6.2']
+    azurePolicy: ['152b15f7-8e1f-4c1f-ab71-8c010ba5dbc0']
+  - id: '8.3.2'
+    title: 'Alla nycklar i Key Vault med åtkomstprinciper (äldre modell) har utgångsdatum'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.1', '6.2']
+    azurePolicy: ['152b15f7-8e1f-4c1f-ab71-8c010ba5dbc0']
+  - id: '8.3.3'
+    title: 'Alla hemligheter i Key Vault med RBAC har utgångsdatum'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.1', '6.2']
+    azurePolicy: ['98728c90-32c7-4049-8429-847dc0f4fe37']
+  - id: '8.3.4'
+    title: 'Alla hemligheter i Key Vault med åtkomstprinciper (äldre modell) har utgångsdatum'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.1', '6.2']
+    azurePolicy: ['98728c90-32c7-4049-8429-847dc0f4fe37']
+  - id: '8.3.5'
+    title: 'Rensningsskydd (purge protection) är aktiverat'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: ['0b60c0b2-2dc2-4e1c-b5c9-abbed971de53']
+  - id: '8.3.6'
+    title: 'Rollbaserad åtkomstkontroll (RBAC) är aktiverad för Azure Key Vault'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['3.3', '6.8']
+    azurePolicy: ['12d4fa5e-1f9f-4c21-97a9-b99b3c6611b5']
+  - id: '8.3.7'
+    title: 'Publik nätverksåtkomst är inaktiverad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['405c5871-3e91-4644-8a63-58e19d68ff5b']
+  - id: '8.3.8'
+    title: 'Privata slutpunkter används för åtkomst till Azure Key Vault'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['a6abeaec-4d90-4a02-805f-6b26c4d3fbe9']
+  - id: '8.3.9'
+    title: 'Automatisk nyckelrotation är aktiverad i Azure Key Vault'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['6.2']
+    azurePolicy: ['d8cf8476-a2ec-4916-896e-992351803c44']
+  - id: '8.3.10'
+    title: 'Azure Key Vault Managed HSM används när det krävs'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['3.12']
+    azurePolicy: ['587c79fe-dd04-4a5e-9d0b-f89598c7261b']
+  - id: '8.3.11'
+    title: 'Certifikatens giltighetstid är högst 12 månader'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['4.6']
+    azurePolicy: ['0a075868-4c26-42ef-914c-5bc007359560']
+  - id: '8.4.1'
+    title: 'En Azure Bastion-värd finns'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['12.1', '13.4']
+    azurePolicy: []
+  - id: '8.5'
+    title: 'Azure DDoS Network Protection är aktiverat på virtuella nätverk'
+    level: 2
+    automated: true
+    ig: 3
+    cisControls: ['13.8']
+    azurePolicy: ['a7aca53f-2ed4-4466-a25e-0b45ade68efd']
+  - id: '9.1.1'
+    title: 'Mjuk borttagning är aktiverad för Azure-filresurser'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: []
+  - id: '9.1.2'
+    title: 'SMB-filresurser kräver minst SMB 3.1.1'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['12.6']
+    azurePolicy: []
+  - id: '9.1.3'
+    title: 'SMB-filresurser kräver kanalkryptering med minst AES-256-GCM'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: []
+  - id: '9.2.1'
+    title: 'Mjuk borttagning av blobbar är aktiverad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: []
+  - id: '9.2.2'
+    title: 'Mjuk borttagning av containrar är aktiverad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: []
+  - id: '9.2.3'
+    title: 'Versionshantering är aktiverad för Blob Storage'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: ['c36a325b-ae04-4863-ad4f-19c6678f8e08']
+  - id: '9.3.1.1'
+    title: 'Påminnelser om nyckelrotation är aktiverade för varje lagringskonto'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['4.1']
+    azurePolicy: ['044985bb-afe1-42cd-8a36-9d5d42424537']
+  - id: '9.3.1.2'
+    title: 'Åtkomstnycklar till lagringskonton förnyas regelbundet'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['4.6', '6.2']
+    azurePolicy: ['044985bb-afe1-42cd-8a36-9d5d42424537']
+  - id: '9.3.1.3'
+    title: 'Åtkomst med lagringskontonyckel är inaktiverad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3', '6.2']
+    azurePolicy: ['8c6a50c6-9ffd-4ae7-986f-5fa6111f9a54']
+  - id: '9.3.2.1'
+    title: 'Privata slutpunkter används för åtkomst till lagringskonton'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['6edd7eda-6dd8-40f7-810d-67160c639cd9']
+  - id: '9.3.2.2'
+    title: 'Publik nätverksåtkomst är inaktiverad för lagringskonton'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['b2982f36-99f2-4db5-8eff-283140c09693']
+  - id: '9.3.2.3'
+    title: 'Standardregeln för nätverksåtkomst till lagringskonton är Deny'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['34c877ad-507e-4c82-993e-3452a6e0ad3c', '2a1a9cdf-e04d-429a-8416-3bfb72a1b26f']
+  - id: '9.3.3.1'
+    title: 'Microsoft Entra-auktorisering är förval i Azure-portalen'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: []
+  - id: '9.3.4'
+    title: 'Säker överföring krävs'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['404c3081-a854-4457-ae30-26a93ef643f9']
+  - id: '9.3.5'
+    title: 'Betrodda Microsoft-tjänster får åtkomst till lagringskontot'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['3.3', '13.5']
+    azurePolicy: ['c9d007d0-c057-4772-b18c-01e546713bcd']
+  - id: '9.3.6'
+    title: 'Lagringskonton kräver minst TLS 1.2'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['fe83a0eb-a853-422d-aac2-1bffd182c5d0']
+  - id: '9.3.7'
+    title: 'Replikering mellan klienter är inaktiverad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['92a89a79-6c52-4a7e-a03f-61306fc49312']
+  - id: '9.3.8'
+    title: 'Anonym åtkomst till blobbar är inaktiverad'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: ['4fa4b6c0-31ca-4c0d-b10d-24b96f62a751']
+  - id: '9.3.9'
+    title: 'Raderingslås från Azure Resource Manager finns på lagringskonton'
+    level: 1
+    automated: false
+    cisControls: ['3']
+    azurePolicy: []
+  - id: '9.3.10'
+    title: 'Skrivskyddslås från Azure Resource Manager har övervägts för lagringskonton'
+    level: 2
+    automated: false
+    cisControls: ['3']
+    azurePolicy: []
+  - id: '9.3.11'
+    title: 'Kritiska lagringskonton använder geo-redundant lagring (GRS)'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['11.1']
+    azurePolicy: ['bf045164-79ba-4215-8f95-f8048dc1780b']

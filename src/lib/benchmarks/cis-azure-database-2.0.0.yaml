@@ -1,0 +1,365 @@
+# CIS Microsoft Azure Database Services Benchmark v2.0.0: ID, nivå och kopplingar.
+# Rubrikerna är egna svenska översättningar. CIS beskrivningar och anvisningar ingår inte (B-45).
+# level: profilnivå (1 eller 2). automated: kan kontrolleras automatiskt. ig: lägsta implementeringsgrupp i CIS Controls v8.
+# cisControls: skyddsåtgärder i CIS Controls v8. azurePolicy: ID för inbyggda Azure Policy-definitioner.
+
+schemaVersion: 1
+id: cis-azure-database
+version: '2.0.0'
+name: CIS Microsoft Azure Database Services Benchmark
+publisher: Center for Internet Security (CIS)
+language: sv
+sections:
+  - id: '2'
+    title: 'Azure Cache for Redis (fasas ut)'
+  - id: '3'
+    title: 'Azure Cosmos DB'
+  - id: '4'
+    title: 'Azure Data Factory'
+  - id: '5'
+    title: 'Azure Database for MySQL'
+  - id: '6'
+    title: 'Azure Database for PostgreSQL'
+  - id: '9'
+    title: 'Azure SQL Database'
+recommendations:
+  - id: '2.1'
+    title: 'Microsoft Entra-autentisering är aktiverad'
+    level: 1
+    automated: false
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: []
+  - id: '2.2'
+    title: 'Åtkomst tillåts bara via SSL/TLS'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['22bee202-a82f-4305-9a2a-6d7f44d4dedb', '766f5de3-c6c0-4327-9f4d-042ab8ae846c']
+  - id: '2.3'
+    title: 'Minst TLS 1.2 krävs'
+    level: 1
+    automated: false
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: []
+  - id: '2.4'
+    title: 'Åtkomstprinciper är införda och granskas regelbundet'
+    level: 2
+    automated: false
+    ig: 3
+    cisControls: ['6.8']
+    azurePolicy: []
+  - id: '2.5'
+    title: 'Systemtilldelad hanterad identitet är aktiverad'
+    level: 1
+    automated: false
+    ig: 2
+    cisControls: ['5.5']
+    azurePolicy: []
+  - id: '2.6'
+    title: 'Publik nätverksåtkomst är inaktiverad'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['4.4']
+    azurePolicy: ['470baccb-7e51-4549-8b1a-3e5be069f663']
+  - id: '2.7'
+    title: 'Azure Cache for Redis använder Private Link'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['960e650e-9ce3-4316-9590-8ee2c016ca2f']
+  - id: '2.8'
+    title: 'Azure Cache for Redis använder kundhanterade nycklar'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['09aa11bb-87ec-409f-bf0b-49b7c1561a87']
+  - id: '2.9'
+    title: 'Autentisering med åtkomstnycklar är inaktiverad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: ['3827af20-8f80-4b15-8300-6db0873ec901']
+  - id: '2.10'
+    title: 'Uppdateringskanalen är ''Stable'''
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['2.2']
+    azurePolicy: []
+  - id: '3.1'
+    title: 'Brandväggen tillåter bara utvalda nätverk, inte alla nätverk'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['4.4', '12.2']
+    azurePolicy: ['862e97cf-49fc-4a5c-9de4-40d4e2e7c8eb']
+  - id: '3.2'
+    title: 'Cosmos DB använder privata slutpunkter där det är möjligt'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['58440f8a-10c5-4151-bdce-dfbaad4a20b7']
+  - id: '3.3'
+    title: 'Lokal autentisering är inaktiverad (disableLocalAuth)'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['6.7']
+    azurePolicy: ['5450f5bd-9c72-4390-a9c4-a7aba4edfdd2']
+  - id: '3.4'
+    title: 'Publik nätverksåtkomst är inaktiverad'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['4.4']
+    azurePolicy: ['797b37f7-06b8-444c-b1ad-fc62867f335a']
+  - id: '3.5'
+    title: 'Kritisk data krypteras med kundhanterade nycklar (CMK)'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['1f905d99-2ab7-462c-a6b0-f709acca6c8f']
+  - id: '3.6'
+    title: 'Brandväggen tillåter inte all nätverkstrafik'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['4.4']
+    azurePolicy: ['12339a85-a25c-4f17-9f82-4766f13f5c4c']
+  - id: '3.7'
+    title: 'Loggning är aktiverad för Cosmos DB'
+    level: 1
+    automated: false
+    ig: 1
+    cisControls: ['8.2']
+    azurePolicy: []
+  - id: '4.1'
+    title: 'Data Factory krypteras med kundhanterade nycklar'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['4ec52d6d-beb7-40c4-9a9e-fe753254690e']
+  - id: '4.2'
+    title: 'Data Factory använder hanterade identiteter'
+    level: 1
+    automated: true
+    cisControls: []
+    azurePolicy: ['f78ccdb4-7bf4-4106-8647-270491d2978a']
+  - id: '4.3'
+    title: 'Data Factory lagrar inloggningsuppgifter och hemligheter i Azure Key Vault'
+    level: 2
+    automated: false
+    cisControls: []
+    azurePolicy: ['127ef6d7-242f-43b3-9eef-947faf1725d0']
+  - id: '4.4'
+    title: 'Data Factory använder RBAC för att tilldela behörigheter'
+    level: 2
+    automated: false
+    cisControls: []
+    azurePolicy: []
+  - id: '5.1'
+    title: 'MySQL krypterar lagrad data med kundhanterade nycklar'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: []
+  - id: '5.2'
+    title: 'MySQL använder bara Microsoft Entra-autentisering'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: ['40e85574-ef33-47e8-a854-7a65c7500560']
+  - id: '5.3'
+    title: 'Publik nätverksåtkomst är inaktiverad för MySQL'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['4.4']
+    azurePolicy: ['c9299215-ae47-4f50-9c54-8a392f68a052']
+  - id: '5.4'
+    title: 'Privata slutpunkter används för MySQL'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: []
+  - id: '5.5'
+    title: 'Granskningsloggen är aktiverad i MySQL flexible server (audit_log_enabled)'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['8.2']
+    azurePolicy: []
+  - id: '5.6'
+    title: 'Granskningsloggen fångar anslutningar i MySQL flexible server (audit_log_events)'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['8.2']
+    azurePolicy: []
+  - id: '5.7'
+    title: 'Felloggfilen är aktiverad i MySQL (error_server_log_file)'
+    level: 2
+    automated: false
+    ig: 1
+    cisControls: ['8.2']
+    azurePolicy: []
+  - id: '5.8'
+    title: 'MySQL kräver säker transport (require_secure_transport)'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: []
+  - id: '5.9'
+    title: 'MySQL flexible server kräver minst TLS 1.2 (tls_version)'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: []
+  - id: '6.1'
+    title: 'PostgreSQL krypterar lagrad data med kundhanterade nycklar'
+    level: 2
+    automated: false
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['12c74c95-0efd-48da-b8d9-2a7d68470c92']
+  - id: '6.2'
+    title: 'PostgreSQL använder bara Microsoft Entra-autentisering'
+    level: 1
+    automated: false
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: []
+  - id: '6.3'
+    title: 'Publik nätverksåtkomst är inaktiverad för PostgreSQL'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['4.4']
+    azurePolicy: ['5e1de0e3-42cb-4ebc-a86d-61d0c619ca48']
+  - id: '6.4'
+    title: 'Privata slutpunkter används för PostgreSQL'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['12.2']
+    azurePolicy: ['5375a5bb-22c6-46d7-8a43-83417cfb4460']
+  - id: '6.5'
+    title: 'Begränsning av anslutningsförsök är aktiverad i PostgreSQL (connection_throttle.enable)'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['8.2']
+    azurePolicy: ['dacf07fa-0eea-4486-80bc-b93fae88ac40']
+  - id: '6.6'
+    title: 'PostgreSQL sparar loggfiler i mer än tre dagar (logfiles.retention_days)'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['8.3']
+    azurePolicy: []
+  - id: '6.7'
+    title: 'PostgreSQL loggar kontrollpunkter (log_checkpoints)'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['8.2']
+    azurePolicy: ['70be9e12-c935-49ac-9bd8-fd64b85c1f87']
+  - id: '6.8'
+    title: 'PostgreSQL loggar frånkopplingar (log_disconnections)'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['8.2']
+    azurePolicy: ['1d14b021-1bae-4f93-b36b-69695e14984a']
+  - id: '6.9'
+    title: 'PostgreSQL loggar anslutningar (log_connections)'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['8.2']
+    azurePolicy: ['086709ac-11b5-478d-a893-9567a16d2ae3']
+  - id: '6.10'
+    title: 'PostgreSQL kräver säker transport (require_secure_transport)'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['c29c38cb-74a7-4505-9a06-e588ab86620a']
+  - id: '6.11'
+    title: 'PostgreSQL kräver minst TLS 1.2 (ssl_min_protocol_version)'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['a43d5475-c569-45ce-a268-28fa79f4e87a']
+  - id: '9.1'
+    title: 'Granskning (auditing) är aktiverad'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['8.5']
+    azurePolicy: ['a6fb4358-5bf4-4ad7-ba82-2cd2f41ce5e9']
+  - id: '9.2'
+    title: 'Publik nätverksåtkomst är inaktiverad'
+    level: 2
+    automated: true
+    ig: 1
+    cisControls: ['4.4']
+    azurePolicy: ['1b8ca024-1d5c-4dec-8995-b1a932b41780']
+  - id: '9.3'
+    title: 'Inga brandväggsregler för Azure SQL Database är för tillåtande'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['3.3']
+    azurePolicy: []
+  - id: '9.4'
+    title: 'TDE-skyddet för SQL Server krypteras med kundhanterad nyckel'
+    level: 2
+    automated: true
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: ['0a370ff3-6cab-4e85-8995-295fd854c5b8', 'ac01ad65-10e5-46df-bdd9-6b0cad13e1d2']
+  - id: '9.5'
+    title: 'Microsoft Entra-autentisering är konfigurerad för SQL-servrar'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['5.6']
+    azurePolicy: ['1f314764-cb73-4fc9-b863-8eca98ac36e9']
+  - id: '9.6'
+    title: 'Datakryptering är aktiverad för SQL-databaser'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.11']
+    azurePolicy: []
+  - id: '9.7'
+    title: 'Granskningsloggar sparas i mer än 90 dagar'
+    level: 1
+    automated: true
+    ig: 1
+    cisControls: ['8.3']
+    azurePolicy: ['89099bee-89e0-4b26-a5f4-165451757743']
+  - id: '9.8'
+    title: 'Minst TLS 1.2 krävs'
+    level: 1
+    automated: true
+    ig: 2
+    cisControls: ['3.10']
+    azurePolicy: ['32e6bbec-16b6-44c2-be37-c5b672d103cf']
